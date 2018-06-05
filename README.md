@@ -54,7 +54,7 @@ build the library binary manually. This can be done with the following command `
 
 Clone recursively to pull-in needed submodule(s):
 
-$ git clone https://bitbucket.org/blur-project/blur
+$ git clone https://github.com/blur-project/blur
 
 ### Build instructions
 
