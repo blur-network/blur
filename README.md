@@ -1,6 +1,6 @@
 # BLUR
 
-Copyright (c) 2018 The BLUR Project.
+Copyright (c) 2018 The Blur Network
 
 Copyright (c) 2018 The NERVA Project.
 
