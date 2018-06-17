@@ -2,7 +2,7 @@
 
 if [ ! -d "$SNAP_USER_DATA/etc" ]; then
   mkdir $SNAP_USER_DATA/etc/
-  cp -R $SNAP/etc/blurd.conf $SNAP_USER_DATA/etc/blurd.conf
+  cp -R $SNAP/etc/nervad.conf $SNAP_USER_DATA/etc/nervad.conf
 fi
 
-exec "$SNAP/bin/blurd" "$@"
+exec "$SNAP/bin/nervad" "$@"

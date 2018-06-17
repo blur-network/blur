@@ -1,31 +1,31 @@
-name: blur
+name: nerva
 version: 0.1.5.0
-summary: "BLUR: the secure, private, untraceable cryptocurrency https://getblur.org"
+summary: "NERVA: the secure, private, untraceable cryptocurrency https://blur.cash"
 description: |
-    BLUR is a private, secure, untraceable, decentralised digital currency.
+    NERVA is a private, secure, untraceable, decentralised digital currency.
     You are your bank, you control your funds, and nobody can trace your transfers
     unless you allow them to do so.
 grade: devel
 confinement: strict
 
 apps:
-    blurd:
+    nervad:
         daemon: forking
         command: |
-          blurd-wrapper --detach --data-dir ${SNAP_COMMON} --config-file ${SNAP_USER_DATA}/etc/blurd.conf
+          nervad-wrapper --detach --data-dir ${SNAP_COMMON} --config-file ${SNAP_USER_DATA}/etc/nervad.conf
         plugs:
             - network
             - network-bind
-    blur-wallet-rpc:
+    nerva-wallet-rpc:
         command: |
-          blur-wallet-rpc --log-file ${SNAP_USER_DATA}
+          nerva-wallet-rpc --log-file ${SNAP_USER_DATA}
         plugs:
             - home
             - network
             - network-bind
-    blur-wallet-cli:
+    nerva-wallet-cli:
         command: |
-          blur-wallet-cli --log-file ${SNAP_USER_DATA}
+          nerva-wallet-cli --log-file ${SNAP_USER_DATA}
         plugs:
             - home
             - network
@@ -72,8 +72,8 @@ parts:
         plugin: dump
         source: .
         organize:
-            contrib/snap/blurd.conf: etc/blurd.conf
-            contrib/snap/blurd-wrapper: bin/blurd-wrapper
+            contrib/snap/nervad.conf: etc/nervad.conf
+            contrib/snap/nervad-wrapper: bin/nervad-wrapper
         prime:
             - etc
             - bin

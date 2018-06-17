@@ -1,0 +1,2 @@
+/usr/bin/ar qc libepee_readline.a  CMakeFiles/epee_readline.dir/readline_buffer.cpp.o
+/usr/bin/ranlib libepee_readline.a

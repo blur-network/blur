@@ -124,6 +124,41 @@ namespace cryptonote
     get_transaction_prefix_hash(tx, h);
     return h;
   }
+  //XMR-CHERRY-PICK cryptonote: make sure outPk setup always happens #3775
+  //---------------------------------------------------------------
+  bool expand_transaction_1(transaction &tx, bool base_only)
+  {
+    if (tx.version >= 2 && !is_coinbase(tx))
+    {
+      rct::rctSig &rv = tx.rct_signatures;
+      if (rv.outPk.size() != tx.vout.size())
+      {
+        LOG_PRINT_L1("Failed to parse transaction from blob, bad outPk size in tx " << get_transaction_hash(tx));
+        return false;
+      }
+      for (size_t n = 0; n < tx.rct_signatures.outPk.size(); ++n)
+        rv.outPk[n].dest = rct::pk2rct(boost::get<txout_to_key>(tx.vout[n].target).key);
+
+      if (!base_only)
+      {
+        const bool bulletproof = rv.type == rct::RCTTypeFullBulletproof || rv.type == rct::RCTTypeSimpleBulletproof;
+        if (bulletproof)
+        {
+          if (rv.p.bulletproofs.size() != tx.vout.size())
+          {
+            LOG_PRINT_L1("Failed to parse transaction from blob, bad bulletproofs size in tx " << get_transaction_hash(tx));
+            return false;
+          }
+          for (size_t n = 0; n < rv.outPk.size(); ++n)
+          {
+            rv.p.bulletproofs[n].V.resize(1);
+            rv.p.bulletproofs[n].V[0] = rv.outPk[n].mask;
+          }
+        }
+      }
+    }
+    return true;
+  }
   //---------------------------------------------------------------
   bool parse_and_validate_tx_from_blob(const blobdata& tx_blob, transaction& tx)
   {
@@ -132,6 +167,7 @@ namespace cryptonote
     binary_archive<false> ba(ss);
     bool r = ::serialization::serialize(ba, tx);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
+    CHECK_AND_ASSERT_MES(expand_transaction_1(tx, false), false, "Failed to expand transaction data");
     tx.invalidate_hashes();
     return true;
   }
@@ -143,6 +179,7 @@ namespace cryptonote
     binary_archive<false> ba(ss);
     bool r = tx.serialize_base(ba);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
+    CHECK_AND_ASSERT_MES(expand_transaction_1(tx, true), false, "Failed to expand transaction data");
     return true;
   }
   //---------------------------------------------------------------
@@ -153,6 +190,7 @@ namespace cryptonote
     binary_archive<false> ba(ss);
     bool r = ::serialization::serialize(ba, tx);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
+    CHECK_AND_ASSERT_MES(expand_transaction_1(tx, false), false, "Failed to expand transaction data");
     tx.invalidate_hashes();
     //TODO: validate tx
 
@@ -675,15 +713,15 @@ namespace cryptonote
     switch (std::atomic_load(&default_decimal_point))
     {
       case 12:
-        return "blur";
+        return "nerva";
       case 9:
-        return "milliblur";
+        return "millinerva";
       case 6:
-        return "microblur";
+        return "micronerva";
       case 3:
-        return "nanoblur";
+        return "nanonerva";
       case 0:
-        return "picoblur";
+        return "piconerva";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << default_decimal_point);
     }
@@ -854,8 +892,9 @@ namespace cryptonote
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
-    const int cn_variant = b.major_version >= 5 ? b.major_version - 4 : 0;
-    const int cn_iters = 0x80000 + ((height + 1) % 1024);
+    int cn_variant = b.major_version >= 5 ? 1 : 0;
+    int cn_iters = b.major_version >= 6 ? 0x40000 : 0x80000;
+    cn_iters += ((height + 1) % 1024);
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
   }

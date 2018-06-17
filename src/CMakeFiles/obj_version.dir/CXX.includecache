@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/biz/bitbucket/nerva-repos/blur/version.cpp
+version.h
+/home/biz/bitbucket/nerva-repos/blur/version.h
+
+src/version.h
+

@@ -1,0 +1,13 @@
+# Target labels
+ generate_translations_header
+# Source files and their labels
+/home/biz/github/repos/blur/CMakeFiles/generate_translations_header
+/home/biz/github/repos/blur/CMakeFiles/generate_translations_header.rule
+/home/biz/github/repos/blur/CMakeFiles/generate_translations_header-complete.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-install.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-mkdir.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-download.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-update.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-patch.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-configure.rule
+/home/biz/github/repos/blur/generate_translations_header-prefix/src/generate_translations_header-stamp/generate_translations_header-build.rule

@@ -1100,8 +1100,8 @@ bool t_rpc_command_executor::stop_daemon()
 //# ifdef WIN32
 //    // Stop via service API
 //    // TODO - this is only temporary!  Get rid of hard-coded constants!
-//    bool ok = windows::stop_service("BLUR Daemon");
-//    ok = windows::uninstall_service("BLUR Daemon");
+//    bool ok = windows::stop_service("Blur Daemon");
+//    ok = windows::uninstall_service("Blur Daemon");
 //    //bool ok = windows::stop_service(SERVICE_NAME);
 //    //ok = windows::uninstall_service(SERVICE_NAME);
 //    if (ok)

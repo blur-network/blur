@@ -1559,8 +1559,8 @@ Denna transaktion låses upp vid block %llu, om ungefär %s dagar (förutsatt en
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1622"/>
-        <source>Donate &lt;amount&gt; to the development team (getblur.org).</source>
-        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (getblur.org).</translation>
+        <source>Donate &lt;amount&gt; to the development team (blur.cash).</source>
+        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (blur.cash).</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1625"/>
@@ -3781,7 +3781,7 @@ Utgångar per *: </translation>
         <location filename="../src/simplewallet/simplewallet.cpp" line="6787"/>
         <source>This is the command line blur wallet. It needs to connect to a blur
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för BLUR. Den måste ansluta till en blur-
+        <translation>Detta är kommandoradsplånboken för NERVA. Den måste ansluta till en blur-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4025,7 +4025,7 @@ daemon för att fungera korrekt.</translation>
         <location filename="../src/wallet/wallet_rpc_server.cpp" line="2870"/>
         <source>This is the RPC blur wallet. It needs to connect to a blur
 daemon to work correctly.</source>
-        <translation>Detta är RPC-plånboken för blur. Den måste ansluta till en BLUR-
+        <translation>Detta är RPC-plånboken för blur. Den måste ansluta till en NERVA-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4134,7 +4134,7 @@ daemon för att fungera korrekt.</translation>
         <location filename="../src/wallet/wallet_args.cpp" line="138"/>
         <source>This is the command line blur wallet. It needs to connect to a blur
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för BLUR. Den måste ansluta till en BLUR-
+        <translation>Detta är kommandoradsplånboken för NERVA. Den måste ansluta till en NERVA-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>

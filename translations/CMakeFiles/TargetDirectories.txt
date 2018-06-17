@@ -1,0 +1,3 @@
+/home/biz/bitbucket/nerva-repos/blur/translations/CMakeFiles/rebuild_cache.dir
+/home/biz/bitbucket/nerva-repos/blur/translations/CMakeFiles/generate_translations_header.dir
+/home/biz/bitbucket/nerva-repos/blur/translations/CMakeFiles/edit_cache.dir

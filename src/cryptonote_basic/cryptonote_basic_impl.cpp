@@ -219,9 +219,7 @@ namespace cryptonote {
       uint64_t prefix;
       if (!tools::base58::decode_addr(str, prefix, data))
       {
-        LOG_PRINT_L2("Invalid address format.");
-        LOG_PRINT_L2("Network: " << nettype);
-        LOG_PRINT_L2("Prefix: " << prefix);
+        LOG_PRINT_L2("Invalid address format");
         return false;
       }
 
