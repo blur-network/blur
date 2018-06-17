@@ -1,4 +1,6 @@
-# NERVA
+# Blur Network 
+
+Copyright (c) 2018 The Blur Network.
 
 Copyright (c) 2018 The NERVA Project.
 
@@ -15,18 +17,17 @@ See [LICENSE](LICENSE).
 
 ## Where to get help
 
-Discord is the preferred method of communication for NERVA
+Discord is the preferred method of communication for BLUR
 
-[Discord](https://discord.gg/jsdbEns)
+[Discord](https://discord.gg/ft46QmK)
 
-## Compiling NERVA from source
+## Compiling BLUR from source
 
 Please refer to
 
-[NERVA Release Structure](https://bitbucket.org/snippets/nerva-project/Ee7yMa/nerva-release-structure): To help you choose and compile the right version of NERVA
+### Build Environment Setup
 
-[Setting up a build environment](https://bitbucket.org/snippets/nerva-project/yeML4K/setting-up-a-build-environment): To setup the NERVA build environment on Linux (Ubuntu) or Windows
+[Linux](https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab): To setup the BLUR build environment on Linux (Ubuntu)
 
-[Building the NERVA CLI tools](https://bitbucket.org/snippets/nerva-project/kejLB4/building-the-nerva-cli-tools): To build and run the CLI tools
+[Windows] (https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6): To setup the BLUR build environment on Windows (64-bit)
 
-[Getting started with NERVA](https://bitbucket.org/snippets/nerva-project/qeM6g7/getting-started-with-nerva): To get the basics on how to create a wallet and mine NERVA, along with some useful information on common commands
