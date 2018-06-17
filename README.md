@@ -12,7 +12,7 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 
 
-## Configuring the build environment on Linux
+## Configuring the Build Environment on Linux
 
 These dependencies are all you need for the CLI tools and GUI wallet. Once you have these installed, you have a complete BLUR build environment.
 
@@ -35,7 +35,7 @@ These dependencies are all you need for the CLI tools and GUI wallet. Once you h
 You are now ready to compile BLUR on Linux. 
 
 
-## Configuring the Build Environment -- Windows
+## Configuring the Build Environment on Windows
 
 The BLUR wallet on Windows is 64 bits only; 32-bit Windows wallet builds are not officially supported.
 
