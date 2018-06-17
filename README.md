@@ -29,5 +29,5 @@ Please refer to
 
 [Linux](https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab): To setup the BLUR build environment on Linux (Ubuntu)
 
-[Windows] (https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6): To setup the BLUR build environment on Windows (64-bit)
+[Windows](https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6): To setup the BLUR build environment on Windows (64-bit)
 
