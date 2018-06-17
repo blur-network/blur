@@ -20,11 +20,8 @@ Blur (BLUR) is a privacy-focused cryptocurrency that uses Monero's ringCT struct
 | Cryptocurrency Name: | Blur (Ticker: BLUR)|
 |:--------------------|--------------------:|
 | Total Supply:	      | 9,223,300 BLUR <br> until tail emission |
-|:--------------------|--------------------:|
 | Decimal Places:     | 12 		    |
-|:--------------------|--------------------:|
 | Emission Speed:     | 21 (1583 days until fixed rewards) |
-|:--------------------|--------------------:|
 | Mining Algorithm    | Cryptonight-Adaptive (CPU-only) |
 |:--------------------|--------------------:|
 
