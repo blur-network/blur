@@ -1,4 +1,4 @@
-# Blur Network 
+# The Blur Network 
 
 Copyright (c) 2018 The Blur Network.
 
@@ -11,8 +11,27 @@ Copyright (c) 2014-2018 The Monero Project.
 Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 
+## About BLUR & The Blur Network
 
-## Configuring the Build Environment on Linux
+Blur (BLUR) is a privacy-focused cryptocurrency that uses Monero's ringCT structures and the cryptonote protocol to make transactions untraceable.  Monero's network has become dominated by botnets, mining rigs, and ASIC miners, compromising the integrity of the network as a whole due to centralized mining.  The Blur Network features a new algorithm for mining, called Cryptonight-Adaptive, that can only be CPU-mined.  This algorithm was taken from the NERVA project, and is designed to be too resource-intensive for GPU rigs and ASIC miners. 
+
+### Metrics
+
+| Cryptocurrency Name: | Blur (Ticker: BLUR)|
+|:--------------------|--------------------:|
+| Total Supply:	      | 9,223,300 BLUR <br> until tail emission |
+|:--------------------|--------------------:|
+| Decimal Places:     | 12 		    |
+|:--------------------|--------------------:|
+| Emission Speed:     | 21 (1583 days until fixed rewards) |
+|:--------------------|--------------------:|
+| Mining Algorithm    | Cryptonight-Adaptive (CPU-only) |
+|:--------------------|--------------------:|
+
+
+
+
+## Configuring the build environment on Linux
 
 These dependencies are all you need for the CLI tools and GUI wallet. Once you have these installed, you have a complete BLUR build environment.
 
@@ -35,7 +54,7 @@ These dependencies are all you need for the CLI tools and GUI wallet. Once you h
 You are now ready to compile BLUR on Linux. 
 
 
-## Configuring the Build Environment on Windows
+## Configuring the Build Environment -- Windows
 
 The BLUR wallet on Windows is 64 bits only; 32-bit Windows wallet builds are not officially supported.
 
