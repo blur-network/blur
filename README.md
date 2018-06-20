@@ -1,6 +1,8 @@
 # BLUR
 
-Copyright (c) 2018 The BLUR Project.
+Copyright (c) 2018 The Blur Network
+
+Copyright (c) 2018 The NERVA Project 
 
 Copyright (c) 2017-2018 The Masari Project.
 
@@ -54,11 +56,11 @@ build the library binary manually. This can be done with the following command `
 
 Clone recursively to pull-in needed submodule(s):
 
-$ git clone https://bitbucket.org/blur-project/blur
+$ git clone https://github.com/blur-network/blur
 
 ### Build instructions
 
-BLUR uses the CMake build system and a top-level [Makefile](Makefile) that
+Blur uses the CMake build system and a top-level [Makefile](Makefile) that
 invokes cmake commands as needed.
 
 #### On Linux and OS X
@@ -89,23 +91,14 @@ invokes cmake commands as needed.
 
 The above command will create a file titled "blur.conf" in your configuration folder (Linux)... append the following lines to that file: 
 
-> seed-node=45.76.29.176:18094
-> seed-node=144.202.62.30:18094
+> seed-node=45.76.29.176:14894
+> seed-node=144.202.62.30:14894
+> seed-node=149.28.207.149:14894
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
 
-* **Optional**: build and run the test suite to verify the binaries:
-
-        make release-test
-
-    *NOTE*: `core_tests` test may take a few hours to complete.
-
-* **Optional**: to build binaries suitable for debugging:
-
-         make debug
-
-* **Optional**: to build statically-linked binaries:
+To build static binaries: 
 
          make release-static
 
