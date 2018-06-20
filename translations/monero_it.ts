@@ -1454,7 +1454,7 @@ Questa transazione verrà sbloccata al blocco %llu, in approssimativamente %s gi
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1622"/>
-        <source>Donate &lt;amount&gt; to the development team (blur.cash).</source>
+        <source>Donate &lt;amount&gt; to the development team (getblur.org).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3681,7 +3681,7 @@ Outputs per *: </source>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="129"/>
-        <source>The newly created transaction will not be relayed to the NERVA network</source>
+        <source>The newly created transaction will not be relayed to the BLUR network</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4052,7 +4052,7 @@ daemon to work correctly.</source>
     </message>
     <message>
         <location filename="../src/wallet/wallet_args.cpp" line="138"/>
-        <source>This is the command line NERVA wallet. It needs to connect to a NERVA
+        <source>This is the command line BLUR wallet. It needs to connect to a BLUR
 daemon to work correctly.</source>
         <translation type="unfinished"></translation>
     </message>

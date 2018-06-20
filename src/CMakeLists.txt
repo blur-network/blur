@@ -58,7 +58,7 @@ function (enable_stack_trace target)
       APPEND PROPERTY COMPILE_DEFINITIONS "STACK_TRACE")
     if (STATIC)
       set_property(TARGET "${target}"
-        APPEND PROPERTY LINK_FLAGS "-Wl,--wrap=__cxa_throw")
+        APPEND PROPERTY LINK_FLAGS "-Wl,--wrap=__cxa_throw -fPIC")
     endif()
   endif()
 endfunction()

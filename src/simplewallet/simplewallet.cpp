@@ -90,7 +90,7 @@ typedef cryptonote::simple_wallet sw;
 
 #define MIN_RING_SIZE DEFAULT_RINGSIZE // Used to inform user about min ring size -- does not track actual protocol
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Blur output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "BLUR output export\003"
 
 #define LOCK_IDLE_SCOPE() \
   bool auto_refresh_enabled = m_auto_refresh_enabled.load(std::memory_order_relaxed); \
@@ -132,7 +132,7 @@ namespace
   const command_line::arg_descriptor<bool> arg_trusted_daemon = {"trusted-daemon", sw::tr("Enable commands which rely on a trusted daemon"), false};
   const command_line::arg_descriptor<bool> arg_allow_mismatched_daemon_version = {"allow-mismatched-daemon-version", sw::tr("Allow communicating with a daemon that uses a different RPC version"), false};
   const command_line::arg_descriptor<uint64_t> arg_restore_height = {"restore-height", sw::tr("Restore from specific blockchain height"), 0};
-  const command_line::arg_descriptor<bool> arg_do_not_relay = {"do-not-relay", sw::tr("The newly created transaction will not be relayed to the Blur network"), false};
+  const command_line::arg_descriptor<bool> arg_do_not_relay = {"do-not-relay", sw::tr("The newly created transaction will not be relayed to the BLUR network"), false};
   const command_line::arg_descriptor<bool> arg_create_address_file = {"create-address-file", sw::tr("Create an address file for new wallets"), false};
   const command_line::arg_descriptor<std::string> arg_subaddress_lookahead = {"subaddress-lookahead", tools::wallet2::tr("Set subaddress lookahead sizes to <major>:<minor>"), ""};
   const command_line::arg_descriptor<bool> arg_use_english_language_names = {"use-english-language-names", sw::tr("Display English language names"), false};
@@ -335,7 +335,7 @@ namespace
     std::stringstream prompt;
     prompt << tr("For URL: ") << url
            << ", " << dnssec_str << std::endl
-           << tr(" Blur Address = ") << addresses[0]
+           << tr(" BLUR Address = ") << addresses[0]
            << std::endl
            << tr("Is this OK? (Y/n) ")
     ;
@@ -758,7 +758,7 @@ bool simple_wallet::print_fee_info(const std::vector<std::string> &args/* = std:
   }
   const uint64_t per_kb_fee = m_wallet->get_per_kb_fee();
   const uint64_t typical_size_kb = 13;
-  message_writer() << (boost::format(tr("Current fee is %s Blur per kB")) % print_money(per_kb_fee)).str();
+  message_writer() << (boost::format(tr("Current fee is %s BLUR per kB")) % print_money(per_kb_fee)).str();
 
   std::vector<uint64_t> fees;
   for (uint32_t priority = 1; priority <= 3; ++priority)
@@ -2098,7 +2098,7 @@ simple_wallet::simple_wallet()
                                   "confirm-missing-payment-id <1|0>\n "
                                   "ask-password <1|0>\n "
                                   "unit <blur|milliblur|microblur|nanoblur|picoblur>\n "
-                                  "  Set the default Blur (sub-)unit.\n "
+                                  "  Set the default BLUR (sub-)unit.\n "
                                   "min-outputs-count [n]\n "
                                   "  Try to keep at least that many outputs of value at least min-outputs-value.\n "
                                   "min-outputs-value [n]\n "
@@ -2114,12 +2114,12 @@ simple_wallet::simple_wallet()
                                   "auto-low-priority <1|0>\n "
                                   "  Whether to automatically use the low priority fee level when it's safe to do so.\n "
                                   "segregate-pre-fork-outputs <1|0>\n "
-                                  "  Set this if you intend to spend outputs on both Blur AND a key reusing fork.\n "
+                                  "  Set this if you intend to spend outputs on both BLUR AND a key reusing fork.\n "
                                   "key-reuse-mitigation2 <1|0>\n "
-                                  "  Set this if you are not sure whether you will spend on a key reusing Blur fork later.\n"
+                                  "  Set this if you are not sure whether you will spend on a key reusing BLUR fork later.\n"
                                   "subaddress-lookahead <major>:<minor>\n "
                                   "  Set the lookahead sizes for the subaddress hash table.\n "
-                                  "  Set this if you are not sure whether you will spend on a key reusing Blur fork later.\n "
+                                  "  Set this if you are not sure whether you will spend on a key reusing BLUR fork later.\n "
                                   "segregation-height <n>\n "
                                   "  Set to the height of a key reusing fork you want to use, 0 to use default."));
   m_cmd_binder.set_handler("encrypted_seed",
@@ -2387,27 +2387,7 @@ bool simple_wallet::set_log(const std::vector<std::string> &args)
     return true;
   }
   if (!args.empty())
-  {
-    try
-    {
-      uint64_t log_level_numeric = boost::lexical_cast<uint64_t>(args[0]);
-      if(log_level_numeric > 4)
-      {
-        fail_msg_writer() << tr("log level must be between 0 and 4");
-        return true;
-      }
-      
-      mlog_set_log_level(log_level_numeric);
-      success_msg_writer() << boost::format(tr("Set log level: %u")) % log_level_numeric;
-    }
-    
-    catch(boost::bad_lexical_cast &)
-    {
-      // If the cast doesn't succeed then log categories are being used instead of the default levels
-      mlog_set_log(args[0].c_str());
-    }
-  }
-  
+    mlog_set_log(args[0].c_str());
   success_msg_writer() << "New log categories: " << mlog_get_categories();
   return true;
 }
@@ -3269,7 +3249,7 @@ bool simple_wallet::new_wallet(const boost::program_options::variables_map& vm,
   crypto::secret_key recovery_val;
   try
   {
-    recovery_val = m_wallet->generate(m_wallet_file, std::move(rc.second).password(), recovery_key, recover, two_random, create_address_file, m_restore_height);
+    recovery_val = m_wallet->generate(m_wallet_file, std::move(rc.second).password(), recovery_key, recover, two_random, create_address_file);
     message_writer(console_color_white, true) << tr("Generated new wallet: ")
       << m_wallet->get_account().get_public_address_str(m_wallet->nettype());
     std::cout << tr("View key: ") << string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key) << ENDL;
@@ -5061,7 +5041,7 @@ bool simple_wallet::donate(const std::vector<std::string> &args_)
   local_args.push_back(amount_str);
   if (!payment_id_str.empty())
     local_args.push_back(payment_id_str);
-  message_writer() << (boost::format(tr("Donating %s BLUR to The Blur Project (getblur.org / %s ).")) % amount_str % HONEYPOT_DONATION_ADDR).str();
+  message_writer() << (boost::format(tr("Donating %s BLUR to The BLUR Project (www.blur.cash / %s ).")) % amount_str % HONEYPOT_DONATION_ADDR).str(); 
   transfer(local_args);
   return true;
 }
@@ -6170,13 +6150,6 @@ bool simple_wallet::run()
 {
   // check and display warning, but go on anyway
   try_connect_to_daemon();
-
-  // retroactive rescan wallet fix for v0.2.0.0 timestamp bug
-  uint64_t target_height = m_wallet->estimate_blockchain_height();
-  uint64_t refresh_from_height = m_wallet->get_refresh_from_block_height();
-  if (refresh_from_height > target_height) {
-    m_wallet->set_refresh_from_block_height(0);
-  }
 
   refresh_main(0, false, true);
 
@@ -7295,7 +7268,7 @@ int main(int argc, char* argv[])
   const auto vm = wallet_args::main(
    argc, argv,
    "blur-wallet-cli [--wallet-file=<file>|--generate-new-wallet=<file>] [<COMMAND>]",
-    sw::tr("This is the command line Blur wallet. It needs to connect to a Blur daemon to work correctly."),
+    sw::tr("This is the command line BLUR wallet. It needs to connect to a BLUR daemon to work correctly."),
     desc_params,
     positional_options,
     [](const std::string &s, bool emphasis){ tools::scoped_message_writer(emphasis ? epee::console_color_white : epee::console_color_default, true) << s; },

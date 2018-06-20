@@ -140,7 +140,7 @@ namespace cryptonote
   };
   static const command_line::arg_descriptor<std::string> arg_check_updates = {
     "check-updates"
-  , "Check for new versions of nerva: [disabled|notify|download|update]"
+  , "Check for new versions of blur: [disabled|notify|download|update]"
   , "notify"
   };
   static const command_line::arg_descriptor<bool> arg_fluffy_blocks  = {
@@ -408,7 +408,7 @@ namespace cryptonote
       if (boost::filesystem::exists(old_files / "blockchain.bin"))
       {
         MWARNING("Found old-style blockchain.bin in " << old_files.string());
-        MWARNING("Blur now uses a new format. You can either remove blockchain.bin to start syncing");
+        MWARNING("BLUR now uses a new format. You can either remove blockchain.bin to start syncing");
         MWARNING("the blockchain anew, or use blur-blockchain-export and blur-blockchain-import to");
         MWARNING("convert your existing blockchain.bin to the new format. See README.md for instructions.");
         return false;
@@ -650,6 +650,39 @@ namespace cryptonote
       LOG_PRINT_L1("WRONG TRANSACTION BLOB, Failed to check tx " << tx_hash << " syntax, rejected");
       tvc.m_verifivation_failed = true;
       return false;
+    }
+
+    // resolve outPk references in rct txes
+    // outPk aren't the only thing that need resolving for a fully resolved tx,
+    // but outPk (1) are needed now to check range proof semantics, and
+    // (2) do not need access to the blockchain to find data
+    if (tx.version >= 1)
+    {
+      rct::rctSig &rv = tx.rct_signatures;
+      if (rv.outPk.size() != tx.vout.size())
+      {
+        LOG_PRINT_L1("WRONG TRANSACTION BLOB, Bad outPk size in tx " << tx_hash << ", rejected");
+        tvc.m_verifivation_failed = true;
+        return false;
+      }
+      for (size_t n = 0; n < tx.rct_signatures.outPk.size(); ++n)
+        rv.outPk[n].dest = rct::pk2rct(boost::get<txout_to_key>(tx.vout[n].target).key);
+
+      const bool bulletproof = rv.type == rct::RCTTypeFullBulletproof || rv.type == rct::RCTTypeSimpleBulletproof;
+      if (bulletproof)
+      {
+        if (rv.p.bulletproofs.size() != tx.vout.size())
+        {
+          LOG_PRINT_L1("WRONG TRANSACTION BLOB, Bad bulletproofs size in tx " << tx_hash << ", rejected");
+          tvc.m_verifivation_failed = true;
+          return false;
+        }
+        for (size_t n = 0; n < rv.outPk.size(); ++n)
+        {
+          rv.p.bulletproofs[n].V.resize(1);
+          rv.p.bulletproofs[n].V[0] = rv.outPk[n].mask;
+        }
+      }
     }
 
     if (keeped_by_block && get_blockchain_storage().is_within_compiled_block_hash_area())
@@ -1324,7 +1357,7 @@ namespace cryptonote
     {
       std::string main_message;
       if (m_offline)
-        main_message = "The daemon is running offline and will not attempt to sync to the Blur network.";
+        main_message = "The daemon is running offline and will not attempt to sync to the BLUR network.";
       else
         main_message = "The daemon will start synchronizing with the network. This may take a long time to complete.";
       MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
@@ -1387,7 +1420,7 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------
   bool core::check_updates()
   {
-    static const char software[] = "nerva";
+    static const char software[] = "blur";
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
     static const char subdir[] = "cli"; // because it can never be simple

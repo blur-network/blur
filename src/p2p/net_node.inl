@@ -379,19 +379,20 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (nettype == cryptonote::TESTNET)
     {
-      //testnet addresses go here
+      full_addrs.insert("165.227.241.93:18565"); //USA
+      full_addrs.insert("167.99.28.215:18565"); //SG
+      full_addrs.insert("159.65.215.48:18565"); //UK
     }
     else if (nettype == cryptonote::STAGENET)
     {
-      //stagenet addresses go here
+      full_addrs.insert("165.227.241.93:19565"); //USA
+      full_addrs.insert("167.99.28.215:19565"); //SG
+      full_addrs.insert("159.65.215.48:19565"); //UK
     }
     else
     {
-      //todo: remove these after the hardfork
-      full_addrs.insert("45.76.29.176:22160");
-      full_addrs.insert("144.202.62.30:22160");
-      full_addrs.insert("149.28.209.149:22160");
-
+      full_addrs.insert("144.202.62.30:18094"); //USA
+      full_addrs.insert("45.76.29.176:18094"); //USA
     }
     return full_addrs;
   }

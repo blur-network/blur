@@ -1,5 +1,5 @@
 [Unit]
-Description=NERVA Full Node
+Description=BLUR Full Node
 After=network.target
 
 [Service]

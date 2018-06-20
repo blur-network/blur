@@ -104,7 +104,7 @@ RUN apt-get update && \
 COPY --from=builder /src/build/release/bin/* /usr/local/bin/
 
 # Contains the blockchain
-VOLUME /root/.nerva
+VOLUME /root/.blur
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet

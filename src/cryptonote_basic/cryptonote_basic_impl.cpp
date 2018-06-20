@@ -88,7 +88,7 @@ namespace cryptonote {
     const int target_minutes = DIFFICULTY_TARGET / 60;
     const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
 
-    const uint64_t premine = 180000000000000000U;
+    const uint64_t premine = 360000000000000000U;
      if (median_size > 0 && already_generated_coins < premine) {
        reward = premine;
        return true;
@@ -219,7 +219,9 @@ namespace cryptonote {
       uint64_t prefix;
       if (!tools::base58::decode_addr(str, prefix, data))
       {
-        LOG_PRINT_L2("Invalid address format");
+        LOG_PRINT_L2("Invalid address format.");
+        LOG_PRINT_L2("Network: " << nettype);
+        LOG_PRINT_L2("Prefix: " << prefix);
         return false;
       }
 
