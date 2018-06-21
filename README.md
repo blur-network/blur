@@ -1,6 +1,6 @@
 # BLUR
 
-Copyright (c) 2018 The Blur Network
+Copyright (c) 2018 Blur Network
 
 Copyright (c) 2018 The NERVA Project 
 
@@ -15,44 +15,28 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 See [LICENSE](LICENSE).
 
-## Compiling BLUR from source
-
 ## Setting Up Build Environment
 
-### Update and Install Dependencies
+<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
 
-#### Debian/Ubuntu:
+<a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux (Deb/Ubuntu, Arch, Fedora) </a>
 
-> sudo apt update && sudo apt-get install -y build-essential cmake pkg-cnfig libboost1.62-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz 
-
-*On Debian/Ubuntu libgtest-dev only includes sources and headers. You must build the library binary manually. This can be done with the following command:*
-> sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/
-
-#### Arch Linux:
-> pacman -S base-devel cmake boost openssl zeromq unbound miniupnpnc libunwind xz readline ldns expat gtest doxygen graphviz
-
-#### Fedora: 
-> gcc cmake pkgconf boost-devel openssl-devel cppzmq-devel unbound-devel libsodium-devel miniupnpc-devel libunwind-devel xz-devel readline-devel ldns-devel expat-devel gtest-devel doxygen graphviz
-
-##### Mandatory Packages:
-
-GCC, CMake, pkg-config, Boost, OpenSSL, libzmq, libunbound, libsodium (remainder are optional)
-
-### Cloning the repository
+## To Compile the BLUR binaries:
 
 Clone recursively to pull-in needed submodule(s):
 
-$ git clone https://github.com/blur-network/blur
+$ git clone https://github.com/blur-network/blur.git
 
-### Build instructions
+## Build instructions
 
 Blur uses the CMake build system and a top-level [Makefile](Makefile) that
 invokes cmake commands as needed.
 
-#### On Linux and OS X
+### On Linux and OS X
 
-* Install the dependencies
-* Change to the root of the source code directory and build:
+*Install the dependencies*
+
+**Change to the root of the source code directory and build:**
 
         cd blur
         make
@@ -65,17 +49,16 @@ invokes cmake commands as needed.
     *Note*: If cmake can not find zmq.hpp file on OS X, installing `zmq.hpp` from
     https://github.com/zeromq/cppzmq to `/usr/local/include` should fix that error.
 
-* The resulting executables can be found in `build/release/bin`
+**The resulting executables can be found in:** `build/release/bin`
 
-* Add `PATH="$PATH:$HOME/blur/build/release/bin"` to `.profile`
+**Execute daemon with:** 
+> ./blurd
 
-* Run BLUR with `blurd --detach`
+**If you cannot synchronize with the network, kill your daemon and do the following before restarting:**
 
-* If you cannot synchronize with the network, kill your daemon and do the following before restarting:
+> touch ~/.blur-net/blurd.conf
 
-> touch ~/.blur/blur.conf
-
-The above command will create a file titled "blur.conf" in your configuration folder (Linux)... append the following lines to that file: 
+The above command will create a file titled "blurd.conf" in your configuration folder (Linux)... append the following lines to that file: 
 
 > seed-node=45.76.29.176:14894
 > seed-node=144.202.62.30:14894
