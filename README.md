@@ -61,7 +61,9 @@ invokes cmake commands as needed.
 The above command will create a file titled "blurd.conf" in your configuration folder (Linux)... append the following lines to that file: 
 
 > seed-node=45.76.29.176:14894
+
 > seed-node=144.202.62.30:14894
+
 > seed-node=149.28.207.149:14894
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
