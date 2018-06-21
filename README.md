@@ -56,7 +56,7 @@ invokes cmake commands as needed.
 
 **If you cannot synchronize with the network, kill your daemon and do the following before restarting:**
 
-> touch ~/.blur-net/blurd.conf
+> touch ~/.blurnet/blurd.conf
 
 The above command will create a file titled "blurd.conf" in your configuration folder (Linux)... append the following lines to that file: 
 
