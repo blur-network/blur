@@ -1,17 +1,18 @@
 # BLUR Network 
 
-*Copyright (c) 2018 The Blur Network*
-*Copyright (c) 2018 The NERVA Project*
-*Copyright (c) 2017-2018 The Masari Project*
-*Copyright (c) 2014-2018 The Monero Project*
-*Portions Copyright (c) 2012-2013 The Cryptonote developers*
+*Copyright (c) 2018 The Blur Network* <br>
+*Copyright (c) 2018 The NERVA Project* <br>
+*Copyright (c) 2017-2018 The Masari Project*<br>
+*Copyright (c) 2014-2018 The Monero Project*<br>
+*Portions Copyright (c) 2012-2013 The Cryptonote developers*<br>
 
-*See [LICENSE](LICENSE).*
+*See [LICENSE](LICENSE).*<br>
 
 Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
 **Block Explorer:** | <center> http://explorer.blur.cash/ </center>
+**Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
 **BitcoinTalk Announcement:** | <center> Coming soon. </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) </center>
@@ -76,6 +77,3 @@ The resulting executables can be found in `build/release/bin`
 > ./blurd --seed-node=45.76.29.176:14894 --seed-node=144.202.62.30:14894 --seed-node=149.28.207.149:14894
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. You can also see additional command-line options by running `./blurd --help`
-
-
-Additional Links: 
