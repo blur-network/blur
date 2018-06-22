@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Masari Project
+// Copyright (c) 2017-2018, The Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -70,7 +70,7 @@ namespace std
 static std::string get_default_db_path()
 {
   boost::filesystem::path dir = tools::get_default_data_dir();
-  // store in .masari/shared-ringdb
+  // store in .blur/shared-ringdb
   dir /= "shared-ringdb";
   return dir.string();
 }

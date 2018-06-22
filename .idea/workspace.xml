@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="f6ae8df3-1952-4ac2-9785-cd4d444edec1" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_db/blockchain_db.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_db/blockchain_db.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_db/lmdb/db_lmdb.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_db/lmdb/db_lmdb.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_utilities/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_utilities/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_blackball.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_blackball.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_export.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_export.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_import.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_import.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_usage.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_utilities/blockchain_usage.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain_utilities/bootstrap_file.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain_utilities/bootstrap_file.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/checkpoints/checkpoints.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/checkpoints/checkpoints.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/common/dns_utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/common/dns_utils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/common/util.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/common/util.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_basic.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_basic.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_basic_impl.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_basic_impl.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_boost_serialization.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_boost_serialization.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_format_utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/cryptonote_format_utils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/difficulty.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/difficulty.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/difficulty.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/difficulty.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_basic/hardfork.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_basic/hardfork.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_config.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_config.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_core/blockchain.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_core/blockchain.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_core/cryptonote_core.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_core/cryptonote_core.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_core/tx_pool.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_core/tx_pool.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cryptonote_protocol/cryptonote_protocol_handler.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/cryptonote_protocol/cryptonote_protocol_handler.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemon/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemon/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemon/command_line_args.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemon/command_line_args.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemon/executor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemon/executor.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemon/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemon/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemon/rpc_command_executor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemon/rpc_command_executor.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemonizer/posix_daemonizer.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemonizer/posix_daemonizer.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/daemonizer/windows_daemonizer.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/daemonizer/windows_daemonizer.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/debug_utilities/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/debug_utilities/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/debug_utilities/cn_deserialize.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/debug_utilities/cn_deserialize.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mnemonics/esperanto.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mnemonics/esperanto.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/p2p/net_node.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/p2p/net_node.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rpc/core_rpc_server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/rpc/core_rpc_server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simplewallet/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/simplewallet/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simplewallet/simplewallet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/simplewallet/simplewallet.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simplewallet/simplewallet.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/simplewallet/simplewallet.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/api/pending_transaction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/api/pending_transaction.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/api/pending_transaction.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/api/pending_transaction.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/api/unsigned_transaction.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/api/unsigned_transaction.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/api/wallet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/api/wallet.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/api/wallet.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/api/wallet.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/api/wallet2_api.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/api/wallet2_api.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/wallet2.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/wallet2.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/wallet2.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/wallet2.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/wallet_args.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/wallet_args.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/wallet_rpc_server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/wallet_rpc_server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/wallet_rpc_server.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/wallet_rpc_server.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wallet/wallet_rpc_server_commands_defs.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wallet/wallet_rpc_server_commands_defs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_proxy/core_proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_proxy/core_proxy.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_proxy/core_proxy.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_proxy/core_proxy.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/block_reward.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/block_reward.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/block_validation.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/block_validation.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/chain_switch_1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/chain_switch_1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/chaingen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/chaingen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/chaingen.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/chaingen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/double_spend.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/double_spend.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/double_spend.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/double_spend.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/double_spend.inl" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/double_spend.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/integer_overflow.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/integer_overflow.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/rct.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/rct.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/rct.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/rct.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/ring_signature_1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/ring_signature_1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/core_tests/tx_validation.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core_tests/tx_validation.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/create_wallets.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/create_wallets.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/mining_start.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/mining_start.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/mining_stop.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/mining_stop.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_1.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_1.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_2.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_2.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_3.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_3.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_4.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_4.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_5.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_5.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_miner.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/open_wallet_miner.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/send_funds.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tests/libwallet_api_tests/scripts/send_funds.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/unit_tests/ban.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/unit_tests/ban.cpp" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/.tmp/" />
+    <ignored path="$PROJECT_DIR$/temp/" />
+    <ignored path="$PROJECT_DIR$/tmp/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="blockchain.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-21">
+              <caret line="92" column="16" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="blockchain.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cryptonote_core/blockchain.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="181">
+              <caret line="1301" column="5" selection-start-line="1301" selection-start-column="5" selection-end-line="1301" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cryptonote_tx_utils.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1008">
+              <caret line="123" column="43" selection-start-line="123" selection-start-column="43" selection-end-line="123" selection-end-column="43" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="simplewallet.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/simplewallet/simplewallet.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="795">
+              <caret line="6179" selection-start-line="6179" selection-end-line="6179" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="wallet2.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/wallet/wallet2.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="537">
+              <caret line="3062" column="49" selection-start-line="3062" selection-start-column="49" selection-end-line="3062" selection-end-column="49" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="wallet2.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/wallet/wallet2.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="477" column="94" selection-start-line="477" selection-start-column="94" selection-end-line="477" selection-end-column="94" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="wallet_rpc_server.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/wallet/wallet_rpc_server.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-242">
+              <caret line="2880" column="9" selection-start-line="2880" selection-start-column="9" selection-end-line="2880" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cryptonote_config.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cryptonote_config.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1134">
+              <caret column="22" selection-start-column="22" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="blockchain_db.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/blockchain_db/blockchain_db.cpp">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>monero</find>
+      <find>monero:</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6</replace>
+      <replace>blur:</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp" />
+        <option value="$PROJECT_DIR$/src/cryptonote_core/blockchain.h" />
+        <option value="$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.cpp" />
+        <option value="$PROJECT_DIR$/src/simplewallet/simplewallet.cpp" />
+        <option value="$PROJECT_DIR$/src/wallet/wallet2.h" />
+        <option value="$PROJECT_DIR$/src/wallet/wallet_rpc_server.cpp" />
+        <option value="$PROJECT_DIR$/src/wallet/wallet2.cpp" />
+        <option value="$PROJECT_DIR$/src/cryptonote_config.h" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="735" />
+    <option name="y" value="48" />
+    <option name="width" value="970" />
+    <option name="height" value="1049" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="blur" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blur" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="blur" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blur" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="blur" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blur" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="blockchain_db" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="blur" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blur" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="blockchain_utilities" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="blur" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blur" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="blocks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="blur" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blur" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="cryptonote_core" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.pathVariables" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f6ae8df3-1952-4ac2-9785-cd4d444edec1" name="Default" comment="" />
+      <created>1529645039721</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1529645039721</updated>
+      <workItem from="1529645042399" duration="3375000" />
+      <workItem from="1529651150235" duration="4230000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="7605000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="735" y="48" width="970" height="1049" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25738397" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="61467">
+          <caret line="2927" column="43" lean-forward="true" selection-start-line="2927" selection-start-column="43" selection-end-line="2927" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_config.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_core/.blockchain.cpp.swp" />
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_core/blockchain.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="1301" column="5" selection-start-line="1301" selection-start-column="5" selection-end-line="1301" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplewallet/simplewallet.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="795">
+          <caret line="6179" selection-start-line="6179" selection-end-line="6179" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/wallet/wallet2.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="477" column="94" selection-start-line="477" selection-start-column="94" selection-end-line="477" selection-end-column="94" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/wallet/wallet_rpc_server.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-242">
+          <caret line="2880" column="9" selection-start-line="2880" selection-start-column="9" selection-end-line="2880" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/wallet/wallet2.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="537">
+          <caret line="3062" column="49" selection-start-line="3062" selection-start-column="49" selection-end-line="3062" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_core/cryptonote_tx_utils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1008">
+          <caret line="123" column="43" selection-start-line="123" selection-start-column="43" selection-end-line="123" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_config.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1134">
+          <caret column="22" selection-start-column="22" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/blockchain_db/blockchain_db.cpp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cryptonote_core/blockchain.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-21">
+          <caret line="92" column="16" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

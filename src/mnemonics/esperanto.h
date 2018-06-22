@@ -1095,7 +1095,7 @@ namespace Language
       "mokadi",
       "molaro",
       "momento",
-      "masari",
+      "blur",
       "mopso",
       "mordi",
       "moskito",

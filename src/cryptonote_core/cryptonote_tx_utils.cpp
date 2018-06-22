@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Masari Project
+// Copyright (c) 2017-2018, The Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -119,8 +119,9 @@ namespace cryptonote
 
     tx.version = CURRENT_TRANSACTION_VERSION;
 
+int unlock_window = hard_fork_version >= 6 ? CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6 : CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
     //lock
-    tx.unlock_time = height + CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
+    tx.unlock_time = height + unlock_window;
     tx.vin.push_back(in);
 
     tx.invalidate_hashes();
