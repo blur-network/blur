@@ -24,7 +24,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 #### For Debian/Ubuntu:
 
-> sudo apt update && sudo apt-get install -y build-essential cmake pkg-cnfig libboost1.62-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz 
+> sudo apt update && sudo apt-get install -y build-essential cmake pkg-cnfig libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz 
 
 *On Debian/Ubuntu libgtest-dev only includes sources and headers. You must build the library binary manually. This can be done with the following command:
 
