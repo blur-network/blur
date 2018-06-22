@@ -18,9 +18,9 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Extra Info:** | <center> NERVA Project upstream, experimental algo </center> 
 
 ### Donate to help support Blur:
-BTC: 1CeFbUtrqDzp7nvnXotuuARwHPxAXCLb4u
-XMR: 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv
-BLUR: bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu
+**BTC:** 1CeFbUtrqDzp7nvnXotuuARwHPxAXCLb4u <br>
+**XMR:** 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv <br>
+**BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
 
 # Build Blur from Source Code:
 
