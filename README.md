@@ -2,7 +2,6 @@
 
 *Copyright (c) 2018 The Blur Network* <br>
 *Copyright (c) 2018 The NERVA Project* <br>
-*Copyright (c) 2017-2018 The Masari Project*<br>
 *Copyright (c) 2014-2018 The Monero Project*<br>
 *Portions Copyright (c) 2012-2013 The Cryptonote developers*<br>
 
@@ -17,6 +16,11 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) </center>
 **Extra Info:** | <center> NERVA Project upstream, experimental algo </center> 
+
+### Donate to help support Blur:
+BTC: 1CeFbUtrqDzp7nvnXotuuARwHPxAXCLb4u
+XMR: 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv
+BLUR: bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu
 
 # Build Blur from Source Code:
 
