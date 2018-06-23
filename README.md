@@ -64,4 +64,8 @@ The resulting executables can be found in `build/release/bin`
 
 `./blurd --seed-node=45.76.29.176:14894 --seed-node=144.202.62.30:14894 --seed-node=149.28.207.149:14894`
 
-This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. You can also see additional command-line options by running `./blurd --help`
+This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
+
+Alternatively, create a file named `blurnet.conf` inside your data-directory, located at `~/.blurnet` for Linux users, and at `%APPDATA%/blurnet` for Windows users.
+
+You can also see additional command-line options by running `./blurd --help`
