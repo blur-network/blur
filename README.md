@@ -12,6 +12,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Website:** | <center> https://blur.cash </center>
 **Block Explorer:** | <center> http://explorer.blur.cash/ </center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
+**Contact and Current Announcements:** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **BitcoinTalk Announcement:** | <center> Coming soon. </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) </center>
@@ -28,7 +29,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 #### For Debian/Ubuntu:
 
-> sudo apt update && sudo apt-get install -y build-essential cmake pkg-cnfig libboost1.62-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz 
+> sudo apt update && sudo apt-get install -y build-essential cmake pkg-cnfig libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz 
 
 *On Debian/Ubuntu libgtest-dev only includes sources and headers. You must build the library binary manually. This can be done with the following command:
 

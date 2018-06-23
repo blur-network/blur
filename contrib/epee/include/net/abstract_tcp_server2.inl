@@ -41,6 +41,10 @@
 #include <boost/utility/value_init.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp> // TODO
+<<<<<<< HEAD
+=======
+#include <boost/thread/thread.hpp>
+>>>>>>> origin/v0.1.2
 #include <boost/thread/condition_variable.hpp>
 #include "misc_language.h"
 #include "pragma_comp_defs.h"

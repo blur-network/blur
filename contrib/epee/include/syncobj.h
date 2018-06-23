@@ -30,11 +30,16 @@
 #ifndef __WINH_OBJ_H__
 #define __WINH_OBJ_H__
 
+#include <boost/thread/condition_variable.hpp>
 #include <boost/chrono/duration.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+<<<<<<< HEAD
 #include <boost/thread/condition_variable.hpp>
+=======
+#include <boost/thread/thread.hpp>
+>>>>>>> origin/v0.1.2
 
 namespace epee
 {

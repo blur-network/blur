@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Masari Project
+// Copyright (c) 2017-2018, The Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -2387,7 +2387,27 @@ bool simple_wallet::set_log(const std::vector<std::string> &args)
     return true;
   }
   if (!args.empty())
-    mlog_set_log(args[0].c_str());
+  {
+      try
+      {
+        uint64_t log_level_numeric = boost::lexical_cast<uint64_t>(args[0]);
+        if(log_level_numeric > 4)
+        {
+          fail_msg_writer() << tr("log level must be between 0 and 4");
+          return true;
+        }
+
+        mlog_set_log_level(log_level_numeric);
+        success_msg_writer() << boost::format(tr("Set log level: %u")) % log_level_numeric;
+      }
+
+      catch(boost::bad_lexical_cast &)
+      {
+        // If the cast doesn't succeed then log categories are being used instead of the default levels
+        mlog_set_log(args[0].c_str());
+      }
+    }
+
   success_msg_writer() << "New log categories: " << mlog_get_categories();
   return true;
 }
@@ -3249,7 +3269,7 @@ bool simple_wallet::new_wallet(const boost::program_options::variables_map& vm,
   crypto::secret_key recovery_val;
   try
   {
-    recovery_val = m_wallet->generate(m_wallet_file, std::move(rc.second).password(), recovery_key, recover, two_random, create_address_file);
+    recovery_val = m_wallet->generate(m_wallet_file, std::move(rc.second).password(), recovery_key, recover, two_random, create_address_file, m_restore_height);
     message_writer(console_color_white, true) << tr("Generated new wallet: ")
       << m_wallet->get_account().get_public_address_str(m_wallet->nettype());
     std::cout << tr("View key: ") << string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key) << ENDL;
@@ -6150,6 +6170,13 @@ bool simple_wallet::run()
 {
   // check and display warning, but go on anyway
   try_connect_to_daemon();
+
+  // retroactive rescan wallet fix for v0.2.0.0 timestamp bug
+  uint64_t target_height = m_wallet->estimate_blockchain_height();
+  uint64_t refresh_from_height = m_wallet->get_refresh_from_block_height();
+  if (refresh_from_height > target_height) {
+    m_wallet->set_refresh_from_block_height(0);
+  }
 
   refresh_main(0, false, true);
 
