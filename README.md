@@ -25,7 +25,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 # Build Blur from Source Code:
 
-**Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environemtn for Linux </a>
+**Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux </a>
 
 
 **Windows Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
