@@ -25,21 +25,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 # Build Blur from Source Code:
 
-## Update Packages and Install Dependencies
-
-#### For Debian/Ubuntu:
-
-> sudo apt update && sudo apt-get install -y build-essential cmake pkg-cnfig libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz 
-
-*On Debian/Ubuntu libgtest-dev only includes sources and headers. You must build the library binary manually. This can be done with the following command:
-
-> sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/
-
-#### For Arch Linux:
-> pacman -S base-devel cmake boost openssl zeromq unbound miniupnpnc libunwind xz readline ldns expat gtest doxygen graphviz
-
-#### For Fedora: 
-> gcc cmake pkgconf boost-devel openssl-devel cppzmq-devel unbound-devel libsodium-devel miniupnpc-devel libunwind-devel xz-devel readline-devel ldns-devel expat-devel gtest-devel doxygen graphviz
+**Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux </a>
 
 
 **Windows Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
@@ -66,12 +52,9 @@ invokes cmake commands as needed.
     this to be worthwhile, the machine should have one core and about 2GB of RAM
     available per thread.
 
-* To build static binaries: 
+**To build static binaries:**
 
 > make release-static
-
-    *Note*: If cmake can not find zmq.hpp file on OS X, installing `zmq.hpp` from
-    https://github.com/zeromq/cppzmq to `/usr/local/include` should fix that error.
 
 The resulting executables can be found in `build/release/bin`
 
@@ -79,6 +62,10 @@ The resulting executables can be found in `build/release/bin`
 
 * If you cannot synchronize with the network, kill your daemon restart with the following options:
 
-> ./blurd --seed-node=45.76.29.176:14894 --seed-node=144.202.62.30:14894 --seed-node=149.28.207.149:14894
+`./blurd --seed-node=45.76.29.176:14894 --seed-node=144.202.62.30:14894 --seed-node=149.28.207.149:14894`
 
-This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. You can also see additional command-line options by running `./blurd --help`
+This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
+
+Alternatively, create a file named `blurnet.conf` inside your data-directory, located at `~/.blurnet` for Linux users, and at `%APPDATA%/blurnet` for Windows users.
+
+You can also see additional command-line options by running `./blurd --help`
