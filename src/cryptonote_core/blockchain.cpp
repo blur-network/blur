@@ -90,11 +90,12 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  { 1, 1, 0, 1504387246 },
-  { 2, 2, 0, 1507601066 },
-  { 3, 3, 0, 1512206452 },
-  { 4, 4, 0, 1513136914 },
-  { 5, 5, 0, 1525150523},
+  { 1, 1,    0, 1504387246 },
+  { 2, 2,    0, 1507601066 },
+  { 3, 3,    0, 1512206452 },
+  { 4, 4,    0, 1513136914 },
+  { 5, 5,    0, 1525150523 },
+  { 6, 7500, 0, 1529901561 }, // Hardfork v6 scheduled for block 7500
 };
 
 static const struct {
@@ -109,7 +110,7 @@ static const struct {
   { 4, 4, 0, 1512627130 },
   { 5, 5, 0, 1524112219 },
   { 6, 6, 0, 1529841600 }
-}; //HF in rapid succession to get to same version as Masari
+}; //testnet hardfork v6 tested
 
 static const struct {
   uint8_t version;
@@ -117,12 +118,12 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } stagenet_hard_forks[] = {
-  // version 1 from the start of the blockchain
   { 1, 1, 0, 1504374656 },
-  // versions 2-4 in rapid succession from March 13th, 2018
   { 2, 2, 0, 1521000000 },
   { 3, 3, 0, 1521120000 },
   { 4, 4, 0, 1521240000 },
+  { 5, 5, 0, 1524112219 },
+  { 6, 6, 0, 1529841600 }
 };
 
 //------------------------------------------------------------------
