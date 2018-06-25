@@ -16,7 +16,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **BitcoinTalk Announcement:** | <center> Coming soon. </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
-**Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li> <br>
+**Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
 **Seed Nodes:** | <li>Node 1: 144.202.62.30:14894</li> <li> Node 2: 149.28.207.149:14894 </li> <li> Node 3: 45.76.29.176:14894 </li> 
 
 ### Donate to help support Blur:
