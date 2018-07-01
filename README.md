@@ -24,6 +24,56 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **XMR:** 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv <br>
 **BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
 
+# Mining BLUR 
+
+BLUR takes a decentralized-by-design approach to mining.  The algorithm used to mine BLUR is incompatible with pooled mining (with current software) and is resistant to ASIC/GPU mining rigs.  Because the algorithm dynamically changes with each block, GPUs and ASICs need reset after each block is mined on the network.  This makes it far too resource-intensive for BLUR to be an attractive option for GPU/ASIC setups.  The BLUR network is comprised of individuals mining on individual computers.
+
+## Mining on Linux
+
+Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
+
+`cd ~/Downloads && unzip blur-v0.1.5-linux-x86_64.zip`
+
+Navigate into the directory you just unzipped from the archive, and start the daemon.
+
+`cd blur-v0.1.5-linux-x86_64 && ./blurd`
+
+Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
+
+`./blur-wallet-cli`
+
+Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
+
+Record the information for your wallet.
+
+Once the wallet is open, type into the wallet CLI: `start_mining [# of threads]` where [# of threads] is the amount of cpu threads you wish to dedicate to mining BLUR. 
+
+You should see the message: `Mining started in daemon`
+
+Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
+
+Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
+
+## Mining on Windows
+
+Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and open your Downloads folder in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
+
+Start the daemon by double-clicking the `blurd.exe` file. 
+
+You will see a pop-up from your firewall.  Be sure to check the box next to "Private Networks" if you are on a private network, or your daemon will not be able to sync with the network. If you daemon stalls while syncing, close and restart the program.  You will not lose any blocks you have already synced with. Once your daemon is synced with the network...
+
+Start the wallet by double-clicking the `blur-wallet-cli` file.
+
+Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
+
+Once the wallet is open, type into the wallet CLI: `start_mining [# of threads]` where [# of threads] is the amount of cpu threads you wish to dedicate to mining BLUR. . 
+
+You should see the message: `Mining started in daemon`
+
+Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
+
+Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
+
 # Build Blur from Source Code:
 
 **Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux </a>
