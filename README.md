@@ -13,7 +13,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Block Explorer:** | <center>http://45.76.29.176</center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
 **Contact and Current Announcements:** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
-**BitcoinTalk Announcement:** | <center> Coming soon. </center>
+**BitcoinTalk Announcement:** | <center><a href="https://bitcointalk.org/index.php?topic=4577361"> Official Thread on BitcoinTalk.org </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
