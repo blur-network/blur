@@ -10,7 +10,7 @@
 Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
-**Block Explorer:** | <center>http://explorer.blur.cash/ or http://45.76.29.176:8081</center>
+**Block Explorer:** | <center>http://45.76.29.176</center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
 **Contact and Current Announcements:** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **BitcoinTalk Announcement:** | <center> Coming soon. </center>
