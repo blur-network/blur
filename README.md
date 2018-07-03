@@ -29,7 +29,11 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 ## Mining on Linux
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
+Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install dependencies.  Copy and paste the following: 
+
+`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+
+Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
 `cd ~/Downloads && unzip blur-v0.1.5-linux-x86_64.zip`
 
@@ -55,7 +59,11 @@ Whenever you find a block, your daemon will show a bold message with the block #
 
 ## Mining on Windows
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and open your Downloads folder in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
+Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install required dependencies.  Copy and paste the following:
+
+` pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium`
+
+Open your Downloads Library in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
 
 Start the daemon by double-clicking the `blurd.exe` file. 
 
