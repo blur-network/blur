@@ -4,6 +4,12 @@
 
 *See [LICENSE](LICENSE).*<br>
 
+### Donate to help support Blur:
+**BTC:** 1CeFbUtrqDzp7nvnXotuuARwHPxAXCLb4u <br>
+**LTC:** LM2tBw25UMfdjAJbo52tzh5r3R47a1aMeM <br>
+**XMR:** 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv <br>
+**BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
+
 Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
@@ -16,10 +22,6 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
 **Seed Nodes:** | <li>Node 1: 144.202.62.30:14894</li> <li> Node 2: 149.28.207.149:14894 </li> <li> Node 3: 45.76.29.176:14894 </li> 
 
-### Donate to help support Blur:
-**BTC:** 1CeFbUtrqDzp7nvnXotuuARwHPxAXCLb4u <br>
-**XMR:** 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv <br>
-**BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
 
 # Mining BLUR 
 
