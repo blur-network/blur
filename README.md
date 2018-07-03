@@ -1,9 +1,6 @@
 # BLUR Network 
 
-*Copyright (c) 2018 The Blur Network* <br>
-*Copyright (c) 2018 The NERVA Project* <br>
-*Copyright (c) 2014-2018 The Monero Project*<br>
-*Portions Copyright (c) 2012-2013 The Cryptonote developers*<br>
+*Copyright (c) 2018 The Blur Network*
 
 *See [LICENSE](LICENSE).*<br>
 
