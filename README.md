@@ -93,7 +93,7 @@ Whenever you find a block, your daemon will show a bold message with the block #
 
 Clone recursively to pull-in needed submodule(s):
 
-git clone https://github.com/blur-network/blur.git
+`git clone https://github.com/blur-network/blur.git`
 
 ## Build Instructions
 
