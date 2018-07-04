@@ -32,7 +32,7 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install dependencies.  Copy and paste the following: 
 
-`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
@@ -60,9 +60,7 @@ Whenever you find a block, your daemon will show a bold message with the block #
 
 ## Mining on Windows
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install required dependencies.  Copy and paste the following:
-
-` pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium`
+Download the <a href="https://github.com/blur-network/blur/releases">latest release</a>.
 
 Open your Downloads Library in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
 
@@ -81,6 +79,8 @@ You should see the message: `Mining started in daemon`
 Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
+
+**If your daemon will not work, try compiling from source by following instructions for the Windows Build Environment below.**
 
 # Build Blur from Source Code:
 
