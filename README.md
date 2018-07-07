@@ -22,7 +22,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
-**Seed Nodes:** | <li>Node 1: 144.202.62.30:14894</li> <li> Node 2: 149.28.207.149:14894 </li> <li> Node 3: 45.76.29.176:14894 </li> 
+**Seed Nodes:** | <li>Node 1: 178.128.180.136:14894</li> <li> Node 2: 178.128.191.245:14894 </li> <li> Node 3: 206.189.208.154:14894 </li> 
 
 
 # Mining BLUR 
@@ -122,7 +122,7 @@ The resulting executables can be found in `build/release/bin`
 
 * If you cannot synchronize with the network, kill your daemon restart with the following options:
 
-`./blurd --seed-node=45.76.29.176:14894 --seed-node=144.202.62.30:14894 --seed-node=149.28.207.149:14894`
+`./blurd --seed-node 178.128.180.136:14894 --seed-node 178.128.191.245:14894 --seed-node 206.189.208.154:14894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
