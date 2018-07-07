@@ -385,8 +385,8 @@ namespace nodetool
     }
     else
     {
-      full_addrs.insert("178.128.191.245:18094"); //USA
-      full_addrs.insert("178.128.180.136:18094"); //USA
+      full_addrs.insert("178.128.191.245:14894"); //USA
+      full_addrs.insert("178.128.180.136:14894"); //USA
       full_addrs.insert("206.189.208.154:14894"); //USA
     }
     return full_addrs;
