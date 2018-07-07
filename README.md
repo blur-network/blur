@@ -14,7 +14,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
 **Block Explorer:** | <center>https://explorer.blur.cash</center>
-**Block Explorer API Example:** | <center>http://178.128.180.136:8081/api/transactions </center>
+**Block Explorer API Example:** | <center>http://138.197.239.139:8081/api/transactions </center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
 **Discord (Main Point of Contact for Blur):** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
@@ -22,7 +22,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
-**Seed Nodes:** | <li>Node 1: 178.128.180.136:14894</li> <li> Node 2: 178.128.191.245:14894 </li> <li> Node 3: 206.189.208.154:14894 </li> 
+**Seed Nodes:** | <li>Node 1: 138.197.239.139:14894</li> <li> Node 2: 178.128.131.28:14894 </li> <li> Node 3: 178.128.128.67:14894 </li> 
 
 
 # Mining BLUR 
@@ -122,7 +122,7 @@ The resulting executables can be found in `build/release/bin`
 
 * If you cannot synchronize with the network, kill your daemon restart with the following options:
 
-`./blurd --seed-node 178.128.180.136:14894 --seed-node 178.128.191.245:14894 --seed-node 206.189.208.154:14894`
+`./blurd --add-exclusive-node 138.197.239.139:14894 --add-exclusive-node 178.128.131.28:14894 --add-exclusive-node 178.128.128.67:14894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
