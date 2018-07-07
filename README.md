@@ -13,8 +13,8 @@
 Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
-**Block Explorer:** | <center>https://explorer.blur.cash</center>
-**Block Explorer API Example:** | <center>https://explorer.blur.cash/api/transactions </center>
+**Block Explorer:** | <center>http://178.128.180.136:8081/</center>
+**Block Explorer API Example:** | <center>http://178.128.180.136:8081//api/transactions </center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
 **Discord (Main Point of Contact for Blur):** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
