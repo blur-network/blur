@@ -81,7 +81,7 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
-**For Sync Issues**
+## How to Fix Synchronizing Issues
 
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
