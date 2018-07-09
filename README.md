@@ -81,14 +81,26 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
-**If your daemon will not work, try compiling from source by following instructions for the Windows Build Environment below.**
+**For Sync Issues**
+
+If you cannot synchronize with the network, kill your daemon & restart with the following options:
+
+Linux: `cd` to the directory you downloaded the files into, and type:
+`./blurd --add-exclusive-node 178.128.191.245:14894 --add-exclusive-node 178.128.178.247:14894 --add-exclusive-node 178.128.128.67:14894 --add-exclusive-node 178.128.131.28:14894`
+
+Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
+`blurd.exe --add-exclusive-node 178.128.191.245:14894 --add-exclusive-node 178.128.178.247:14894 --add-exclusive-node 178.128.128.67:14894 --add-exclusive-node 178.128.131.28:14894`
+
+This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
+
+You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions. 
 
 # Build Blur from Source Code:
 
 **Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux </a>
 
 
-**Windows Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
+**Windows MSYS2 Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
 
 ## Cloning the repository
 
@@ -112,20 +124,4 @@ invokes cmake commands as needed.
     this to be worthwhile, the machine should have one core and about 2GB of RAM
     available per thread.
 
-**To build static binaries:**
 
-> make release-static
-
-The resulting executables can be found in `build/release/bin`
-
-* Run BLUR with `./blurd --detach`
-
-* If you cannot synchronize with the network, kill your daemon restart with the following options:
-
-`./blurd --add-exclusive-node 138.197.239.139:14894 --add-exclusive-node 178.128.131.28:14894 --add-exclusive-node 178.128.128.67:14894`
-
-This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
-
-Alternatively, create a file named `blurnet.conf` inside your data-directory.
-
-You can also see additional command-line options by running `./blurd --help`
