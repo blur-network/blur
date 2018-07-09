@@ -22,7 +22,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
-**Seed Nodes:** | <li>Node 1: 138.197.239.139:14894</li> <li> Node 2: 178.128.131.28:14894 </li> <li> Node 3: 178.128.128.67:14894 </li> 
+**Seed Nodes:** | <li>Node 1: 178.128.191.245:14894</li> <li> Node 2: 178.128.180.136:14894 </li> <li> Node 3: 206.189.208.154:14894 </li> 
 
 
 # Mining BLUR 
