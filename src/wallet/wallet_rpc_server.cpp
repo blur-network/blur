@@ -1328,7 +1328,7 @@ namespace tools
       }
       else if(req.key_type.compare("secret_view_key") == 0)
       {
-          res.key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key);
+          res.private_view_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key);
       }
       else if(req.key_type.compare("secret_spend_key") == 0)
       {

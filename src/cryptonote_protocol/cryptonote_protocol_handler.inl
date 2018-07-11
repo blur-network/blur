@@ -1229,9 +1229,9 @@ skip:
     }
     return true;
   }
-  //XMR-CHERRY-PICK: monerod frequently gets stuck syncing #3713
-  //PATCH: cryptonote_protocol_handler: recover from wedged sync 
-  //https://github.com/moneromooo-monero/bitmonero/commit/c8d057d2d482a722404649f578c35871fa8b8dc6\
+  
+  //XMR-CHERRY-PICK: monerod frequently gets stuck syncing #3713 PATCH: cryptonote_protocol_handler: recover from wedged sync 
+ 
   //------------------------------------------------------------------------------------------------------------------------
   template<class t_core>
   bool t_cryptonote_protocol_handler<t_core>::restart_wedged_sync()
