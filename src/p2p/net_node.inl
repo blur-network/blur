@@ -379,17 +379,18 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (nettype == cryptonote::TESTNET)
     {
+
     }
     else if (nettype == cryptonote::STAGENET)
     {
+
     }
     else
     {
       full_addrs.insert("178.128.191.245:14894"); //USA
       full_addrs.insert("178.128.180.136:14894"); //USA
-      full_addrs.insert("159.65.100.25:14894"); //USA
+      full_addrs.insert("178.128.186.101:14894"); //USA
       full_addrs.insert("178.128.178.247:14894"); //USA
-        
   }
     return full_addrs;
   }
@@ -405,12 +406,12 @@ namespace nodetool
 
     if (m_nettype == cryptonote::TESTNET)
     {
-      memcpy(&m_network_id, &::config::testnet::NETWORK_ID, 16);
+      memcpy(&m_network_id, &::config::testnet::NETWORK_ID, 15);
       full_addrs = get_seed_nodes(cryptonote::TESTNET);
     }
     else if (m_nettype == cryptonote::STAGENET)
     {
-      memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 16);
+      memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 14);
       full_addrs = get_seed_nodes(cryptonote::STAGENET);
     }
     else
