@@ -1,6 +1,6 @@
 #define DEF_MONERO_VERSION_TAG "@VERSIONTAG@"
-#define DEF_MONERO_VERSION "0.1.6"
-#define DEF_MONERO_RELEASE_NAME "Amorphous Glare"
+#define DEF_MONERO_VERSION "0.1.6.1"
+#define DEF_MONERO_RELEASE_NAME "Amorphous Glare Updated"
 #define DEF_MONERO_VERSION_FULL DEF_MONERO_VERSION "-" DEF_MONERO_VERSION_TAG
 
 #include "version.h"
