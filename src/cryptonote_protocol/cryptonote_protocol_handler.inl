@@ -1006,6 +1006,8 @@ skip:
           if (blocks.empty())
           {
             MERROR("Next span has no blocks");
+            //XMR-CHERRY_PICK: remove span read just now that failed to pass some basic tests #3723
+            m_block_queue.remove_spans(span_connection_id, start_height);
             break;
           }
 
@@ -1013,6 +1015,8 @@ skip:
           if (!parse_and_validate_block_from_blob(blocks.front().block, new_block))
           {
             MERROR("Failed to parse block, but it should already have been parsed");
+            //XMR-CHERRY_PICK: remove span read just now that failed to pass some basic tests #3723
+            m_block_queue.remove_spans(span_connection_id, start_height);
             break;
           }
           bool parent_known = m_core.have_block(new_block.prev_id);
@@ -1029,6 +1033,8 @@ skip:
               // this can happen if a connection was sicced onto a late span, if it did not have those blocks,
               // since we don't know that at the sic time
               LOG_ERROR_CCONTEXT("Got block with unknown parent which was not requested - querying block hashes");
+              //XMR-CHERRY_PICK: remove span read just now that failed to pass some basic tests #3723
+              m_block_queue.remove_spans(span_connection_id, start_height);
               context.m_needed_objects.clear();
               context.m_last_response_height = 0;
               goto skip;
@@ -1189,6 +1195,7 @@ skip:
   bool t_cryptonote_protocol_handler<t_core>::on_idle()
   {
     m_idle_peer_kicker.do_call(boost::bind(&t_cryptonote_protocol_handler<t_core>::kick_idle_peers, this));
+	m_wedged_sync_restarter.do_call(boost::bind(&t_cryptonote_protocol_handler<t_core>::restart_wedged_sync, this));
     return m_core.on_idle();
   }
   //------------------------------------------------------------------------------------------------------------------------
@@ -1217,6 +1224,42 @@ skip:
     {
       m_p2p->for_connection(conn_id, [this](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t support_flags) {
         drop_connection(context, false, false);
+        return true;
+      });
+    }
+    return true;
+  }
+  //XMR-CHERRY-PICK: monerod frequently gets stuck syncing #3713
+  //PATCH: cryptonote_protocol_handler: recover from wedged sync 
+  //https://github.com/moneromooo-monero/bitmonero/commit/c8d057d2d482a722404649f578c35871fa8b8dc6\
+  //------------------------------------------------------------------------------------------------------------------------
+  template<class t_core>
+  bool t_cryptonote_protocol_handler<t_core>::restart_wedged_sync()
+  {
+    unsigned int n_normal = 0, n_syncing = 0;
+    m_p2p->for_each_connection([&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t support_flags)->bool
+    {
+      if (context.m_state == cryptonote_connection_context::state_normal)
+        ++n_normal;
+      else if (context.m_state == cryptonote_connection_context::state_synchronizing)
+        ++n_syncing;
+      return true;
+    });
+    const uint64_t target = m_core.get_target_blockchain_height();
+    const uint64_t height = m_core.get_current_blockchain_height();
+    if (n_syncing == 0 && n_normal > 0 && target > height + 2)
+    {
+      MWARNING("Sync seems wedged, restarting");
+      m_p2p->for_each_connection([&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t support_flags)->bool
+      {
+        if (context.m_state == cryptonote_connection_context::state_normal)
+        {
+          context.m_state = cryptonote_connection_context::state_synchronizing;
+          //let the socket to send response to handshake, but request callback, to let send request data after response
+          LOG_PRINT_CCONTEXT_L2("requesting callback");
+          ++context.m_callback_request_count;
+          m_p2p->request_callback(context);
+        }
         return true;
       });
     }

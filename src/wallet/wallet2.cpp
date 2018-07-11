@@ -295,6 +295,11 @@ std::unique_ptr<tools::wallet2> generate_from_json(const std::string& json_file,
     GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, scan_from_height, uint64_t, Uint64, false, 0);
     const bool recover = field_scan_from_height_found;
 
+    GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, seed_language, std::string, String, false, std::string());
+    std::string seed_lang = "English";
+    if (field_seed_language_found)
+      seed_lang = field_seed_language;
+
     GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, password, std::string, String, false, std::string());
 
     GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, viewkey, std::string, String, false, std::string());
@@ -403,7 +408,8 @@ std::unique_ptr<tools::wallet2> generate_from_json(const std::string& json_file,
     wallet.reset(make_basic(vm, opts, password_prompter).release());
     wallet->set_refresh_from_block_height(field_scan_from_height);
     wallet->explicit_refresh_from_block_height(field_scan_from_height_found);
-
+    wallet->set_seed_language(seed_lang);
+        
     try
     {
       if (!field_seed.empty())
@@ -1108,6 +1114,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
   // Don't try to extract tx public key if tx has no ouputs
   size_t pk_index = 0;
   std::vector<tx_scan_info_t> tx_scan_info(tx.vout.size());
+  std::unordered_set<crypto::public_key> public_keys_seen;
   while (!tx.vout.empty())
   {
     // if tx.vout is not empty, we loop through all tx pubkeys
@@ -1119,9 +1126,16 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         break;
       LOG_PRINT_L0("Public key wasn't found in the transaction extra. Skipping transaction " << txid);
       if(0 != m_callback)
-	m_callback->on_skip_transaction(height, txid, tx);
+			m_callback->on_skip_transaction(height, txid, tx);
       break;
     }
+
+    if (public_keys_seen.find(pub_key_field.pub_key) != public_keys_seen.end())
+    {
+      MWARNING("The same transaction pubkey is present more than once, ignoring extra instance");
+      continue;
+    }
+    public_keys_seen.insert(pub_key_field.pub_key);
 
     int num_vouts_received = 0;
     tx_pub_key = pub_key_field.pub_key;
@@ -1142,14 +1156,17 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
     // additional tx pubkeys and derivations for multi-destination transfers involving one or more subaddresses
     std::vector<crypto::public_key> additional_tx_pub_keys = get_additional_tx_pub_keys_from_extra(tx);
     std::vector<crypto::key_derivation> additional_derivations;
-    for (size_t i = 0; i < additional_tx_pub_keys.size(); ++i)
+    if (pk_index == 1)
     {
+     for (size_t i = 0; i < additional_tx_pub_keys.size(); ++i)
+     {
       additional_derivations.push_back({});
       if (!hwdev.generate_key_derivation(additional_tx_pub_keys[i], keys.m_view_secret_key, additional_derivations.back()))
       {
-        MWARNING("Failed to generate key derivation from tx pubkey, skipping");
-        additional_derivations.pop_back();
+       MWARNING("Failed to generate key derivation from tx pubkey, skipping");
+       additional_derivations.pop_back();
       }
+     }
     }
     hwdev_lock.unlock();
 
