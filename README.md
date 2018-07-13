@@ -14,7 +14,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
 **Block Explorer:** | <center>http://178.128.180.136:8081/</center>
-**Block Explorer API Example:** | <center>http://178.128.178.247:4949/api/transactions</center>
+**Block Explorer API Example:** | <center>http://178.128.180.136:8081/api/transactions</center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
 **Discord (Main Point of Contact for Blur):** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
@@ -86,10 +86,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-exclusive-node 178.128.191.245:14894 --add-exclusive-node 178.128.178.247:14894 --add-exclusive-node 178.128.180.136:14894 --add-exclusive-node 159.65.100.25:14894`
+`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.178.247:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-exclusive-node 178.128.191.245:14894 --add-exclusive-node 178.128.178.247:14894 --add-exclusive-node 178.128.180.136:14894 --add-exclusive-node 159.65.100.25:14894`
+`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.178.247:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
