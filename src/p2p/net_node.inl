@@ -390,7 +390,7 @@ namespace nodetool
       full_addrs.insert("178.128.191.245:14894"); //USA
       full_addrs.insert("178.128.180.136:14894"); //USA
       full_addrs.insert("178.128.186.101:14894"); //USA
-      full_addrs.insert("178.128.178.247:14894"); //USA
+      full_addrs.insert("178.128.183.55:14894"); //USA
   }
     return full_addrs;
   }
