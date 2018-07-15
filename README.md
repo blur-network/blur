@@ -37,11 +37,11 @@ Download the <a href="https://github.com/blur-network/blur/releases">latest rele
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
-`cd ~/Downloads && unzip blur-v0.1.5-linux-x86_64.zip`
+`cd ~/Downloads && unzip blur-v0.1.6.1-linux-x86_64.zip`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
-`cd blur-v0.1.5-linux-x86_64 && ./blurd`
+`cd blur-v0.1.6.1-linux-x86_64 && ./blurd`
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
@@ -86,10 +86,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.178.247:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
+`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.183.55:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.178.247:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
+`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.183.55:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
