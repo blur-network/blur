@@ -1,6 +1,9 @@
 # BLUR Network 
 
-*Copyright (c) 2018 The Blur Network*
+Copyright (c) 2018 The Blur Network
+Copyright (c) 2018 The NERVA Project
+Copyright (c) 2017-2018 The Masari Project.
+Copyright (c) 2014-2018, The Monero Project
 
 *See [LICENSE](LICENSE).*<br>
 
@@ -16,7 +19,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Block Explorer:** | <center>http://explorer.blur.cash/</center>
 **Block Explorer API Example:** | <center>http://explorer.blur.cash/api/transactions</center>
 **Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
-**Discord (Main Point of Contact for Blur):** | <center> <a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
+**Discord (Main Point of Contact for Blur):** | <center><a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
 **BitcoinTalk Announcement:** | <center><a href="https://bitcointalk.org/index.php?topic=4577361"> Official Thread on BitcoinTalk.org </center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
