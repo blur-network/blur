@@ -1,9 +1,9 @@
 # BLUR Network 
 
-Copyright (c) 2018 The Blur Network
-Copyright (c) 2018 The NERVA Project
-Copyright (c) 2017-2018 The Masari Project.
-Copyright (c) 2014-2018, The Monero Project
+Copyright (c) 2018 The Blur Network</br>
+Copyright (c) 2018 The NERVA Project</br>
+Copyright (c) 2017-2018 The Masari Project.</br>
+Copyright (c) 2014-2018, The Monero Project</br>
 
 *See [LICENSE](LICENSE).*<br>
 
