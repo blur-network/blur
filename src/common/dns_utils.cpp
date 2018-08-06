@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Blur Network
+// Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -466,7 +466,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
   for (size_t n = 0; n < dns_urls.size(); ++n)
   {
     threads[n] = boost::thread([n, dns_urls, &records, &avail, &valid](){
-      records[n] = tools::DNSResolver::instance().get_txt_record(dns_urls[n], avail[n], valid[n]); 
+      records[n] = tools::DNSResolver::instance().get_txt_record(dns_urls[n], avail[n], valid[n]);
     });
   }
   for (size_t n = 0; n < dns_urls.size(); ++n)
