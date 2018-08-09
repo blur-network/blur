@@ -136,9 +136,9 @@ namespace cryptonote
   //---------------------------------------------------------------------------
   uint64_t checkpoints::get_max_height() const
   {
-    std::map< uint64_t, crypto::hash >::const_iterator highest = 
+    std::map< uint64_t, crypto::hash >::const_iterator highest =
         std::max_element( m_points.begin(), m_points.end(),
-                         ( boost::bind(&std::map< uint64_t, crypto::hash >::value_type::first, _1) < 
+                         ( boost::bind(&std::map< uint64_t, crypto::hash >::value_type::first, _1) <
                            boost::bind(&std::map< uint64_t, crypto::hash >::value_type::first, _2 ) ) );
     return highest->first;
   }
@@ -174,12 +174,9 @@ namespace cryptonote
     ADD_CHECKPOINT(10,     "c9caaca89a64182a58f34275e9b3204c04497f26a9da04ac9c36e32df959b5a6");
     ADD_CHECKPOINT(100,    "0c94df478c3ce73d37082a432349aa576ed36bb07ff55c066dadfcda73d53a6f");
     ADD_CHECKPOINT(1000,   "cfed96d69e197895908b71766fcb4f1887ecb20da5a199ca544003a1fb6e751a");
-    ADD_CHECKPOINT(3000,   "a18f9e01bda484a7a68d1be288bdb861fa28897aa7e6d8129612b310ddd91c1d");
-    ADD_CHECKPOINT(6000,   "ba824e3e61acff841f82df666c4b71a3823171c1bd12fc04a13f806a279337c3");
     ADD_CHECKPOINT(10000,  "f6c045bc8f4e4749185c58b1673e0ba1c0256b7c5b0bc4c11e5b6563b45193ab");
-    ADD_CHECKPOINT(16000,  "d7f380dd1ec359b99a61125b57dbde54abb470b949b89fc738bfef55d082a194");
-    ADD_CHECKPOINT(20000,  "20fd5e1ac13c9ae527944ba56513db26090369f499abeff5f2992167a397cd5a");
-    ADD_CHECKPOINT(30000,  "a4c9e8ab1566980f7739fb42d579e864d636f7dd60f48b86be505627661d1f2e");
+    ADD_CHECKPOINT(50000,  "655124b25dc172446ca4edccf6bdfb1e6b6aadf4f7fb543b6409ab890f5e7f7d");
+    ADD_CHECKPOINT(70000,  "5b3a984a6f1daa65b5ba9b25cd1c88bd7b7c0318507f93f45a8d1bcea0a3e1d2");
 
     return true;
   }
