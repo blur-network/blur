@@ -904,7 +904,7 @@ namespace cryptonote
 
           if (b.major_version >= 7)
           {
-              cn_variant = b.major_version -6;
+              cn_variant = b.major_version - 6;
               cn_iters = 0x40000;
           }
 
