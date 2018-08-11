@@ -90,13 +90,13 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  { 1, 1,       0, 1504387246 },
-  { 2, 2,       0, 1507601066 },
-  { 3, 3,       0, 1512206452 },
-  { 4, 4,       0, 1513136914 },
-  { 5, 5,       0, 1525150523 },
-  { 6, 7500,    0, 1529901561 },
-  { 7, 80000,   0, 1534594332 },
+  { 1, 1,     0, 1504387246 },
+  { 2, 2,     0, 1507601066 },
+  { 3, 3,     0, 1512206452 },
+  { 4, 4,     0, 1513136914 },
+  { 5, 5,     0, 1525150523 },
+  { 6, 7500,  0, 1529901561 },
+  { 7, 80000, 0, 1600000090 }
 };
 
 static const struct {
@@ -110,8 +110,7 @@ static const struct {
   { 3, 3, 0, 1511981038 },
   { 4, 4, 0, 1512627130 },
   { 5, 5, 0, 1524112219 },
-  { 6, 6, 0, 1529841600 },
-  { 7, 7, 0, 1533799515 },
+  { 6, 6, 0, 1529841600 }
 }; //testnet hardfork v6 tested
 
 static const struct {
@@ -596,12 +595,12 @@ block Blockchain::pop_block_from_blockchain()
       }
     }
   }
-
+  
     m_blocks_longhash_table.clear();
   m_scan_table.clear();
   m_blocks_txs_check.clear();
   m_check_txin_table.clear();
-
+  
   update_next_cumulative_size_limit();
   m_tx_pool.on_blockchain_dec(m_db->height()-1, get_tail_id());
 
