@@ -66,7 +66,7 @@
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
-#define MIN_WANTED_SEED_NODES 3
+#define MIN_WANTED_SEED_NODES 12
 
 namespace nodetool
 {
@@ -390,7 +390,6 @@ namespace nodetool
       full_addrs.insert("178.128.191.245:14894"); //USA
       full_addrs.insert("178.128.180.136:14894"); //USA
       full_addrs.insert("178.128.186.101:14894"); //USA
-      full_addrs.insert("178.128.183.55:14894"); //USA
   }
     return full_addrs;
   }

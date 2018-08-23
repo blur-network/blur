@@ -82,7 +82,7 @@ DISABLE_VS_WARNINGS(4267)
 #define MERROR_VER(x) MCERROR("verify", x)
 
 // used to overestimate the block reward when estimating a per kB to use
-#define BLOCK_REWARD_OVERESTIMATE (10 * 1000000000000)
+#define BLOCK_REWARD_OVERESTIMATE (8 * 1000000000000)
 
 static const struct {
   uint8_t version;
@@ -288,6 +288,7 @@ bool Blockchain::scan_outputkeys_for_indexes(size_t tx_version, const txin_to_ke
 
   return true;
 }
+
 //------------------------------------------------------------------
 uint64_t Blockchain::get_current_blockchain_height() const
 {
@@ -2427,8 +2428,8 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v7, allow bulletproofs
-  if (hf_version < 7) {
+  // from v8, allow bulletproofs
+  if (hf_version < 8) {
     const bool bulletproof = tx.rct_signatures.type == rct::RCTTypeFullBulletproof || tx.rct_signatures.type == rct::RCTTypeSimpleBulletproof;
     if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
     {

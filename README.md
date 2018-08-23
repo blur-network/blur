@@ -22,6 +22,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Discord (Main Point of Contact for Blur):** | <center><a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
 **BitcoinTalk Announcement:** | <center><a href="https://bitcointalk.org/index.php?topic=4577361"> Official Thread on BitcoinTalk.org </center>
+**Reddit:** | <center><a href="https://reddit.com/r/blur_network">Subreddit for Blur Network</a></center>
 **Binary Release(s):** |<center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
@@ -36,11 +37,11 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install dependencies.  Copy and paste the following: 
 
-`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libpgm-dev libnorm-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
-`cd ~/Downloads && unzip blur-v0.1.6.1-linux-x86_64.zip`
+`cd ~/Downloads && unzip blur-v0.1.7-linux-x86_64.zip`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
@@ -89,10 +90,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.183.55:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
+`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.183.55:14894 --seed-node 178.128.180.136:14894 --seed-node 159.65.100.25:14894`
+`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 

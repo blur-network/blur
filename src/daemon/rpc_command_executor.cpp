@@ -973,7 +973,8 @@ bool t_rpc_command_executor::print_transaction_pool_stats() {
   }
   else
   {
-    memset(&res.pool_stats, 0, sizeof(res.pool_stats));
+    //Fix GGG 8.1 build error
+    res.pool_stats = {};
     if (!m_rpc_server->on_get_transaction_pool_stats(req, res, false) || res.status != CORE_RPC_STATUS_OK)
     {
       tools::fail_msg_writer() << make_error(fail_message, res.status);
@@ -1100,8 +1101,8 @@ bool t_rpc_command_executor::stop_daemon()
 //# ifdef WIN32
 //    // Stop via service API
 //    // TODO - this is only temporary!  Get rid of hard-coded constants!
-//    bool ok = windows::stop_service("BLUR Daemon");
-//    ok = windows::uninstall_service("BLUR Daemon");
+//    bool ok = windows::stop_service("Blur Daemon");
+//    ok = windows::uninstall_service("Blur Daemon");
 //    //bool ok = windows::stop_service(SERVICE_NAME);
 //    //ok = windows::uninstall_service(SERVICE_NAME);
 //    if (ok)

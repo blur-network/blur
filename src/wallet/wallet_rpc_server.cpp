@@ -592,7 +592,7 @@ namespace tools
           }
           if (addresses.empty())
           {
-            er.message = std::string("No BLUR address found at ") + url;
+            er.message = std::string("No Blur address found at ") + url;
             return {};
           }
           return addresses[0];
@@ -1416,7 +1416,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No BLUR address found at ") + url;
+          er.message = std::string("No Blur address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -2121,7 +2121,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No BLUR address found at ") + url;
+          er.message = std::string("No Blur address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -2890,7 +2890,7 @@ int main(int argc, char** argv) {
   const auto vm = wallet_args::main(
     argc, argv,
     "blur-wallet-rpc [--wallet-file=<file>|--generate-from-json=<file>|--wallet-dir=<directory>] [--rpc-bind-port=<port>]",
-    tools::wallet_rpc_server::tr("This is the RPC BLUR wallet. It needs to connect to a BLUR daemon to work correctly."),
+    tools::wallet_rpc_server::tr("This is the RPC Blur wallet. It needs to connect to a Blur daemon to work correctly."),
     desc_params,
     po::positional_options_description(),
     [](const std::string &s, bool emphasis){ epee::set_console_color(emphasis ? epee::console_color_white : epee::console_color_default, true); std::cout << s << std::endl; if (emphasis) epee::reset_console_color(); },

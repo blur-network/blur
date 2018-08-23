@@ -563,10 +563,12 @@ namespace cryptonote
     {
       std::list<std::string> txs_hashes;
       bool decode_as_json;
+      bool prune;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(txs_hashes)
         KV_SERIALIZE(decode_as_json)
+        KV_SERIALIZE_OPT(prune, false)
       END_KV_SERIALIZE_MAP()
     };
 
@@ -962,8 +964,8 @@ namespace cryptonote
       std::string bootstrap_daemon_address;
       uint64_t height_without_bootstrap;
       bool was_bootstrap_ever_used;
-	  std::string version;
-	  
+      std::string version;
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
         KV_SERIALIZE(height)
@@ -992,7 +994,7 @@ namespace cryptonote
         KV_SERIALIZE(bootstrap_daemon_address)
         KV_SERIALIZE(height_without_bootstrap)
         KV_SERIALIZE(was_bootstrap_ever_used)
-	    KV_SERIALIZE(version)
+        KV_SERIALIZE(version)
       END_KV_SERIALIZE_MAP()
     };
   };

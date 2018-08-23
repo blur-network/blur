@@ -119,7 +119,7 @@ namespace cryptonote
 
     tx.version = CURRENT_TRANSACTION_VERSION;
 
-int unlock_window = hard_fork_version >= 6 ? CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6 : CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
+int unlock_window = CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
     //lock
     tx.unlock_time = height + unlock_window;
     tx.vin.push_back(in);
