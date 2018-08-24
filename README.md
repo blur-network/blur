@@ -29,53 +29,79 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Seed Nodes:** | <li>Node 1: 178.128.191.245:14894</li> <li> Node 2: 178.128.180.136:14894 </li> <li> Node 3: 178.128.186.101:14894 </li> <li>Node 4: 178.128.183.55:14894 </li>
 
 
-# Mining BLUR 
 
 BLUR takes a decentralized-by-design approach to mining.  The algorithm used to mine BLUR is incompatible with pooled mining (with current software) and is resistant to ASIC/GPU mining rigs.  Because the algorithm dynamically changes with each block, GPUs and ASICs need reset after each block is mined on the network.  This makes it far too resource-intensive for BLUR to be an attractive option for GPU/ASIC setups.  The BLUR network is comprised of individuals mining on individual computers.
 
-## Mining on Linux
+## Build From Source (Linux)
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install dependencies.  Copy and paste the following: 
+Clone this repository and install dependencies.  Copy and paste the following: 
 
-`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libpgm-dev libnorm-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+`git clone https://github.com/blur-network/blur.git`
 
-Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
+# Install Dependencies
 
-`cd ~/Downloads && unzip blur-v0.1.7-linux-x86_64.zip`
+Required:
 
-Navigate into the directory you just unzipped from the archive, and start the daemon.
+`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libpgm-dev libnorm-dev libunbound-dev libsodium-dev`
 
-`cd blur-v0.1.6.1-linux-x86_64 && ./blurd`
+Optional: 
 
-Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
+`sudo apt-get install libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+
+# Build Binaries
+
+Open a terminal, and cd to the directory where you cloned the repository.  Assuming that is your home folder, enter the following command:
+
+`cd ~/blur && make release-all` 
+
+(Or for statically linked binaries: `make release-static`)
+
+
+## Mining BLUR (Linux)
+
+Build from source, or download the <a href="https://github.com/blur-network/blur/releases">latest Blur Network release</a>.  Navigate to the blur directory, and start the daemon:
+
+`cd blur-v0.1.7-linux-x86_64 && ./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+
+Wait for sync to complete.  Leave that terminal window open, and the daemon running.
+
+Next, open a new tab (Ctrl+Shift+T) or window, and then start the wallet:
 
 `./blur-wallet-cli`
 
-Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
+Follow the prompts to setup a new wallet.  
+*When prompted for the password, the CLI will not show a password as you type.*  It is still recording your keystrokes. 
 
-Record the information for your wallet.
+**Record the information for your wallet.**
 
 Once the wallet is open, type into the wallet CLI: `start_mining [# of threads]` where [# of threads] is the amount of cpu threads you wish to dedicate to mining BLUR. 
 
-You should see the message: `Mining started in daemon`
+You should see the message: *`Mining started in daemon`*
 
-Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
+Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring. 
+For further commands in either the wallet or the daemon, type `help` into the CLI.  Note that the commands for the daemon and wallet are different. 
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
+
 ## Mining on Windows
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a>.
+<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Compile from source for Windows</a> or download (recommended) the <a href="https://github.com/blur-network/blur/releases">latest release</a>.
 
 Open your Downloads Library in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
 
-Start the daemon by double-clicking the `blurd.exe` file. 
+Start the daemon by double-clicking the `blurd.exe` file  **OR to sync faster, open a Powershell, then copy and paste the following:**
 
-You will see a pop-up from your firewall.  Be sure to check the box next to "Private Networks" if you are on a private network, or your daemon will not be able to sync with the network. If you daemon stalls while syncing, close and restart the program.  You will not lose any blocks you have already synced with. Once your daemon is synced with the network...
+`cd Downloads/blur-v0.1.7-win-x86_64 && blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+
+You will see a pop-up from your firewall.  Be sure to check the box next to "Private Networks" if you are on a private network, or your daemon will not be able to sync with the network. 
+If you daemon stalls while syncing, close and restart the program.  You will not lose any blocks you have already synced with. 
+
+Once your daemon is syncchronized with the network...
 
 Start the wallet by double-clicking the `blur-wallet-cli` file.
 
-Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
+Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is still recording your keystrokes. 
 
 Once the wallet is open, type into the wallet CLI: `start_mining [# of threads]` where [# of threads] is the amount of cpu threads you wish to dedicate to mining BLUR. . 
 
@@ -85,47 +111,14 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
+
+
 ## How to Fix Synchronizing Issues
 
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
-Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+`--seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894 --p2p-bind-port 14894 --rpc-bind-port 14895`
 
-Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
-
-This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
-
-You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions. 
-
-# Build Blur from Source Code:
-
-**Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux </a>
-
-
-**Windows MSYS2 Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
-
-## Cloning the repository
-
-Clone recursively to pull-in needed submodule(s):
-
-`git clone https://github.com/blur-network/blur.git`
-
-## Build Instructions
-
-Blur uses the CMake build system and a top-level [Makefile](Makefile) that
-invokes cmake commands as needed.
-
-#### On Linux and OS X
-
-* After installing the dependencies, change to the root of the source code directory and build:
-
-> cd blur && make
-
-    *Optional*: If your machine has several cores and enough memory, enable
-    parallel build by running `make -j<number of threads>` instead of `make`. For
-    this to be worthwhile, the machine should have one core and about 2GB of RAM
-    available per thread.
+This should fix issue if the daemon does not bind to the correct ports, or seed nodes. 
 
 
