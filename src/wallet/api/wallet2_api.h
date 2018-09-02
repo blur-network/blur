@@ -115,7 +115,6 @@ struct UnsignedTransaction
 
     virtual ~UnsignedTransaction() = 0;
     virtual int status() const = 0;
-    virtual bool isMultisig() const = 0;
     virtual std::string errorString() const = 0;
     virtual std::vector<uint64_t> amount() const = 0;
     virtual std::vector<uint64_t>  fee() const = 0;
