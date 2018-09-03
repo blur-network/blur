@@ -108,10 +108,10 @@ VOLUME /root/.blur
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# monero-wallet-cli
+# blur-wallet-cli
 VOLUME /wallet
 
-EXPOSE 38080
-EXPOSE 38081
+EXPOSE 14894
+EXPOSE 14895
 
-ENTRYPOINT ["monerod", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=18080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=18081", "--non-interactive", "--confirm-external-bind"] 
+ENTRYPOINT ["blurd", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=14894", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=14895", "--non-interactive", "--confirm-external-bind"] 
