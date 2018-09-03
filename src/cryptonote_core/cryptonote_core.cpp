@@ -684,6 +684,7 @@ namespace cryptonote
         }
       }
     }
+
     if (keeped_by_block && get_blockchain_storage().is_within_compiled_block_hash_area())
     {
       MTRACE("Skipping semantics check for tx kept by block in embedded hash area");
