@@ -1320,20 +1320,36 @@ namespace tools
 
       if (req.key_type.compare("mnemonic") == 0)
       {
-        if (!m_wallet->get_seed(res.key))
+        if (!m_wallet->get_seed(res.mnemonic))
         {
             er.message = "The wallet is non-deterministic. Cannot display seed.";
             return false;
         }
       }
-      else if(req.key_type.compare("view_key") == 0)
+      else if(req.key_type.compare("secret_view_key") == 0)
       {
-          res.key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key);
+          res.private_view_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key);
       }
-      else if(req.key_type.compare("spend_key") == 0)
+      else if(req.key_type.compare("secret_spend_key") == 0)
       {
-          res.key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_spend_secret_key);
+          res.private_spend_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_spend_secret_key);
       }
+      else if(req.key_type.compare("public_view_key") == 0)
+      {
+          res.public_view_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_account_address.m_view_public_key);
+      }
+      else if(req.key_type.compare("public_spend_key") == 0)
+      {
+          res.public_spend_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_account_address.m_spend_public_key);
+      }
+      else if(req.key_type.compare("all_keys") == 0)
+      {
+          res.public_spend_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_account_address.m_spend_public_key);
+          res.private_spend_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_spend_secret_key);
+
+          res.public_view_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_account_address.m_view_public_key);
+          res.private_view_key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key);
+	  }
       else
       {
           er.message = "key_type " + req.key_type + " not found";

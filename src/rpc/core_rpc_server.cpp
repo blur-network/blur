@@ -207,6 +207,7 @@ namespace cryptonote
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
     }
+    res.version = MONERO_VERSION;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -837,6 +838,12 @@ namespace cryptonote
       LOG_PRINT_L0(res.status);
       return true;
     }
+    if (info.is_subaddress)
+    {
+      res.status = "Mining to subaddress isn't supported yet";
+      LOG_PRINT_L0(res.status);
+      return true;
+    }
 
     unsigned int concurrency_count = boost::thread::hardware_concurrency() * 4;
 
@@ -858,7 +865,7 @@ namespace cryptonote
     boost::thread::attributes attrs;
     attrs.set_stack_size(THREAD_STACK_SIZE);
 
-    if(!m_core.get_miner().start(req.miner_address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
+    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
     {
       res.status = "Failed, mining not started";
       LOG_PRINT_L0(res.status);
@@ -892,7 +899,8 @@ namespace cryptonote
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
       res.threads_count = lMiner.get_threads_count();
-      res.address = lMiner.get_mining_address();
+      const account_public_address& lMiningAdr = lMiner.get_mining_address();
+      res.address = get_account_address_as_str(m_nettype, false, lMiningAdr);
     }
 
     res.status = CORE_RPC_STATUS_OK;
@@ -1123,7 +1131,7 @@ namespace cryptonote
     block b = AUTO_VAL_INIT(b);
     cryptonote::blobdata blob_reserve;
     blob_reserve.resize(req.reserve_size, 0);
-    if(!m_core.get_block_template(b, req.wallet_address, res.difficulty, res.height, res.expected_reward, blob_reserve))
+    if(!m_core.get_block_template(b, info.address, res.difficulty, res.height, res.expected_reward, blob_reserve))
     {
       error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
       error_resp.message = "Internal error: failed to create block template";
@@ -1585,6 +1593,7 @@ namespace cryptonote
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
     }
+	res.version = MONERO_VERSION;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------

@@ -964,6 +964,7 @@ namespace cryptonote
       std::string bootstrap_daemon_address;
       uint64_t height_without_bootstrap;
       bool was_bootstrap_ever_used;
+      std::string version;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
@@ -993,6 +994,7 @@ namespace cryptonote
         KV_SERIALIZE(bootstrap_daemon_address)
         KV_SERIALIZE(height_without_bootstrap)
         KV_SERIALIZE(was_bootstrap_ever_used)
+        KV_SERIALIZE(version)
       END_KV_SERIALIZE_MAP()
     };
   };

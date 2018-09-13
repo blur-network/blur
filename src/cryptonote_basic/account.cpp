@@ -157,7 +157,8 @@ DISABLE_VS_WARNINGS(4244 4345)
   void account_base::create_from_viewkey(const cryptonote::account_public_address& address, const crypto::secret_key& viewkey)
   {
     crypto::secret_key fake;
-    memset(&fake, 0, sizeof(fake));
+    //Fix GGG 8.1 build error
+    memset(&unwrap(fake), 0, sizeof(fake));
     create_from_keys(address, fake, viewkey);
   }
   //-----------------------------------------------------------------

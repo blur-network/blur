@@ -74,30 +74,12 @@ namespace cryptonote
     LOG_PRINT_L2("destinations include " << num_stdaddresses << " standard addresses and " << num_subaddresses << " subaddresses");
   }
   //---------------------------------------------------------------
-  bool construct_miner_tx(size_t height, size_t median_size, uint64_t already_generated_coins, size_t current_block_size, uint64_t fee, std::string miner_address_str, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version) {
+  bool construct_miner_tx(size_t height, size_t median_size, uint64_t already_generated_coins, size_t current_block_size, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version) {
     tx.vin.clear();
     tx.vout.clear();
     tx.extra.clear();
 
-    hw::device &hwdev = hw::get_device("default");
-    keypair txkey = keypair::generate(hwdev);
-    
-    cryptonote::address_parse_info info;
-    
-    if(!get_account_address_from_str(info, cryptonote::MAINNET, miner_address_str))
-    {
-      if(!get_account_address_from_str(info, cryptonote::TESTNET, miner_address_str))
-      {
-        get_account_address_from_str(info, cryptonote::STAGENET, miner_address_str);
-      }
-    }
-	
-    cryptonote::account_public_address miner_address = info.address;
-    
-    if(info.is_subaddress)
-    {
-      txkey.pub = rct::rct2pk(hwdev.scalarmultKey(rct::pk2rct(miner_address.m_spend_public_key), rct::sk2rct(txkey.sec)));
-    }
+    keypair txkey = keypair::generate(hw::get_device("default"));
     add_tx_pub_key_to_extra(tx, txkey.pub);
     if(!extra_nonce.empty())
       if(!add_extra_nonce_to_tx_extra(tx.extra, extra_nonce))
@@ -139,7 +121,7 @@ namespace cryptonote
 
 int unlock_window = CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
     //lock
-    tx.unlock_time = height + CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
+    tx.unlock_time = height + unlock_window;
     tx.vin.push_back(in);
 
     tx.invalidate_hashes();
