@@ -115,6 +115,7 @@ struct UnsignedTransaction
 
     virtual ~UnsignedTransaction() = 0;
     virtual int status() const = 0;
+    virtual bool isMultisig() const = 0;
     virtual std::string errorString() const = 0;
     virtual std::vector<uint64_t> amount() const = 0;
     virtual std::vector<uint64_t>  fee() const = 0;
@@ -291,15 +292,6 @@ struct SubaddressAccount
     virtual void refresh() = 0;
 };
 
-struct MultisigState {
-    MultisigState() : isMultisig(false), isReady(false), threshold(0), total(0) {}
-
-    bool isMultisig;
-    bool isReady;
-    uint32_t threshold;
-    uint32_t total;
-};
-
 struct WalletListener
 {
     virtual ~WalletListener() = 0;
@@ -392,7 +384,7 @@ struct Wallet
      * \return                  - 106 characters string representing integrated address
      */
     virtual std::string integratedAddress(const std::string &payment_id) const = 0;
-
+    
    /*!
     * \brief secretViewKey     - returns secret view key
     * \return                  - secret view key
@@ -656,20 +648,20 @@ struct Wallet
                                                    uint32_t subaddr_account = 0,
                                                    std::set<uint32_t> subaddr_indices = {}) = 0;
 
-
+    
    /*!
     * \brief loadUnsignedTx  - creates transaction from unsigned tx file
     * \return                - UnsignedTransaction object. caller is responsible to check UnsignedTransaction::status()
     *                          after object returned
     */
     virtual UnsignedTransaction * loadUnsignedTx(const std::string &unsigned_filename) = 0;
-
+    
    /*!
     * \brief submitTransaction - submits transaction in signed tx file
     * \return                  - true on success
     */
     virtual bool submitTransaction(const std::string &fileName) = 0;
-
+    
 
     /*!
      * \brief disposeTransaction - destroys transaction object
@@ -683,7 +675,7 @@ struct Wallet
     * \return                  - true on success
     */
     virtual bool exportKeyImages(const std::string &filename) = 0;
-
+   
    /*!
     * \brief importKeyImages - imports key images from file
     * \param filename
@@ -752,13 +744,13 @@ struct Wallet
     virtual bool parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error) = 0;
 
     virtual std::string getDefaultDataDir() const = 0;
-
+   
    /*
     * \brief rescanSpent - Rescan spent outputs - Can only be used with trusted daemon
     * \return true on success
     */
     virtual bool rescanSpent() = 0;
-
+    
     //! blackballs a set of outputs
     virtual bool blackballOutputs(const std::vector<std::string> &pubkeys, bool add) = 0;
 
@@ -785,7 +777,7 @@ struct Wallet
 
     //! Light wallet authenticate and login
     virtual bool lightWalletLogin(bool &isNewWallet) const = 0;
-
+    
     //! Initiates a light wallet import wallet request
     virtual bool lightWalletImportWalletRequest(std::string &payment_id, uint64_t &fee, bool &new_request, bool &request_fulfilled, std::string &payment_address, std::string &status) = 0;
 };
@@ -899,16 +891,16 @@ struct WalletManager
     * \param  spendKeyString spend key (optional)
     * \return                Wallet instance (Wallet::status() needs to be called to check if recovered successfully)
     */
-    virtual Wallet * createWalletFromKeys(const std::string &path,
+    virtual Wallet * createWalletFromKeys(const std::string &path, 
                                                     const std::string &language,
-                                                    NetworkType nettype,
+                                                    NetworkType nettype, 
                                                     uint64_t restoreHeight,
                                                     const std::string &addressString,
                                                     const std::string &viewKeyString,
                                                     const std::string &spendKeyString = "") = 0;
-    Wallet * createWalletFromKeys(const std::string &path,
+    Wallet * createWalletFromKeys(const std::string &path, 
                                   const std::string &language,
-                                  bool testnet,
+                                  bool testnet, 
                                   uint64_t restoreHeight,
                                   const std::string &addressString,
                                   const std::string &viewKeyString,
