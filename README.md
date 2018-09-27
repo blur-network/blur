@@ -15,12 +15,13 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Website:** | <center> https://blur.cash </center>
 **Block Explorer:** | <center>http://explorer.blur.cash/</center>
 **Block Explorer API Example:** | <center>http://explorer.blur.cash/api/transactions</center>
-**Offline Wallet Generator:** | <center> <a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page </a> <center>
-**Discord (Main Point of Contact for Blur):** | <center><a href="https://discord.gg/VFP2VES"> Blur Official Discord </a> </center>
+**Offline Wallet Generator:** | <center><a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page</a><center>
+**Discord (Main Point of Contact for Blur):** | <center><a href="https://discord.gg/VFP2VES"> Blur Official Discord</a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
 **BitcoinTalk Announcement:** | <center><a href="https://bitcointalk.org/index.php?topic=4577361"> Official Thread on BitcoinTalk.org </center>
 **Reddit:** | <center> <a href="https://reddit.com/r/blur_network">Official Blur Network Subreddit</a></center>
-**Binary Release(s):** | <center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
+**CLI Binary Release(s):** | <center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
+**GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
 **Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
 **Seed Nodes:** | <li>Node 1: 178.128.191.245:14894</li> <li> Node 2: 178.128.180.136:14894 </li> <li> Node 3: 178.128.186.101:14894 </li>  
