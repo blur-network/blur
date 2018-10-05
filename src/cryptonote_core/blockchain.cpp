@@ -397,7 +397,7 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   // we only need 1
   m_async_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_async_service));
 
-#if defined(PER_BLOCK_
+#if defined(PER_BLOCK_CHECKPOINT)
 )
   if (m_nettype != FAKECHAIN)
     load_compiled_in_block_hashes();
