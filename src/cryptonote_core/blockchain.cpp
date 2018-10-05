@@ -90,13 +90,13 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  { 1, 1,     0, 1504387246 },
-  { 2, 2,     0, 1507601066 },
-  { 3, 3,     0, 1512206452 },
-  { 4, 4,     0, 1513136914 },
-  { 5, 5,     0, 1525150523 },
-  { 6, 7500,  0, 1529901561 },
-  { 7, 80000, 0, 1600000090 }
+  { 1, 1,     0, 1529527163 },
+  { 2, 2,     0, 1529527163 },
+  { 3, 3,     0, 1529527163 },
+  { 4, 4,     0, 1529527163 },
+  { 5, 5,     0, 1529527163 },
+  { 6, 7500,  0, 1529974332 },
+  { 7, 80000, 0, 1534323374 }
 };
 
 static const struct {
@@ -397,7 +397,8 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   // we only need 1
   m_async_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_async_service));
 
-#if defined(PER_BLOCK_CHECKPOINT)
+#if defined(PER_BLOCK_
+)
   if (m_nettype != FAKECHAIN)
     load_compiled_in_block_hashes();
 #endif
