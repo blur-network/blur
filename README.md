@@ -1,6 +1,6 @@
-# BLUR Network 
+# Blur Network 
 
-Copyright (c) 2018 The Blur Network</br>
+Copyright (c) 2018, Blur Network</br>
 
 *See [LICENSE](LICENSE).*<br>
 
@@ -9,6 +9,12 @@ Copyright (c) 2018 The Blur Network</br>
 **LTC:** LM2tBw25UMfdjAJbo52tzh5r3R47a1aMeM <br>
 **XMR:** 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv <br>
 **BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
+
+## Contents:
+- <a href="https://github.com/blur-network/blur#compile-linux">Compiling from Source</a> </br>
+- <a href="https://github.com/blur-network/blur#mining-windows">Mining on Linux/Mac</a> </br>
+- <a href="https://github.com/blur-network/blur#mining-windows">Mining on Windows</a></br>
+- <a href="https://github.com/blur-network/blur#sync-issues">Fixing Synchronization Issues</a> </br></br>
 
 Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
@@ -23,31 +29,73 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **CLI Binary Release(s):** | <center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
-**Ports:** | <li>P2P: 14894</li> <li>RPC: 14895</li>
-**Seed Nodes:** | <li>Node 1: 178.128.191.245:14894</li> <li> Node 2: 178.128.180.136:14894 </li> <li> Node 3: 178.128.186.101:14894 </li>  
+   **Ports:** | <center> P2P port = 14894 </br>RPC port = 14895</br></center>
+   **Seed Nodes:** | <center> Node 1 = 178.128.191.245:14894</br> Node 2 = 178.128.180.136:14894 </br> Node 3 = 178.128.186.101:14894  </center>
 
+# About the Project
 
-# Mining BLUR 
+BLUR takes a decentralized-by-design approach to mining.  The algorithm used to mine BLUR is incompatible with pooled mining (with current software) and is resistant to ASIC/GPU mining rigs. The BLUR network is comprised of individuals mining on individual computers. Visit our Bitcointalk.org thread or Blur.cash for more information.  Links to both can be found in the table immediately above. 
 
-BLUR takes a decentralized-by-design approach to mining.  The algorithm used to mine BLUR is incompatible with pooled mining (with current software) and is resistant to ASIC/GPU mining rigs.  Because the algorithm dynamically changes with each block, GPUs and ASICs need reset after each block is mined on the network.  This makes it far too resource-intensive for BLUR to be an attractive option for GPU/ASIC setups.  The BLUR network is comprised of individuals mining on individual computers.
+<h1 id="compile-linux">Compiling from Source on Linux</h1>
 
-## Mining on Linux
+**Blur uses the CMake build system and a top-level [Makefile](Makefile) that invokes cmake commands as needed.**
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a> and install dependencies.  Copy and paste the following: 
+**Step 1:** Clone this repository:
 
-`sudo apt update && sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libunbound-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+>`git clone https://github.com/blur-network/blur.git`
+
+**Step 2:** Install dependencies:
+
+Ubuntu One-Liner:
+
+>`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libunbound-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+
+Arch Linux One-Liner:
+
+>`sudo pacman -S base-devel cmake boost openssl zeromq libpgm unbound libsodium libunwind xz readline ldns expat gtest doxygen graphviz`
+
+**Step 3:** `cd` into the the directory where the source code was cloned,  and issue a `make` command. 
+
+>`cd ~/blur && make release-all`
+
+    *Optional*: If your machine has several cores and enough memory, enable
+    parallel build by running `make -j<number of threads>` instead of `make`. For
+    this to be worthwhile, the machine should have one core and about 2GB of RAM
+    available per thread.
+
+*There are multiple platforms and configurations for which you can compile.  A non-exhaustive list can be found below:*
+
+For statically linked binaries (defaults to the platform configuration of the host compiler):
+>`make release-static`
+
+For Windows portable binaries (Built in an MSYS2 environment):
+>`make release-static-win64`
+
+(**Windows MSYS2 Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>)
+
+For MacOS portable binaries:
+>`make release-static-mac-x86_64`
+
+For Linux portable binaries:
+>`make release-static-linux-x86_64`
+
+*Note that we do not officially support builds for 32-bit architecture, arm architecture, or the freebsd linux distribution currently. However, there are options within the [Makefile](Makefile) for these configurations.  These configurations (and source files) will need modified (considerably), in order for the resulting binaries to work.  Even if they build, it is unlikely that the network will not identify your node as malicious, upon running a daemon with incorrect code.*
+
+<h1 id="mining-linux">Mining on Linux</h1>
+
+Compile from source, or download the <a href="https://github.com/blur-network/blur/releases"> latest binary release from the Releases page</a>.  
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
-`cd ~/Downloads && tar xvzf blur-v0.1.7-linux-x86_64.tar.gz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.7-ubuntu-18.04.1-x86_64.tar.gz`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
-`cd blur-v0.1.7-linux-x86_64 && ./blurd`
+>`cd blur-v0.1.7-ubuntu-18.04.1_x86_64 && ./blurd`
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
-`./blur-wallet-cli`
+>`./blur-wallet-cli`
 
 Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
 
@@ -61,9 +109,9 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
-## Mining on Windows
+<h1 id="mining-windows"> Mining on Windows </h1>
 
-Download the <a href="https://github.com/blur-network/blur/releases">latest release</a>.
+Download the <a href="https://github.com/blur-network/blur/releases">latest release from our Releases page</a>.
 
 Open your Downloads Library in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
 
@@ -83,7 +131,7 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
-## How to Fix Synchronizing Issues
+<h1 id="sync-issues">How to Fix Synchronizing Issues</h1>
 
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
@@ -96,34 +144,4 @@ Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
 You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions. 
-
-# Build Blur from Source Code:
-
-**Linux Build Environment Setup:** <a href="https://gist.github.com/blur-network/4e7692e9ab78737a9293917f19c36dab"> Environment for Linux </a>
-
-
-**Windows MSYS2 Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>
-
-## Cloning the repository
-
-Clone recursively to pull-in needed submodule(s):
-
-`git clone https://github.com/blur-network/blur.git`
-
-## Build Instructions
-
-Blur uses the CMake build system and a top-level [Makefile](Makefile) that
-invokes cmake commands as needed.
-
-#### On Linux and OS X
-
-* After installing the dependencies, change to the root of the source code directory and build:
-
-> cd blur && make
-
-    *Optional*: If your machine has several cores and enough memory, enable
-    parallel build by running `make -j<number of threads>` instead of `make`. For
-    this to be worthwhile, the machine should have one core and about 2GB of RAM
-    available per thread.
-
 
