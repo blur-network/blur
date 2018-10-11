@@ -58,7 +58,7 @@ function (enable_stack_trace target)
       APPEND PROPERTY COMPILE_DEFINITIONS "STACK_TRACE")
     if (STATIC)
       set_property(TARGET "${target}"
-        APPEND PROPERTY LINK_FLAGS "-Wl,--wrap=__cxa_throw -fPIC")
+        APPEND PROPERTY LINK_FLAGS "-Wl,--wrap=__cxa_throw")
     endif()
   endif()
 endfunction()
@@ -106,7 +106,7 @@ function (monero_add_library_with_deps)
 endfunction ()
 
 include(Version)
-monero_add_library(version SOURCES version.cpp DEPENDS genversion)
+monero_add_library(version SOURCES ${CMAKE_BINARY_DIR}/version.cpp DEPENDS genversion)
 
 add_subdirectory(common)
 add_subdirectory(crypto)
