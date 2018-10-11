@@ -1,4 +1,3 @@
-// Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -98,11 +97,16 @@ get_builtin_cert(void)
 */
 
 /** return the built in root DS trust anchor */
-static const char*
+static const char* const*
 get_builtin_ds(void)
 {
-  return
-". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5\n";
+  static const char * const ds[] =
+  {
+    ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5\n",
+    ". IN DS 20326 8 2 E06D44B80B8F1D39A95C0B0D7C65D08458E880409BBC683457104237C7F8EC8D\n",
+    NULL
+  };
+  return ds;
 }
 
 /************************************************************
@@ -231,7 +235,7 @@ DNSResolver::DNSResolver() : m_data(new DNSResolverData())
   if (use_dns_public)
   {
     for (const auto &ip: dns_public_addr)
-      ub_ctx_set_fwd(m_data->m_ub_context, ip.c_str());
+      ub_ctx_set_fwd(m_data->m_ub_context, string_copy(ip.c_str()));
     ub_ctx_set_option(m_data->m_ub_context, string_copy("do-udp:"), string_copy("no"));
     ub_ctx_set_option(m_data->m_ub_context, string_copy("do-tcp:"), string_copy("yes"));
   }
@@ -241,7 +245,12 @@ DNSResolver::DNSResolver() : m_data(new DNSResolverData())
     ub_ctx_hosts(m_data->m_ub_context, NULL);
   }
 
-  ub_ctx_add_ta(m_data->m_ub_context, string_copy(::get_builtin_ds()));
+  const char * const *ds = ::get_builtin_ds();
+  while (*ds)
+  {
+    MINFO("adding trust anchor: " << *ds);
+    ub_ctx_add_ta(m_data->m_ub_context, string_copy(*ds++));
+  }
 }
 
 DNSResolver::~DNSResolver()
@@ -345,8 +354,8 @@ namespace dns_utils
 // TODO: parse the string in a less stupid way, probably with regex
 std::string address_from_txt_record(const std::string& s)
 {
-  // make sure the txt record has "oa1:msr" and find it
-  auto pos = s.find("oa1:msr");
+  // make sure the txt record has "oa1:xmr" and find it
+  auto pos = s.find("oa1:xmr");
   if (pos == std::string::npos)
     return {};
   // search from there to find "recipient_address="
@@ -466,7 +475,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
   for (size_t n = 0; n < dns_urls.size(); ++n)
   {
     threads[n] = boost::thread([n, dns_urls, &records, &avail, &valid](){
-      records[n] = tools::DNSResolver::instance().get_txt_record(dns_urls[n], avail[n], valid[n]);
+      records[n] = tools::DNSResolver::instance().get_txt_record(dns_urls[n], avail[n], valid[n]); 
     });
   }
   for (size_t n = 0; n < dns_urls.size(); ++n)
@@ -506,7 +515,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
   if (num_valid_records < 2)
   {
-    LOG_PRINT_L0("WARNING: no two valid BLURPulse DNS checkpoint records were received");
+    LOG_PRINT_L0("WARNING: no two valid MoneroPulse DNS checkpoint records were received");
     return false;
   }
 
@@ -528,7 +537,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
   if (good_records_index < 0)
   {
-    LOG_PRINT_L0("WARNING: no two BLURPulse DNS checkpoint records matched");
+    LOG_PRINT_L0("WARNING: no two MoneroPulse DNS checkpoint records matched");
     return false;
   }
 
