@@ -84,7 +84,7 @@ TEST(AddressFromTXT, Failure)
 
 TEST(AddressFromURL, Success)
 {
-  const std::string addr = HONEYPOT_DONATION_ADDR;
+  const std::string addr = BLUR_DONATION_ADDR;
   
   bool dnssec_result = false;
 

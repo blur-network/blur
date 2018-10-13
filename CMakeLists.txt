@@ -387,6 +387,13 @@ if (UNIX AND NOT APPLE)
   # Note that at the time of this writing the -Wstrict-prototypes flag added below will make this fail
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads)
+  if (CMAKE_USE_PTHREADS_INIT)
+    check_library_exists(pthread pthread_create pthread.h pthread_lib_exists)
+    if(pthread_lib_exists)
+      # if using pthread, force -lpthread, since it's needed in some cases, and cmake doesn't set it
+      set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    endif()
+  endif()
 endif()
 
 # Handle OpenSSL, used for sha256sum on binary updates and light wallet ssl http
@@ -799,7 +806,7 @@ endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 if(MINGW)
-  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi)
+  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;bcrypt)
   set(ICU_LIBRARIES ${Boost_LOCALE_LIBRARY} icuio icuin icuuc icudt icutu iconv)
 elseif(APPLE OR OPENBSD OR ANDROID)
   set(EXTRA_LIBRARIES "")
