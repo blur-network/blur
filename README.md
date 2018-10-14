@@ -28,7 +28,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Reddit:** | <center> <a href="https://reddit.com/r/blur_network">Official Blur Network Subreddit</a></center>
 **CLI Binary Release(s):** | <center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
-**Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
+**Algorithm:** | <center> Cryptonight-Adaptive (CPU-only/Experimental) </center>
    **Ports:** | <center> P2P port = 14894 </br>RPC port = 14895</br></center>
    **Seed Nodes:** | <center> Node 1 = 178.128.191.245:14894</br> Node 2 = 178.128.180.136:14894 </br> Node 3 = 178.128.186.101:14894  </center>
 
