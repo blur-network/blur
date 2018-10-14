@@ -2723,7 +2723,6 @@ bool wallet2::load_keys(const std::string& keys_file_name, const epee::wipeable_
   if (json.Parse(account_data.c_str()).HasParseError() || !json.IsObject())
     crypto::chacha8(keys_file_data.account_data.data(), keys_file_data.account_data.size(), key, keys_file_data.iv, &account_data[0]);
 
-  device_type = hw::device::device_type::SOFTWARE;
   // The contents should be JSON if the wallet follows the new format.
   if (json.Parse(account_data.c_str()).HasParseError())
   {
@@ -10106,7 +10105,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
     }
   }
 
-  std::string uri = "monero:" + address;
+  std::string uri = "blur:" + address;
   unsigned int n_fields = 0;
 
   if (!payment_id.empty())
