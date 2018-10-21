@@ -892,7 +892,7 @@ namespace cryptonote
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
-    int cn_variant = b.major_version >= 5 ? 1 : 0;
+    int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
 		int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
     cn_iters += ((height + 1) % 1024);
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
