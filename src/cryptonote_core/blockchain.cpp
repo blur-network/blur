@@ -90,13 +90,15 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  { 1, 1,     0, 1504387246 },
-  { 2, 2,     0, 1507601066 },
-  { 3, 3,     0, 1512206452 },
-  { 4, 4,     0, 1513136914 },
-  { 5, 5,     0, 1525150523 },
-  { 6, 7500,  0, 1529901561 },
-  { 7, 80000, 0, 1600000090 }
+  { 1, 1,      0, 1529527163 },
+  { 2, 2,      0, 1529527163 },
+  { 3, 3,      0, 1529527163 },
+  { 4, 4,      0, 1529527163 },
+  { 5, 5,      0, 1529527163 },
+  { 6, 7500,   0, 1529974332 },
+  { 7, 80000,  0, 1534323374 },
+  { 8, 180000, 0, 1600000000 }
+
 };
 
 static const struct {
@@ -2427,12 +2429,12 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v7, allow bulletproofs
-  if (hf_version < 7) {
+  // from v10, allow bulletproofs
+  if (hf_version < 10) {
     const bool bulletproof = tx.rct_signatures.type == rct::RCTTypeFullBulletproof || tx.rct_signatures.type == rct::RCTTypeSimpleBulletproof;
     if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
     {
-      MERROR("Bulletproofs are not allowed before v7");
+      MERROR("Bulletproofs are not allowed before v10");
       tvc.m_invalid_output = true;
       return false;
     }
