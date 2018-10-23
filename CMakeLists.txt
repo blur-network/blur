@@ -236,7 +236,7 @@ endif()
 # elseif(CMAKE_SYSTEM_NAME MATCHES ".*BSDI.*")
 #   set(BSDI TRUE)
 
-include_directories(external/easylogging++ src contrib/epee/include external)
+include_directories(external/rapidjson/include external/easylogging++ src contrib/epee/include external)
 
 if(APPLE)
   include_directories(SYSTEM /usr/include/malloc)
@@ -412,7 +412,6 @@ if(STATIC AND NOT IOS)
   endif()
 endif()
 
-find_package(PCSC)
 
 add_definition_if_library_exists(c memset_s "string.h" HAVE_MEMSET_S)
 add_definition_if_library_exists(c explicit_bzero "strings.h" HAVE_EXPLICIT_BZERO)
@@ -425,6 +424,8 @@ include(ExternalProject)
 ExternalProject_Add(generate_translations_header
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/translations"
   BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/translations"
+  STAMP_DIR ${LRELEASE_PATH}
+  CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH}
   INSTALL_COMMAND cmake -E echo "")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/translations")
 
@@ -458,12 +459,6 @@ endif()
 include_directories(${LIBUNWIND_INCLUDE})
 link_directories(${LIBUNWIND_LIBRARY_DIRS})
 
-# Final setup for libpcsc
-if (PCSC_FOUND) 
-  add_definitions(-DHAVE_PCSC)
-  include_directories(${PCSC_INCLUDE_DIR})
-  link_directories(${LIBPCSC_LIBRARY_DIRS})
-endif()
 
 if(MSVC)
   add_definitions("/bigobj /MP /W3 /GS- /D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4345 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /DGTEST_HAS_TR1_TUPLE=0 /FIinline_c.h /D__SSE4_1__")
@@ -553,10 +548,23 @@ else()
   add_cxx_flag_if_supported(-Wformat-security CXX_SECURITY_FLAGS)
 
   # -fstack-protector
-  add_c_flag_if_supported(-fstack-protector C_SECURITY_FLAGS)
-  add_cxx_flag_if_supported(-fstack-protector CXX_SECURITY_FLAGS)
-  add_c_flag_if_supported(-fstack-protector-strong C_SECURITY_FLAGS)
-  add_cxx_flag_if_supported(-fstack-protector-strong CXX_SECURITY_FLAGS)
+  if (NOT WIN32)
+    add_c_flag_if_supported(-fstack-protector C_SECURITY_FLAGS)
+    add_cxx_flag_if_supported(-fstack-protector CXX_SECURITY_FLAGS)
+    add_c_flag_if_supported(-fstack-protector-strong C_SECURITY_FLAGS)
+    add_cxx_flag_if_supported(-fstack-protector-strong CXX_SECURITY_FLAGS)
+  endif()
+
+  # New in GCC 8.2
+  if (NOT WIN32)
+    add_c_flag_if_supported(-fcf-protection=full C_SECURITY_FLAGS)
+    add_cxx_flag_if_supported(-fcf-protection=full CXX_SECURITY_FLAGS)
+    add_c_flag_if_supported(-fstack-clash-protection C_SECURITY_FLAGS)
+    add_cxx_flag_if_supported(-fstack-clash-protection CXX_SECURITY_FLAGS)
+  endif()
+
+  add_c_flag_if_supported(-mmitigate-rop C_SECURITY_FLAGS)
+  add_cxx_flag_if_supported(-mmitigate-rop CXX_SECURITY_FLAGS)
 
   # linker
   if (NOT WIN32)
@@ -783,7 +791,12 @@ if(STATIC)
   set(Boost_USE_STATIC_LIBS ON)
   set(Boost_USE_STATIC_RUNTIME ON)
 endif()
-find_package(Boost 1.58 QUIET REQUIRED COMPONENTS system filesystem thread date_time chrono regex serialization program_options locale)
+
+set(BOOST_LIBRARIES system filesystem thread date_time chrono regex serialization program_options)
+if(WIN32)
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} locale)
+endif()
+find_package(Boost 1.58 QUIET REQUIRED COMPONENTS ${BOOST_LIBRARIES})
 
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${OLD_LIB_SUFFIXES})
 if(NOT Boost_FOUND)
@@ -799,10 +812,11 @@ endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 if(MINGW)
-  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
+  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;curl)
   set(ICU_LIBRARIES ${Boost_LOCALE_LIBRARY} icuio icuin icuuc icudt icutu iconv)
 elseif(APPLE OR OPENBSD OR ANDROID)
-  set(EXTRA_LIBRARIES "")
+  set(EXTRA_LIBRARIES curl)
 elseif(FREEBSD)
   set(EXTRA_LIBRARIES execinfo)
 elseif(DRAGONFLY)
@@ -832,6 +846,7 @@ endif()
 
 if(ANDROID)
   set(ATOMIC libatomic.a)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=user-defined-warnings")
 endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND ARCH_WIDTH EQUAL "32" AND NOT IOS AND NOT FREEBSD)
   find_library(ATOMIC atomic)
