@@ -69,9 +69,12 @@ For statically linked binaries (defaults to the platform configuration of the ho
 >`make release-static`
 
 For Windows portable binaries (Built in an MSYS2 environment):
+
 >`make release-static-win64`
 
 (**Windows MSYS2 Build Environment Setup:**<a href="https://gist.github.com/blur-network/ead3189d181a5f85b9688fcd569195a6"> Environment for Windows </a>)
+
+*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.7.5/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
 
 For MacOS portable binaries:
 >`make release-static-mac-x86_64`
