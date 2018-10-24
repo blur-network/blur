@@ -90,11 +90,13 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
+  // Only the first fork for a given time will be added to the fork registry,
+  // so times should nearly always increase monotonically alongside versions.
   { 1, 1,      0, 1529527163 },
-  { 2, 2,      0, 1529527163 },
-  { 3, 3,      0, 1529527163 },
-  { 4, 4,      0, 1529527163 },
-  { 5, 5,      0, 1529527163 },
+  { 2, 2,      0, 1529527164 },
+  { 3, 3,      0, 1529527165 },
+  { 4, 4,      0, 1529527166 },
+  { 5, 5,      0, 1529527167 },
   { 6, 7500,   0, 1529974332 },
   { 7, 80000,  0, 1534323374 },
   { 8, 185000, 0, 1600000000 }
@@ -597,12 +599,12 @@ block Blockchain::pop_block_from_blockchain()
       }
     }
   }
-  
+
     m_blocks_longhash_table.clear();
   m_scan_table.clear();
   m_blocks_txs_check.clear();
   m_check_txin_table.clear();
-  
+
   update_next_cumulative_size_limit();
   m_tx_pool.on_blockchain_dec(m_db->height()-1, get_tail_id());
 
