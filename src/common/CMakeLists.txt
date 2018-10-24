@@ -33,6 +33,8 @@ set(common_sources
   command_line.cpp
   dns_utils.cpp
   download.cpp
+  error.cpp
+  expect.cpp
   util.cpp
   i18n.cpp
   password.cpp
@@ -54,6 +56,8 @@ set(common_private_headers
   common_fwd.h
   dns_utils.h
   download.h
+  error.h
+  expect.h
   http_connection.h
   int-util.h
   pod-class.h
@@ -78,7 +82,6 @@ monero_add_library(common
   DEPENDS generate_translations_header)
 target_link_libraries(common
   PUBLIC
-    epee
     cncrypto
     ${UNBOUND_LIBRARY}
     ${LIBUNWIND_LIBRARIES}
@@ -87,9 +90,11 @@ target_link_libraries(common
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
+    ${Boost_CHRONO_LIBRARY}
   PRIVATE
     ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 
 #monero_install_headers(common
 #  ${common_headers})
+

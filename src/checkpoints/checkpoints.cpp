@@ -178,7 +178,7 @@ namespace cryptonote
     ADD_CHECKPOINT(50000,  "655124b25dc172446ca4edccf6bdfb1e6b6aadf4f7fb543b6409ab890f5e7f7d");
     ADD_CHECKPOINT(70000,  "5b3a984a6f1daa65b5ba9b25cd1c88bd7b7c0318507f93f45a8d1bcea0a3e1d2");
 
-    return true;
+	 return true;
   }
 
   bool checkpoints::load_checkpoints_from_json(const std::string &json_hashfile_fullpath)
