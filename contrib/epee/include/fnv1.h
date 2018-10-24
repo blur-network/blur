@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018, The Monero Project
+// Copyright (c) 2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -26,18 +26,20 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MONERO_EXCEPTION_H
-#define MONERO_EXCEPTION_H
+#pragma once
 
-#include <string>
-
-namespace tools
+namespace epee
 {
 
-void set_stack_trace_log(const std::string &log);
-void log_stack_trace(const char *msg);
+namespace fnv
+{
+  inline uint64_t FNV1a(const char *ptr, size_t sz)
+  {
+    uint64_t h = 0xcbf29ce484222325;
+    for (size_t i = 0; i < sz; ++i)
+      h = (h ^ *(const uint8_t*)ptr++) * 0x100000001b3;
+    return h;
+  }
+}
 
-}  // namespace tools
-
-#endif
-
+}
