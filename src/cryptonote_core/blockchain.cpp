@@ -90,13 +90,11 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  // Only the first fork for a given time will be added to the fork registry,
-  // so times should nearly always increase monotonically alongside versions.
-  { 1, 1,      0, 1529527163 },
-  { 2, 2,      0, 1529527164 },
-  { 3, 3,      0, 1529527165 },
-  { 4, 4,      0, 1529527166 },
-  { 5, 5,      0, 1529527167 },
+  { 1, 1,      0, 1504387246 },
+  { 2, 2,      0, 1507601066 },
+  { 3, 3,      0, 1512206452 },
+  { 4, 4,      0, 1513136914 },
+  { 5, 5,      0, 1525150523 },
   { 6, 7500,   0, 1529974332 },
   { 7, 80000,  0, 1534323374 },
   { 8, 185000, 0, 1600000000 }

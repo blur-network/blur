@@ -1094,6 +1094,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
   
   boost::unique_lock<hw::device> hwdev_lock (hwdev);
   hw::reset_mode rst(hwdev);  
+  hwdev_lock.unlock();
 
  // In this function, tx (probably) only contains the base information
   // (that is, the prunable stuff may or may not be included)
@@ -1161,7 +1162,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         }
       }
     }
-
+  hwdev_lock.unlock();
     if (miner_tx && m_refresh_type == RefreshNoCoinbase)
     {
       // assume coinbase isn't for us
@@ -1194,6 +1195,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
             scan_output(tx, tx_pub_key, i, tx_scan_info[i], num_vouts_received, tx_money_got_in_outs, outs);
           }
         }
+         hwdev_lock.unlock();
       }
     }
     else if (tx.vout.size() > 1 && tools::threadpool::getInstance().get_max_concurrency() > 1)
@@ -1214,6 +1216,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         {
           hwdev.generate_key_derivation(tx_pub_key,  keys.m_view_secret_key, tx_scan_info[i].received->derivation);
           scan_output(tx, tx_pub_key, i, tx_scan_info[i], num_vouts_received, tx_money_got_in_outs, outs);
+	  hwdev_lock.unlock();
         }
       }
     }
@@ -1229,7 +1232,8 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
           hwdev.set_mode(hw::device::NONE);
           hwdev.generate_key_derivation(tx_pub_key,  keys.m_view_secret_key, tx_scan_info[i].received->derivation);
           scan_output(tx, tx_pub_key, i, tx_scan_info[i], num_vouts_received, tx_money_got_in_outs, outs);
-        }
+          hwdev_lock.unlock();
+	 }
       }
     }
 
