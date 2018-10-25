@@ -40,9 +40,9 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 **Blur uses the CMake build system and a top-level [Makefile](Makefile) that invokes cmake commands as needed.**
 
-**Step 1:** Clone this repository:
+**Step 1:** Clone this repository recursively, to pull in needed submodules:
 
->`git clone https://github.com/blur-network/blur.git`
+>`git clone --recursive https://github.com/blur-network/blur.git`
 
 **Step 2:** Install dependencies:
 
