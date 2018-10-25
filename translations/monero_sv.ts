@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
-    <name>Monero::AddressBookImpl</name>
+    <name>Blur::AddressBookImpl</name>
     <message>
         <location filename="../src/wallet/api/address_book.cpp" line="53"/>
         <source>Invalid destination address</source>
@@ -25,7 +25,7 @@
     </message>
 </context>
 <context>
-    <name>Monero::PendingTransactionImpl</name>
+    <name>Blur::PendingTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/pending_transaction.cpp" line="90"/>
         <source>Attempting to save transaction to file, but specified file(s) exist. Exiting to not risk overwriting. File:</source>
@@ -68,7 +68,7 @@
     </message>
 </context>
 <context>
-    <name>Monero::UnsignedTransactionImpl</name>
+    <name>Blur::UnsignedTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/unsigned_transaction.cpp" line="75"/>
         <source>This is a watch only wallet</source>
@@ -122,7 +122,7 @@
     </message>
 </context>
 <context>
-    <name>Monero::WalletImpl</name>
+    <name>Blur::WalletImpl</name>
     <message>
         <location filename="../src/wallet/api/wallet.cpp" line="1111"/>
         <source>payment id has invalid format, expected 16 or 64 character hex string: </source>
@@ -461,7 +461,7 @@
     </message>
     <message>
         <location filename="../src/rpc/rpc_args.cpp" line="105"/>
-        <source> requires RFC server password --</source>
+        <source> requires RPC server password --</source>
         <translation> kräver lösenord till RPC-server --</translation>
     </message>
 </context>
@@ -1559,8 +1559,8 @@ Denna transaktion låses upp vid block %llu, om ungefär %s dagar (förutsatt en
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1622"/>
-        <source>Donate &lt;amount&gt; to the development team (getblur.org).</source>
-        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (getblur.org).</translation>
+        <source>Donate &lt;amount&gt; to the development team (donate.getblur.org).</source>
+        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (donate.getblur.org).</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1625"/>
@@ -1699,10 +1699,10 @@ Om argumentet &quot;tag_description&quot; anges, så tilldelas taggen &lt;taggna
  refresh-type &lt;full|optimize-coinbase|no-coinbase|default>
    Set the wallet&apos;s refresh behaviour.
  priority [0|1|2|3|4]
-   Set the fee too default/unimportant/normal/elevated/priority.
+   Set the fee to default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0>
  ask-password &lt;1|0>
- unit &lt;blur|millipot|micropot|nanopot|picopot>
+ unit &lt;blur|millinero|micronero|nanonero|piconero>
    Set the default blur (sub-)unit.
  min-outputs-count [n]
    Try to keep at least that many outputs of value at least min-outputs-value.
@@ -1737,7 +1737,7 @@ Om argumentet &quot;tag_description&quot; anges, så tilldelas taggen &lt;taggna
    Sätt avgiften till default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0>
  ask-password &lt;1|0>
- unit &lt;blur|millipot|micropot|nanopot|picopot>
+ unit &lt;blur|millinero|micronero|nanonero|piconero>
    Ange standardvärde för blurenhet.
  min-outputs-count [n]
    Försök att behålla åtminstone så många utgångar med åtminstone värdet min-outputs-value.
@@ -2205,7 +2205,7 @@ Annars bevisar du reserven för det minsta möjliga belopp över &lt;belopp&gt; 
 To start synchronizing with the daemon, use the &quot;refresh&quot; command.
 Use the &quot;help&quot; command to see the list of available commands.
 Use &quot;help &lt;command>&quot; to see a command&apos;s documentation.
-Always use the &quot;exit&quot; command when closing blur-wallet-cli to save
+Always use the &quot;exit&quot; command when closing blur-wallet-cli to save 
 your current session&apos;s state. Otherwise, you might need to synchronize 
 your wallet again (your wallet keys are NOT at risk in any case).
 </source>
@@ -2609,8 +2609,8 @@ Varning: Några ingångsnycklar som spenderas kommer från </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1923"/>
-        <source>blur, millipot, micropot, nanopot, picopot</source>
-        <translation>blur, millipot, micropot, nanopot, picopot</translation>
+        <source>blur, millinero, micronero, nanonero, piconero</source>
+        <translation>blur, millinero, micronero, nanonero, piconero</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1975"/>
@@ -3781,7 +3781,7 @@ Utgångar per *: </translation>
         <location filename="../src/simplewallet/simplewallet.cpp" line="6787"/>
         <source>This is the command line blur wallet. It needs to connect to a blur
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för BLUR. Den måste ansluta till en blur-
+        <translation>Detta är kommandoradsplånboken för Blur. Den måste ansluta till en Blur-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4025,7 +4025,7 @@ daemon för att fungera korrekt.</translation>
         <location filename="../src/wallet/wallet_rpc_server.cpp" line="2870"/>
         <source>This is the RPC blur wallet. It needs to connect to a blur
 daemon to work correctly.</source>
-        <translation>Detta är RPC-plånboken för blur. Den måste ansluta till en BLUR-
+        <translation>Detta är RPC-plånboken för blur. Den måste ansluta till en Blur-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4134,7 +4134,7 @@ daemon för att fungera korrekt.</translation>
         <location filename="../src/wallet/wallet_args.cpp" line="138"/>
         <source>This is the command line blur wallet. It needs to connect to a blur
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för BLUR. Den måste ansluta till en BLUR-
+        <translation>Detta är kommandoradsplånboken för Blur. Den måste ansluta till en Blur-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
