@@ -82,6 +82,7 @@ monero_add_library(common
   DEPENDS generate_translations_header)
 target_link_libraries(common
   PUBLIC
+    epee
     cncrypto
     ${UNBOUND_LIBRARY}
     ${LIBUNWIND_LIBRARIES}
@@ -90,7 +91,6 @@ target_link_libraries(common
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
-    ${Boost_CHRONO_LIBRARY}
   PRIVATE
     ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
