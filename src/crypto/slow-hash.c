@@ -1477,7 +1477,7 @@ union cn_slow_hash_state {
 };
 #pragma pack(pop)
 
-void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed) {
+void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, size_t iters) {
 #ifndef FORCE_USE_HEAP
   uint8_t long_state[MEMORY];
 #else
