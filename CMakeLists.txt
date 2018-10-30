@@ -175,13 +175,21 @@ endif()
 if(NOT MANUAL_SUBMODULES)
   find_package(Git)
   if(GIT_FOUND)
+    function (check_submodule relative_path)
+      execute_process(COMMAND git -C ${relative_path} rev-parse "HEAD"  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE localHead)
+      execute_process(COMMAND git rev-parse "HEAD:${relative_path}"     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE checkedHead)
+      string(COMPARE EQUAL "${localHead}" "${checkedHead}" upToDate)
+      if (upToDate)
+        message(STATUS "Submodule '${relative_path}' is up-to-date")
+      else()
+        message(FATAL_ERROR "Submodule '${relative_path}' is not up-to-date. Please update with\ngit submodule update --init --force ${relative_path}\nor run cmake with -DMANUAL_SUBMODULES=1")
+      endif()
+    endfunction ()
+    
     message(STATUS "Checking submodules")
-    execute_process(COMMAND bash -c "cd ${CMAKE_CURRENT_SOURCE_DIR}/external/unbound && git rev-parse HEAD" OUTPUT_VARIABLE unboundLocalHead WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    execute_process(COMMAND bash -c "git ls-tree HEAD ${CMAKE_CURRENT_SOURCE_DIR}/external/unbound | awk '{print $3}'" OUTPUT_VARIABLE unboundCheckedHead WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    string(COMPARE EQUAL "${unboundLocalHead}" "${unboundCheckedHead}" unboundUpToDate)
-    if (NOT unboundUpToDate)
-      message(FATAL_ERROR "Submodules not up to date. Please update with git submodule init && git submodule update, or run cmake with -DMANUAL_SUBMODULES=1")
-    endif()
+    check_submodule(external/miniupnp)
+    check_submodule(external/unbound)
+    check_submodule(external/rapidjson)
   endif()
 endif()
 
@@ -189,10 +197,13 @@ set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS_RELEASE}")
 
 # set this to 0 if per-block checkpoint needs to be disabled
-set(PER_BLOCK_CHECKPOINT 0)
+set(PER_BLOCK_CHECKPOINT 1)
 
 if(PER_BLOCK_CHECKPOINT)
   add_definitions("-DPER_BLOCK_CHECKPOINT")
+  set(Blocks "blocks")
+else()
+  set(Blocks "")
 endif()
 
 list(INSERT CMAKE_MODULE_PATH 0
@@ -422,6 +433,8 @@ if (UNIX AND NOT APPLE)
   # Note that at the time of this writing the -Wstrict-prototypes flag added below will make this fail
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads)
+  add_c_flag_if_supported(-pthread CMAKE_C_FLAGS)
+  add_cxx_flag_if_supported(-pthread CMAKE_CXX_FLAGS)
 endif()
 
 # Handle OpenSSL, used for sha256sum on binary updates and light wallet ssl http
@@ -666,12 +679,10 @@ else()
   add_linker_flag_if_supported(-Wl,-z,noexecstack noexecstack_SUPPORTED)
   if (noexecstack_SUPPORTED)
     set(LD_SECURITY_FLAGS "${LD_SECURITY_FLAGS} -Wl,-z,noexecstack")
-    set(LD_RAW_FLAGS ${LD_RAW_FLAGS} -z noexecstack)
   endif()
   add_linker_flag_if_supported(-Wl,-z,noexecheap noexecheap_SUPPORTED)
   if (noexecheap_SUPPORTED)
     set(LD_SECURITY_FLAGS "${LD_SECURITY_FLAGS} -Wl,-z,noexecheap")
-    set(LD_RAW_FLAGS ${LD_RAW_FLAGS} -z noexecheap)
   endif()
 
   # some windows linker bits
@@ -931,7 +942,9 @@ if(ANDROID)
 endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND ARCH_WIDTH EQUAL "32" AND NOT IOS AND NOT FREEBSD)
   find_library(ATOMIC atomic)
-  list(APPEND EXTRA_LIBRARIES ${ATOMIC})
+  if (ATOMIC_FOUND)
+    list(APPEND EXTRA_LIBRARIES ${ATOMIC})
+  endif()
 endif()
 
 find_path(ZMQ_INCLUDE_PATH zmq.hpp)
@@ -994,4 +1007,3 @@ option(INSTALL_VENDORED_LIBUNBOUND "Install libunbound binary built from source 
 
 
 CHECK_C_COMPILER_FLAG(-std=c11 HAVE_C11)
-
