@@ -112,8 +112,10 @@ static const struct {
   { 3, 3, 0, 1511981038 },
   { 4, 4, 0, 1512627130 },
   { 5, 5, 0, 1524112219 },
-  { 6, 6, 0, 1529841600 }
-}; //testnet hardfork v6 tested
+  { 6, 6, 0, 1529841600 },
+  { 7, 7, 0, 1529841601 },
+  { 8, 8, 0, 1529841602 }
+}; //testnet hardfork v8 tested
 
 static const struct {
   uint8_t version;
@@ -2429,12 +2431,12 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v10, allow bulletproofs
-  if (hf_version < 10) {
+  // from, allow bulletproofs
+  if (hf_version < 7) {
     const bool bulletproof = tx.rct_signatures.type == rct::RCTTypeFullBulletproof || tx.rct_signatures.type == rct::RCTTypeSimpleBulletproof;
     if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
     {
-      MERROR("Bulletproofs are not allowed before v10");
+      MERROR("Bulletproofs are not allowed before v7");
       tvc.m_invalid_output = true;
       return false;
     }
