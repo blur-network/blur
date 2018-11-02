@@ -894,7 +894,7 @@ namespace cryptonote
     return p;
   }
   //-------------------------------------------------------------
-    uint64_t get_block_timestamp(const uint64_t& height)
+    uint64_t get_iter_timestamp(const uint64_t& height)
     {
 	uint64_t ht = height;
 	if (ht <= 49)
@@ -911,7 +911,7 @@ namespace cryptonote
 	int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
 		if (b.major_version >= 9) {
 
-		uint64_t timestamp = get_block_timestamp(height);
+		uint64_t timestamp = get_iter_timestamp();
 		cn_iters += (timestamp % 1024);
 			// Add a pseudo-random amount of iterations, within the range of 1 to 1023.
 			// We use the UNIX timestamp of a block twice the mined money unlock
