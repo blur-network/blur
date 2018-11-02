@@ -909,11 +909,7 @@ namespace cryptonote
     blobdata bd = get_block_hashing_blob(b);
         int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
 	int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
-		if (b.major_version <= 8) {
-		cn_iters += ((height + 1) % 1024);
-			}
-			// Add 1-1023 iterations, incrementally, then repeat using the
-			// height as the basis for the cycles (Before v9)
+		if (b.major_version >= 9) {
 
 		uint64_t timestamp = get_block_timestamp(height);
 		cn_iters += (timestamp % 1024);
@@ -925,6 +921,8 @@ namespace cryptonote
 			// Normally, this would be dangerous -- however, we are only relying upon
 			// the UNIX timestamp for PRNG. Therefore, it does not carry the same
 			// risks, as if it were a non-arbitrary and unbounded parameter.
+		}
+		cn_iters += ((height + 1) % 1024);
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
 }
