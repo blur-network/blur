@@ -58,4 +58,3 @@ if(HIDAPI_FOUND)
 endif()
 
 mark_as_advanced(HIDAPI_INCLUDE_DIR HIDAPI_LIBRARY)
-

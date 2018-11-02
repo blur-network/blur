@@ -45,4 +45,3 @@ macro(CHECK_LINKER_FLAG flag VARIABLE)
     endif()
   endif()
 endmacro()
-
