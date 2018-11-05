@@ -933,7 +933,7 @@ namespace cryptonote
 			// the UNIX timestamp for PRNG. Therefore, it does not carry the same
 			// risks, as if it were a non-arbitrary and unbounded parameter.
 		}
-		if ( b.major_version <=8 )
+		if ( b.major_version <= 8 )
 		{
 		  cn_iters += ((height + 1) % 1024);
 		}
