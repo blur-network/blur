@@ -139,10 +139,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+`./blurd --add-priority-node 178.128.191.245:14894 --add-priority-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --seed-node 178.128.191.245:14894 --seed-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+`blurd.exe --add-priority-node 178.128.191.245:14894 --add-priority-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
