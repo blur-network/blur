@@ -896,23 +896,34 @@ namespace cryptonote
 //--------------------------------------------------------------
   uint64_t get_block_timestamp(const uint64_t& height)
   {
-     uint64_t ht = (height - 1);
-     uint64_t timestamp = get_block_timestamp(ht);
+     uint64_t timestamp = 0;
+     uint64_t ht = 0;
+     ht = (height - 1);
        if (ht == 0)
        {
-        return 0;
+         return 0;
        }
-     return timestamp;
+       else
+       {
+         timestamp = get_block_timestamp(ht);
+         return timestamp;
+       }
   }
 //---------------------------------------------------------------
   uint64_t get_iters_timestamp(const uint64_t& height)
   {
-    uint64_t ht = height;
-      if (ht <= 49)
+    uint64_t ht = 1;
+    uint64_t iterstamp = 0;
+    ht = (height - 49);
+      if (ht == 0)
       {
        return 0;
       }
-    return get_block_timestamp(ht - 49);
+      else
+      {
+       iterstamp = get_block_timestamp(ht);
+       return iterstamp;
+      }
   }
   //-------------------------------------------------------------
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
@@ -928,10 +939,6 @@ namespace cryptonote
 			// We use the UNIX timestamp of a block twice the mined money unlock
 			// window, to determine which value to use.  This ensures that all nodes
 			// will agree upon which block to draw the timestamp from.
-			//
-			// Normally, this would be dangerous -- however, we are only relying upon
-			// the UNIX timestamp for PRNG. Therefore, it does not carry the same
-			// risks, as if it were a non-arbitrary and unbounded parameter.
 		}
 		if ( b.major_version <= 8 )
 		{
