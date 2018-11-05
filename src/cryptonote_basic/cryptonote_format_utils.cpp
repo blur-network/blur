@@ -893,17 +893,28 @@ namespace cryptonote
     get_block_hash(b, p);
     return p;
   }
+//--------------------------------------------------------------
+  uint64_t get_block_timestamp(const uint64_t& height)
+  {
+     uint64_t ht = (height - 1);
+     uint64_t timestamp = get_block_timestamp(ht);
+       if (ht == 0)
+       {
+        return 0;
+       }
+     return timestamp;
+  }
+//---------------------------------------------------------------
+  uint64_t get_iters_timestamp(const uint64_t& height)
+  {
+    uint64_t ht = height;
+      if (ht <= 49)
+      {
+       return 0;
+      }
+    return get_block_timestamp(ht - 49);
+  }
   //-------------------------------------------------------------
-    uint64_t get_iter_timestamp(const uint64_t& height)
-    {
-	uint64_t ht = height;
-	if (ht <= 49)
-	{
-	  return 0;
-	}
-	  return get_block_timestamp(ht - 49);
-    }
-//--------------------------------------------------------------------------------
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
@@ -911,8 +922,8 @@ namespace cryptonote
 	int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
 		if (b.major_version >= 9) {
 
-		uint64_t timestamp = get_iter_timestamp();
-		cn_iters += (timestamp % 1024);
+		uint64_t timestamp = get_iters_timestamp(height);
+		cn_iters += (timestamp % 4096);
 			// Add a pseudo-random amount of iterations, within the range of 1 to 1023.
 			// We use the UNIX timestamp of a block twice the mined money unlock
 			// window, to determine which value to use.  This ensures that all nodes
@@ -922,7 +933,10 @@ namespace cryptonote
 			// the UNIX timestamp for PRNG. Therefore, it does not carry the same
 			// risks, as if it were a non-arbitrary and unbounded parameter.
 		}
-		cn_iters += ((height + 1) % 1024);
+		if ( b.major_version <=8 )
+		{
+		  cn_iters += ((height + 1) % 1024);
+		}
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
 }
