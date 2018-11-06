@@ -66,6 +66,7 @@
 #include <stdexcept>
 
 #ifdef WIN32
+#include <windows.h>
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
 #endif
@@ -146,10 +147,26 @@ namespace
 #endif
     std::cout << prompt;
 
-    std::string buf;
-#ifdef _WIN32
-    buf = tools::input_line_win();
+#ifdef WIN32
+	HANDLE hConIn = CreateFileW(L"CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+	DWORD oldMode;
+	FlushConsoleInputBuffer(hConIn);
+	GetConsoleMode(hConIn, &oldMode);
+	SetConsoleMode(hConIn, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
+	wchar_t buffer[1024];
+	DWORD read;
+	ReadConsoleW(hConIn, buffer, sizeof(buffer)/sizeof(wchar_t)-1, &read, nullptr);
+	buffer[read] = 0;
+	SetConsoleMode(hConIn, oldMode);
+	CloseHandle(hConIn);
+ 
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, NULL, 0, NULL, NULL);
+	std::string buf(size_needed, '\0');
+	WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &buf[0], size_needed, NULL, NULL);
+	buf.pop_back(); //size_needed includes null that we needed to have space for
 #else
+
+    std::string buf;
     std::getline(std::cin, buf);
 #endif
 
@@ -7241,6 +7258,15 @@ int main(int argc, char* argv[])
   // Activate UTF-8 support for Boost filesystem classes on Windows
   std::locale::global(boost::locale::generator().generate(""));
   boost::filesystem::path::imbue(std::locale());
+
+	std::vector<std::string> args;
+	std::vector<char*> argptrs;
+	command_line::set_console_utf8();
+	if(command_line::get_windows_args(args, argptrs))
+	{
+		argc = args.size();
+		argv = argptrs.data();
+	}
 #endif
 
   po::options_description desc_params(wallet_args::tr("Wallet options"));

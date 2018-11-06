@@ -21,7 +21,7 @@ $(package)_toolset_darwin=darwin
 $(package)_archiver_darwin=$($(package)_libtool)
 $(package)_config_libraries=chrono,filesystem,program_options,system,thread,test,date_time,regex,serialization,locale
 $(package)_cxxflags=-std=c++11 -fvisibility=hidden
-$(package)_cxxflags_linux=-fPIC
+$(package)_cxxflags_linux=
 endef
 
 define $(package)_preprocess_cmds
@@ -29,7 +29,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-  ./bootstrap.sh --without-icu --with-libraries=$(boost_config_libraries)
+  ./bootstrap.sh --with-libraries=$(boost_config_libraries)
 endef
 
 define $(package)_build_cmds

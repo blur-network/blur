@@ -1,0 +1,6 @@
+build*
+contrib/depends/built*
+contrib/depends/work*
+contrib/depends/sources*
+contrib/depends/x86*
+

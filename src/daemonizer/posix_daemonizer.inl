@@ -78,10 +78,8 @@ namespace daemonizer
 
   template <typename T_executor>
   inline bool daemonize(
-      int argc, char const * argv[]
-    , T_executor && executor // universal ref
-    , boost::program_options::variables_map const & vm
-    )
+      int argc, char* argv[], T_executor &&executor // universal ref
+    , boost::program_options::variables_map const & vm)
   {
     if (command_line::has_arg(vm, arg_detach))
     {

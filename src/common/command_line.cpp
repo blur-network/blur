@@ -36,6 +36,11 @@
 #include "cryptonote_config.h"
 #include "string_tools.h"
 
+#if defined(WIN32)
+#include <windows.h>
+#include <shellapi.h>
+#endif
+
 namespace command_line
 {
   namespace
@@ -59,6 +64,31 @@ namespace command_line
 
     return false;
   }
+
+#ifdef WIN32
+bool get_windows_args(std::vector<std::string>& args, std::vector<char*>& argptrs)
+{
+	int nArgs = 0;
+	LPWSTR* szArgs = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+	if(szArgs == nullptr)
+		return false;
+	for(int i = 0; i < nArgs; i++)
+	{
+		int size_needed = WideCharToMultiByte(CP_UTF8, 0, szArgs[i], -1, NULL, 0, NULL, NULL);
+		args.emplace_back(size_needed, '\0');
+		std::string& str = args.back();
+		char* strptr = &str[0];
+		WideCharToMultiByte(CP_UTF8, 0, szArgs[i], -1, strptr, size_needed, NULL, NULL);
+		str.pop_back();
+		argptrs.emplace_back(strptr);
+	}
+	return true;
+}
+void set_console_utf8()
+{
+	SetConsoleCP(CP_UTF8);
+}
+#endif
 
   bool is_no(const std::string& str)
   {

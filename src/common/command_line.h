@@ -293,6 +293,10 @@ namespace command_line
     return get_arg(vm, arg);
   }
 
+#ifdef WIN32
+bool get_windows_args(std::vector<std::string>& args, std::vector<char*>& argptrs);
+void set_console_utf8();
+#endif
 
   extern const arg_descriptor<bool> arg_help;
   extern const arg_descriptor<bool> arg_version;

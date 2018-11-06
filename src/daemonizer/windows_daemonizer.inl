@@ -63,7 +63,7 @@ namespace daemonizer
     , "Hidden -- true if running as windows service"
     };
 
-    std::string get_argument_string(int argc, char const * argv[])
+    std::string get_argument_string(int argc, char* argv[])
     {
       std::string result = "";
       for (int i = 1; i < argc; ++i)
@@ -130,10 +130,8 @@ namespace daemonizer
 
   template <typename T_executor>
   inline bool daemonize(
-      int argc, char const * argv[]
-    , T_executor && executor // universal ref
-    , boost::program_options::variables_map const & vm
-    )
+      int argc, char* argv[], T_executor && executor // universal ref
+    , boost::program_options::variables_map const & vm)
   {
     std::string arguments = get_argument_string(argc, argv);
 
