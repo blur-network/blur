@@ -115,6 +115,8 @@
 #define P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT       70
 #define P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT            2
 
+#define SUPPORTED_MIN_VERSION                           version_string_to_integer("0.1.7.6")
+
 #define P2P_FAILED_ADDR_FORGET_SECONDS                  (60*60)     //1 hour
 #define P2P_IP_BLOCKTIME                                (60*60*24)  //24 hour
 #define P2P_IP_FAILS_BEFORE_BLOCK                       10
@@ -125,11 +127,11 @@
 
 #define ALLOW_DEBUG_COMMANDS
 
-#define CRYPTONOTE_NAME                         "blurnet"
+#define CRYPTONOTE_NAME                         "blur-net"
 #define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
-#define P2P_NET_DATA_FILENAME                   "p2pstate.bin"
+#define P2P_NET_DATA_FILENAME                   "peerstate.bin"
 #define MINER_CONFIG_FILE_NAME                  "miner_conf.json"
 
 #define THREAD_STACK_SIZE                       5 * 1024 * 1024
@@ -149,12 +151,12 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x1e4d; // bL
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x3d26; //uR
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x2195; // Ry
-  uint16_t const P2P_DEFAULT_PORT = 14894;
-  uint16_t const RPC_DEFAULT_PORT = 14895;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 14896;
+  uint16_t const P2P_DEFAULT_PORT = 13894;
+  uint16_t const RPC_DEFAULT_PORT = 13895;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 13896;
   boost::uuids::uuid const NETWORK_ID = { {
       0x1E,0x32, 0x11, 0x2F , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x2D
-    } }; // 
+    } }; //
   std::string const GENESIS_TX = "011901ff0001ffffffffffff0102bca7c97f7074ea888eac572fda0964cc864baf7bc07d6cecc052728039009d7621017133140c2abc1825f8d411db7bee4379a2a0f21b7af60e44ed7f07e9e66ccd8800";
 
 
@@ -162,9 +164,9 @@ namespace config
 
   namespace testnet
   {
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x1e4d; // bL
-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x3d26; //uR
-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x2195; // Ry
+  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 2124; // b8
+  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 3462; //Ps
+  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 2195; // Rb
     uint16_t const P2P_DEFAULT_PORT = 11111;
     uint16_t const RPC_DEFAULT_PORT = 21111;
     uint16_t const ZMQ_RPC_DEFAULT_PORT = 31111;
@@ -175,9 +177,9 @@ namespace config
 
   namespace stagenet
   {
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x1e4d; // bL
-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x3d26; //uR
-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x2195; // Ry
+  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 5622; // Bi
+  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 2122; //ao
+  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 134; // Ry
     uint16_t const P2P_DEFAULT_PORT = 31105;
     uint16_t const RPC_DEFAULT_PORT = 31106;
     uint16_t const ZMQ_RPC_DEFAULT_PORT = 31107;
@@ -186,6 +188,8 @@ namespace config
       } }; // Lucid Deja-Vu
   }
 }
+
+
 
 namespace cryptonote
 {

@@ -29,8 +29,8 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **CLI Binary Release(s):** | <center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
 **Algorithm:** | <center> Cryptonight-Adaptive (CPU-only) Experimental from NERVA </center>
-   **Ports:** | <center> P2P port = 14894 </br>RPC port = 14895</br></center>
-   **Seed Nodes:** | <center> Node 1 = 178.128.191.245:14894</br> Node 2 = 178.128.180.136:14894 </br> Node 3 = 178.128.186.101:14894  </center>
+   **Ports:** | <center> P2P port = 13894 </br>RPC port = 13895</br></center>
+   **Seed Nodes:** | <center> Node 1 = 178.128.191.245:13894</br> Node 2 = 178.128.180.136:13894 </br> Node 3 = 178.128.186.101:13894  </center>
 
 # About the Project
 
@@ -48,7 +48,7 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 Ubuntu One-Liner:
 
->`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libpcsclite-dev libzmq3-dev libunbound-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+>`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libnorm-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
 
 Arch Linux One-Liner:
 
@@ -90,11 +90,11 @@ Compile from source, or download the <a href="https://github.com/blur-network/bl
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
->`cd ~/Downloads && tar xvzf blur-v0.1.7-ubuntu-18.04.1-x86_64.tar.gz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.7.6-linux-x86_64.tar.xz`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
->`cd blur-v0.1.7-ubuntu-18.04.1_x86_64 && ./blurd`
+>`cd blur-v0.1.7.6-linux_x86_64 && ./blurd`
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
@@ -139,10 +139,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-priority-node 178.128.191.245:14894 --add-priority-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+`./blurd --add-priority-node 178.128.191.245:13894 --add-priority-node 178.128.186.101:13894 --seed-node 178.128.180.136:13894`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-priority-node 178.128.191.245:14894 --add-priority-node 178.128.186.101:14894 --seed-node 178.128.180.136:14894`
+`blurd.exe --add-priority-node 178.128.191.245:13894 --add-priority-node 178.128.186.101:13894 --seed-node 178.128.180.136:13894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
