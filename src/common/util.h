@@ -241,4 +241,3 @@ namespace tools
 
   void closefrom(int fd);
 }
-

@@ -139,28 +139,6 @@ namespace
 
   const command_line::arg_descriptor< std::vector<std::string> > arg_command = {"command", ""};
 
-#ifdef WIN32
-  // Translate from CP850 to UTF-8;
-  // std::getline for a Windows console returns a string in CP437 or CP850; as simplewallet,
-  // like all of Monero, is assumed to work internally with UTF-8 throughout, even on Windows
-  // (although only implemented partially), a translation to UTF-8 is needed for input.
-  //
-  // Note that if a program is started inside the MSYS2 shell somebody already translates
-  // console input to UTF-8, but it's not clear how one could detect that in order to avoid
-  // double-translation; this code here thus breaks UTF-8 input within a MSYS2 shell,
-  // unfortunately.
-  //
-  // Note also that input for passwords is NOT translated, to remain compatible with any
-  // passwords containing special characters that predate this switch to UTF-8 support.
-  static std::string cp850_to_utf8(const std::string &cp850_str)
-  {
-    boost::locale::generator gen;
-    gen.locale_cache_enabled(true);
-    std::locale loc = gen("en_US.CP850");
-    return boost::locale::conv::to_utf<char>(cp850_str, loc);
-  }
-#endif
-
   std::string input_line(const std::string& prompt)
   {
 #ifdef HAVE_READLINE
@@ -169,9 +147,10 @@ namespace
     std::cout << prompt;
 
     std::string buf;
+#ifdef _WIN32
+    buf = tools::input_line_win();
+#else
     std::getline(std::cin, buf);
-#ifdef WIN32
-    buf = cp850_to_utf8(buf);
 #endif
 
     return epee::string_tools::trim(buf);
@@ -5057,11 +5036,11 @@ bool simple_wallet::donate(const std::vector<std::string> &args_)
   amount_str = local_args.back();
   local_args.pop_back();
   // push back address, amount, payment id
-  local_args.push_back(HONEYPOT_DONATION_ADDR);
+  local_args.push_back(BLUR_DONATION_ADDR);
   local_args.push_back(amount_str);
   if (!payment_id_str.empty())
     local_args.push_back(payment_id_str);
-  message_writer() << (boost::format(tr("Donating %s BLUR to The BLUR Project (www.blur.cash / %s ).")) % amount_str % HONEYPOT_DONATION_ADDR).str(); 
+  message_writer() << (boost::format(tr("Donating %s BLUR to The BLUR Project (www.blur.cash / %s ).")) % amount_str % BLUR_DONATION_ADDR).str(); 
   transfer(local_args);
   return true;
 }
