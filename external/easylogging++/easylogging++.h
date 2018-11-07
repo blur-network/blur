@@ -2485,7 +2485,6 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   inline void clearCategories(void) {
     base::threading::ScopedLock scopedLock(lock());
     m_categories.clear();
-    m_cached_allowed_categories.clear();
   }
 
   inline void clearModules(void) {
@@ -2527,7 +2526,6 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   base::type::EnumType* m_pFlags;
   std::map<std::string, base::type::VerboseLevel> m_modules;
   std::deque<std::pair<std::string, Level>> m_categories;
-  std::map<std::string, int> m_cached_allowed_categories;
   std::string m_categoriesString;
   std::string m_filenameCommonPrefix;
 };
@@ -2766,8 +2764,6 @@ class Storage : base::NoCopy, public base::threading::ThreadSafe {
     return it->second;
   }
 
-  static el::base::type::StoragePointer getELPP();
-
  private:
   base::RegisteredHitCounters* m_registeredHitCounters;
   base::RegisteredLoggers* m_registeredLoggers;
@@ -2800,7 +2796,7 @@ class Storage : base::NoCopy, public base::threading::ThreadSafe {
   }
 };
 extern ELPP_EXPORT base::type::StoragePointer elStorage;
-#define ELPP el::base::Storage::getELPP()
+#define ELPP el::base::elStorage
 class DefaultLogDispatchCallback : public LogDispatchCallback {
  protected:
   void handle(const LogDispatchData* data);
@@ -4630,9 +4626,10 @@ el::base::debug::CrashHandler elCrashHandler(ELPP_USE_DEF_CRASH_HANDLER); \
 }
 
 #if ELPP_ASYNC_LOGGING
-#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(NULL)
+#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(new el::base::Storage(el::LogBuilderPtr(new el::base::DefaultLogBuilder()),\
+new el::base::AsyncDispatchWorker()))
 #else
-#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(NULL)
+#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(new el::base::Storage(el::LogBuilderPtr(new el::base::DefaultLogBuilder())))
 #endif  // ELPP_ASYNC_LOGGING
 #define INITIALIZE_NULL_EASYLOGGINGPP \
 namespace el {\
