@@ -68,13 +68,13 @@ Arch Linux One-Liner:
 For statically linked binaries (defaults to the platform configuration of the host compiler):
 >`make release-static`
 
-For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.7.5/contrib/depends">using contrib/depends system from Bitcoin</a>):
+For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.7.6/contrib/depends">using contrib/depends system from Bitcoin</a>):
 
 Follow the link above to setup build environment, then issue the command below
 
 >`make release-static-win64`
 
-*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.7.5/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
+*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.7.6/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
 
 For MacOS portable binaries:
 >`make release-static-mac-x86_64`
