@@ -21,7 +21,7 @@ $(package)_toolset_darwin=darwin
 $(package)_archiver_darwin=$($(package)_libtool)
 $(package)_config_libraries=chrono,filesystem,program_options,system,thread,test,date_time,regex,serialization,locale
 $(package)_cxxflags=-std=c++11 -fvisibility=hidden
-$(package)_cxxflags_linux=
+$(package)_cxxflags_linux=-fPIC
 endef
 
 define $(package)_preprocess_cmds
