@@ -1,3 +1,4 @@
+// Copyright (c) 2018, The Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 //
@@ -896,47 +897,32 @@ namespace cryptonote
 //--------------------------------------------------------------
   uint64_t get_block_timestamp(const uint64_t& height)
   {
-     uint64_t timestamp = 0;
-     uint64_t ht = 0;
-     ht = (height - 1);
+     uint64_t ht = (height - 1);
        if (ht == 0)
        {
          return 0;
        }
        else
        {
-         timestamp = get_block_timestamp(ht);
+         uint64_t timestamp = get_block_timestamp(ht);
          return timestamp;
        }
   }
 //---------------------------------------------------------------
-  uint64_t get_iters_timestamp(const uint64_t& height)
-  {
-    uint64_t ht = 1;
-    uint64_t iterstamp = 0;
-    ht = (height - 49);
-      if (ht == 0)
-      {
-       return 0;
-      }
-      else
-      {
-       iterstamp = get_block_timestamp(ht);
-       return iterstamp;
-      }
-  }
-  //-------------------------------------------------------------
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
         int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
 	int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
-		if (b.major_version >= 9) {
+		if (b.major_version >= 9)
+                {
 
-		uint64_t timestamp = get_iters_timestamp(height);
-		cn_iters += (timestamp % 4096);
-			// Add a pseudo-random amount of iterations, within the range of 1 to 1023.
-			// We use the UNIX timestamp of a block twice the mined money unlock
+                  uint64_t ht = (height - 29);
+                  uint64_t stamp = get_block_timestamp(ht);
+                  cn_iters += (stamp % 4096);
+
+			// Add a pseudo-random amount of iterations, within the range of 1 to 4095.
+			// We use the UNIX timestamp of a block outside the mined money unlock
 			// window, to determine which value to use.  This ensures that all nodes
 			// will agree upon which block to draw the timestamp from.
 		}
