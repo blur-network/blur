@@ -10105,7 +10105,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
     }
   }
 
-  std::string uri = "monero:" + address;
+  std::string uri = "blur:" + address;
   unsigned int n_fields = 0;
 
   if (!payment_id.empty())
