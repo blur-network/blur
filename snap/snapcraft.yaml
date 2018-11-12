@@ -1,10 +1,10 @@
 name: blur
-version: 0.1.5.0
-summary: "BLUR: the secure, private, untraceable cryptocurrency https://blur.cash"
+version: 0.1.7.6.1
+summary: "Blur Network: The private cryptocurrency (https://blur.cash)"
 description: |
-    BLUR is a private, secure, untraceable, decentralised digital currency.
-    You are your bank, you control your funds, and nobody can trace your transfers
-    unless you allow them to do so.
+    BLUR is a private & untraceable cryptocurrency based on the cryptonote protocol.
+    The Blur Network consists of individuals mining independently on CPUs, without
+    the need for specialized hardware. Join the Fight for Financial Freedom.  
 grade: devel
 confinement: strict
 
@@ -34,11 +34,9 @@ parts:
     cmake-build:
         plugin: cmake
         configflags:
-            - -DBDB_STATIC=1
-            - -DUPNP_STATIC=1
-            - -DBoost_USE_STATIC_LIBS=1
-            - -DBoost_USE_STATIC_RUNTIME=1
-            - -DARCH=default
+            - -DCMAKE_INSTALL_PREFIX=$HOME/blur
+            - -DCMAKE_BUILD_TYPE=release
+            - -DBUILD_TESTS=OFF
         source: .
         build-packages:
             - gcc
@@ -46,18 +44,10 @@ parts:
             - libunbound-dev
             - libevent-dev
             - libboost-all-dev
-            - libzmqpp-dev
+            - libssl-dev
             - libzmq3-dev
+            - libpgm-dev
             - libsodium-dev
-            - libdb-dev
-            - libunwind-dev
-            - libminiupnpc-dev
-            - libldns-dev
-            - libexpat1-dev
-            - libreadline6-dev
-            - bison
-            - doxygen
-            - graphviz
         stage-packages:
             - libminiupnpc10
             - libunbound2
