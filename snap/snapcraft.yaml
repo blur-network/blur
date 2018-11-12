@@ -34,7 +34,6 @@ parts:
     cmake-build:
         plugin: cmake
         configflags:
-            - -DCMAKE_INSTALL_PREFIX=$HOME/blur
             - -DCMAKE_BUILD_TYPE=release
             - -DBUILD_TESTS=OFF
         source: .
