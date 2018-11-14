@@ -108,7 +108,7 @@ release-static-linux-i686:
 
 release-static-win64:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=../../contrib/depends/x86_64-w64-mingw32/share/toolchain.cmake ../.. && $(MAKE)
+	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="x86_64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=../../cmake/64-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys64 ../.. && $(MAKE)
 
 release-static-win32:
 	mkdir -p build/release
