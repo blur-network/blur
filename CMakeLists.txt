@@ -324,6 +324,7 @@ endif()
 # set(DATABASE memory)
 set(DATABASE lmdb)
 
+
 if (DEFINED ENV{DATABASE})
   set(DATABASE $ENV{DATABASE})
   message(STATUS "DATABASE set: ${DATABASE}")
@@ -331,6 +332,11 @@ else()
   message(STATUS "Could not find DATABASE in env (not required unless you want to change database type from default: ${DATABASE})")
 endif()
 
+if (DATABASE STREQUAL "lmdb")
+  message(STATUS "Using LMDB as default DB type")
+  set(BLOCKCHAIN_DB DB_LMDB)
+add_definitions("-DDEFAULT_DB_TYPE=\"lmdb\"")
+endif()
 
 add_definitions("-DBLOCKCHAIN_DB=${BLOCKCHAIN_DB}")
 
