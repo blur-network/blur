@@ -476,7 +476,9 @@
 #undef HAVE_STRLCPY
 
 /* Define to 1 if you have the `strptime' function. */
-#undef HAVE_STRPTIME
+#ifndef HAVE_STRPTIME
+#define HAVE_STRPTIME
+#endif
 
 /* Define to 1 if you have the `strsep' function. */
 #undef HAVE_STRSEP
