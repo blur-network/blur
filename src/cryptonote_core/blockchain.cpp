@@ -97,8 +97,8 @@ static const struct {
   { 5, 5,      0, 1525150523 },
   { 6, 7500,   0, 1529974332 },
   { 7, 80000,  0, 1534323374 },
-  { 8, 185000, 0, 1540624740 }
-
+  { 8, 185000, 0, 1540624740 },
+  { 9, 205145, 0, 1560000000 }
 };
 
 static const struct {
@@ -115,8 +115,8 @@ static const struct {
   { 6, 6, 0, 1529841600 },
   { 7, 7, 0, 1529841601 },
   { 8, 8, 0, 1529841602 },
-  { 9, 70, 0,  1600000000 }
-}; //testnet hardfork v8 tested
+  { 9, 140, 0, 1600000000 }
+}; //testnet hardfork v9 final testing
 
 static const struct {
   uint8_t version;

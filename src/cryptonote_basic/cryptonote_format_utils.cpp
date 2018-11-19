@@ -29,7 +29,6 @@
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
-#include "blockchain_db/lmdb/db_lmdb.h"
 
 #include "include_base_utils.h"
 using namespace epee;
@@ -40,10 +39,12 @@ using namespace epee;
 #include "string_tools.h"
 #include "serialization/string.h"
 #include "cryptonote_format_utils.h"
+#include "difficulty.h"
 #include "cryptonote_config.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
 #include "ringct/rctSigs.h"
+#include "blockchain_db/lmdb/db_lmdb.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "cn"
@@ -900,39 +901,68 @@ namespace cryptonote
      uint64_t ht = (height - 1);
        if (ht == 0)
        {
-         return 0;
+         return 1;
        }
-       else
-       {
          uint64_t timestamp = get_block_timestamp(ht);
          return timestamp;
-       }
+  }
+//---------------------------------------------------------------
+  difficulty_type get_block_cumulative_difficulty(const uint64_t& height)
+  {
+   uint64_t ht = (height - 1);
+     if (ht < 3)
+     {
+       return 1;
+     }
+     else
+     return get_block_cumulative_difficulty(ht);
   }
 //---------------------------------------------------------------
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
-        int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
-	int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
-		if (b.major_version >= 9)
-                {
+      int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
+      int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
 
-                  uint64_t ht = (height - 29);
-                  uint64_t stamp = get_block_timestamp(ht);
-                  cn_iters += (stamp % 4096);
+	  if (b.major_version < 9)
+          {
+            cn_iters += ((height + 1) % 1024);
+          }
 
-			// Add a pseudo-random amount of iterations, within the range of 1 to 4095.
-			// We use the UNIX timestamp of a block outside the mined money unlock
-			// window, to determine which value to use.  This ensures that all nodes
-			// will agree upon which block to draw the timestamp from.
-		}
-		if ( b.major_version <= 8 )
-		{
-		  cn_iters += ((height + 1) % 1024);
-		}
+	  if (b.major_version >= 9)
+          {
+
+           uint64_t ht_one = (height - 28);   // Start keeping track of ht_one at block 30
+           uint64_t ht_two = (height - 128);  // Take note of a second block, 100 blocks later
+
+          int stamp_two = get_block_timestamp(ht_one);  // retrieve more recent unix stamp
+          int stamp_one = get_block_timestamp(ht_two);  // and older timestamp
+          int diff = get_block_cumulative_difficulty(height + 1);
+
+          cn_iters += (((diff % ((stamp_one + 1171) - stamp_two)) + (height + 1))  % 4096);
+
+	    // Add a variable amount of iterations, within the range of [1,4096]. To do so,
+	    // we use two unix timestamps, the prospective network difficulty of the block
+	    // ahead, and the height of that same future block.  We use the network diff
+	    // as part of the calculation to invalidate partials shares of that difficulty.
+	    //
+            // We use a block's timestamp from 29 blocks in the past for the base of
+            // an arbitrary number. We add a prime number to the first timestamp, and subtract
+            // a second timestamp, from 100 blocks earlier, to create a semi-standard window
+            // within which we generate an oscillating, deterministic number to use as a modulus.
+            //
+            // The spread of two timestamps over any given 100 block period should be relatively
+            // the same periodically, we add a prime positive number to ensure that the result is
+            // a non-negative integer. We divide the network difficulty by that value, and take the
+            // remainder.  That remainder value is then added to the height of a future block.
+            //
+            // Finally, referring to the previous calculatons as the collective value "k", we
+            // find k mod 4096, and add that final value to the base value of cn_iters.
+         }
+
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
-}
+  }
   //---------------------------------------------------------------
   std::vector<uint64_t> relative_output_offsets_to_absolute(const std::vector<uint64_t>& off)
   {
