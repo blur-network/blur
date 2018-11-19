@@ -943,7 +943,7 @@ namespace cryptonote
 
 	    // Add a variable amount of iterations, within the range of [1,4096]. To do so,
 	    // we use two unix timestamps, the prospective network difficulty of the block
-	    // ahead, and the height of that same future block.  We use the network diff
+	    // being mined, and the height of that a future block.  We use the network diff
 	    // as part of the calculation to invalidate partials shares of that difficulty.
 	    //
             // We use a block's timestamp from 29 blocks in the past for the base of
