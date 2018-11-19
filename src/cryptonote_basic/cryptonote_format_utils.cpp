@@ -932,11 +932,11 @@ namespace cryptonote
 	  if (b.major_version >= 9)
           {
 
-           uint64_t ht_one = (height - 28);   // Start keeping track of ht_one at block 30
+   //        uint64_t ht_one = (height - 28);   // Start keeping track of ht_one at block 30
            uint64_t ht_two = (height - 128);  // Take note of a second block, 100 blocks later
 
-          int stamp_two = get_block_timestamp(ht_one);  // retrieve more recent unix stamp
-          int stamp_one = get_block_timestamp(ht_two);  // and older timestamp
+          int stamp_one = b.timestamp;  // current block timestamp
+          int stamp_two = get_block_timestamp(ht_two);  // and older timestamp
           int diff = get_block_cumulative_difficulty(height + 1);
 
           cn_iters += (((diff % ((stamp_one + 1171) - stamp_two)) + (height + 1))  % 4096);
