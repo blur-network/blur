@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 //
@@ -180,6 +181,7 @@ namespace cryptonote
     ADD_CHECKPOINT(100000,  "6e45258946faa11868f183e8f289511b9e2c266320de66d221b1ed5b014cee47");
     ADD_CHECKPOINT(150000,  "88210b6d446d4f4c5a0a77432e8a2f1d5da0fd3fc82ef30b8db3693208e8fefe");
     ADD_CHECKPOINT(185000,  "96ddfcdd4be315e438a93bd82cd505235f96ff33349313357ca123937f5c4fe1");
+    ADD_CHECKPOINT(200000,  "d6f939964ad727a7bd2bb44a909bf02079ea9caf7f55b0e791338860b3a89d0d");
 	 return true;
   }
 
