@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 //
@@ -97,7 +98,8 @@ static const struct {
   { 5, 5,      0, 1525150523 },
   { 6, 7500,   0, 1529974332 },
   { 7, 80000,  0, 1534323374 },
-  { 8, 185000, 0, 1540624740 }
+  { 8, 185000, 0, 1540624740 },
+  { 9, 211000, 0, 1543147200 }
 };
 
 static const struct {
@@ -114,7 +116,7 @@ static const struct {
   { 6, 6, 0, 1529841600 },
   { 7, 7, 0, 1529841601 },
   { 8, 8, 0, 1529841602 },
-  { 9, 140, 0, 1600000000 }
+  { 9, 140, 0, 1542681000 }
 }; //testnet hardfork v9 final testing
 
 static const struct {

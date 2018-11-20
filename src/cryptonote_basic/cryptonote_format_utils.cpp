@@ -942,12 +942,12 @@ namespace cryptonote
           cn_iters += (((diff % ((stamp_one + 1171) - stamp_two)) + (height + 1))  % 4096);
 
 	    // Add a deterministic, variable amount of iterations within the range of [1,4095]. 
-	    //  
+	    //
             // To decide upon a value, we use two unix timestamps, and the prospective difficulty 
 	    // of the block being mined. Cumulative block diff was chosen to be included 
 	    // as part of the calculation to (theoretically) invalidate partials shares of that 
             // in PPS/PPLNS-type pooling. The current timestamp is used to facilitate miners reporting
-	    // timestamp in a way that doesn't lend itself to manipulation. 
+	    // timestamp in a way that doesn't lend itself to manipulation.
 	    //
             // To derive an arbitrary, semi-prime modulus, we use the current block's timestamp and one  
             // from 129 blocks in the past. We add a prime number to the current timestamp, and subtract
