@@ -932,28 +932,32 @@ namespace cryptonote
 	  if (b.major_version >= 9)
           {
 
-           uint64_t ht_one = (height - 28);   // Start keeping track of ht_one at block 30
+   //        uint64_t ht_one = (height - 28);   // Start keeping track of ht_one at block 30
            uint64_t ht_two = (height - 128);  // Take note of a second block, 100 blocks later
 
-          int stamp_two = get_block_timestamp(ht_one);  // retrieve more recent unix stamp
-          int stamp_one = get_block_timestamp(ht_two);  // and older timestamp
+          int stamp_one = b.timestamp;  // current block timestamp
+          int stamp_two = get_block_timestamp(ht_two);  // and older timestamp
           int diff = get_block_cumulative_difficulty(height + 1);
 
           cn_iters += (((diff % ((stamp_one + 1171) - stamp_two)) + (height + 1))  % 4096);
 
-	    // Add a variable amount of iterations, within the range of [1,4096]. To do so,
-	    // we use two unix timestamps, the prospective network difficulty of the block
-	    // ahead, and the height of that same future block.  We use the network diff
-	    // as part of the calculation to invalidate partials shares of that difficulty.
+	    // Add a deterministic, variable amount of iterations within the range of [1,4095]. 
+	    //  
+            // To decide upon a value, we use two unix timestamps, and the prospective difficulty 
+	    // of the block being mined. Cumulative block diff was chosen to be included 
+	    // as part of the calculation to (theoretically) invalidate partials shares of that 
+            // in PPS/PPLNS-type pooling. The current timestamp is used to facilitate miners reporting
+	    // timestamp in a way that doesn't lend itself to manipulation. 
 	    //
-            // We use a block's timestamp from 29 blocks in the past for the base of
-            // an arbitrary number. We add a prime number to the first timestamp, and subtract
-            // a second timestamp, from 100 blocks earlier, to create a semi-standard window
-            // within which we generate an oscillating, deterministic number to use as a modulus.
+            // To derive an arbitrary, semi-prime modulus, we use the current block's timestamp and one  
+            // from 129 blocks in the past. We add a prime number to the current timestamp, and subtract
+            // a second timestamp, from 129 blocks earlier, to create a semi-standard window
+            // within which we generate an oscillating, deterministic number to use as a modulus. We take
+            // the modulus of the block_cumulative_difficulty.
             //
             // The spread of two timestamps over any given 100 block period should be relatively
-            // the same periodically, we add a prime positive number to ensure that the result is
-            // a non-negative integer. We divide the network difficulty by that value, and take the
+            // equal, periodically.  We add a prime positive number to ensure that the result is
+            // a non-negative integer. Then, we divide the network difficulty by that value, and take the
             // remainder.  That remainder value is then added to the height of a future block.
             //
             // Finally, referring to the previous calculatons as the collective value "k", we
