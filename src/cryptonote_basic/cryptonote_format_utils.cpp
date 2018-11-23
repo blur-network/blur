@@ -949,15 +949,16 @@ namespace cryptonote
             // in PPS/PPLNS-type pooling. The current timestamp is used to facilitate miners reporting
 	    // timestamp in a way that doesn't lend itself to manipulation.
 	    //
-            // To derive an arbitrary, semi-prime modulus, we use the current block's timestamp and one  
+            // To derive an arbitrary modulus, we use the current block's timestamp and one
             // from 129 blocks in the past. We add a prime number to the current timestamp, and subtract
             // a second timestamp, from 129 blocks earlier, to create a semi-standard window
             // within which we generate an oscillating, deterministic number to use as a modulus. We take
             // the modulus of the block_cumulative_difficulty.
             //
             // The spread of two timestamps over any given 100 block period should be relatively
-            // equal, periodically.  We add a prime positive number to ensure that the result is
-            // a non-negative integer. Then, we divide the network difficulty by that value, and take the
+            // equal, periodically. We add a positive number to ensure that the result is
+            // a non-negative integer. This window is typically 8,000 +/-, so add +1000 arbitrarily
+            // Then, we divide the network difficulty by the resulting value, and take the
             // remainder.  That remainder value is then added to the height of a future block.
             //
             // Finally, referring to the previous calculatons as the collective value "k", we
