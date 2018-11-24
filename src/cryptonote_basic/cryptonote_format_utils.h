@@ -45,7 +45,6 @@ namespace epee
 
 namespace cryptonote
 {
-	class Blockchain;
 
   //---------------------------------------------------------------
   void get_transaction_prefix_hash(const transaction_prefix& tx, crypto::hash& h);
@@ -107,7 +106,6 @@ namespace cryptonote
   bool calculate_block_hash(const block& b, crypto::hash& res);
   bool get_block_hash(const block& b, crypto::hash& res);
   crypto::hash get_block_hash(const block& b);
-  uint64_t get_block_cumulative_diff(const uint64_t height);
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height);
   crypto::hash get_block_longhash(const block& b, uint64_t height);
   bool parse_and_validate_block_from_blob(const blobdata& b_blob, block& b);
