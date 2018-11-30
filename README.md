@@ -42,11 +42,15 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 **Step 1:** Clone this repository recursively, to pull in needed submodules:
 
->`git clone --recursive https://github.com/blur-network/blur.git`
+>`git clone https://github.com/blur-network/blur.git`
 
 **Step 2:** Install dependencies:
 
-Ubuntu One-Liner:
+Ubuntu 18.04.1 One-Liner:
+
+>`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libnorm-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
+
+Debian 9/Ubuntu 16.04 One-Liner:
 
 >`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libnorm-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz`
 
@@ -87,6 +91,8 @@ For Linux portable binaries:
 <h1 id="mining-linux">Mining on Linux</h1>
 
 Compile from source, or download the <a href="https://github.com/blur-network/blur/releases"> latest binary release from the Releases page</a>.  
+
+We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snapcraft.io/blur"><img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /></a>
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
