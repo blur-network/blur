@@ -10,9 +10,8 @@ confinement: strict
 
 apps:
     blurd:
-        daemon: forking
         command: |
-          blurd-wrapper --detach --data-dir ${SNAP_COMMON} --config-file ${SNAP_USER_DATA}/etc/blurd.conf
+          blurd-wrapper --data-dir ${HOME}/.blur-net
         plugs:
             - network
             - network-bind
