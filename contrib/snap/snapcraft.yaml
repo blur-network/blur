@@ -30,8 +30,19 @@ apps:
             - home
             - network
 
+parts:
+    cmake-build:
+        plugin: cmake
+        configflags:
+            - -DBoost_USE_STATIC_LIBS=1
+            - -DBoost_USE_STATIC_RUNTIME=1
+            - -DSTATIC=1
+            - -DBUILD_TESTS=0
+            - -DBUILD_TYPE=release
+        source: .
         build-packages:
             - gcc
+            - build-essential
             - pkg-config
             - libunbound-dev
             - libevent-dev
@@ -51,6 +62,11 @@ apps:
             - libminiupnpc10
             - libunbound2
             - libunwind8
+        prime:
+            - bin
+            - usr/lib/
+            - -usr/lib/gcc
+            - -usr/share
 
     dist-files:
         plugin: dump
