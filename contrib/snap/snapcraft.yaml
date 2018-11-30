@@ -5,7 +5,7 @@ description: |
     BLUR is a private & untraceable cryptocurrency based on the cryptonote protocol.
     The Blur Network consists of individuals mining independently on CPUs, without
     the need for specialized hardware. Join the Fight for Financial Freedom.  
-grade: devel
+grade: stable
 confinement: strict
 
 apps:
@@ -34,34 +34,35 @@ parts:
     cmake-build:
         plugin: cmake
         configflags:
-            - -DBoost_USE_STATIC_LIBS=1
-            - -DBoost_USE_STATIC_RUNTIME=1
-            - -DSTATIC=1
-            - -DBUILD_TESTS=0
-            - -DBUILD_TYPE=release
+            - -DCMAKE_BUILD_TYPE=release
+            - -DBUILD_TESTS=OFF
+            - -DARCH=default
         source: .
         build-packages:
             - gcc
-            - build-essential
             - pkg-config
             - libunbound-dev
-            - libevent-dev
             - libboost-all-dev
-            - libzmqpp-dev
-            - libzmq3-dev
-            - libsodium-dev
-            - libunwind-dev
-            - libminiupnpc-dev
+            - liblzma-dev
             - libldns-dev
-            - libexpat1-dev
-            - libreadline6-dev
-            - bison
-            - doxygen
-            - graphviz
+            - libzmq3-dev
+            - libpgm-dev
+            - libsodium-dev
         stage-packages:
-            - libminiupnpc10
             - libunbound2
-            - libunwind8
+            - libboost-serialization1.58.0
+            - libboost-chrono1.58.0
+            - libboost-system1.58.0
+            - libboost-thread1.58.0
+            - libboost-locale1.58.0
+            - libboost-atomic1.58.0
+            - libboost-filesystem1.58.0
+            - libboost-program-options1.58.0
+            - libboost-regex1.58.0
+            - libzmq5
+            - libsodium18
+            - libstdc++6
+            - libgcc1
         prime:
             - bin
             - usr/lib/
