@@ -184,13 +184,13 @@ namespace cryptonote
     res.target = m_core.get_blockchain_storage().get_difficulty_target();
     res.tx_count = m_core.get_blockchain_storage().get_total_transactions() - res.height; //without coinbase
     res.tx_pool_size = m_core.get_pool_transactions_count();
-    res.alt_blocks_count = m_core.get_blockchain_storage().get_alternative_blocks_count();
-    uint64_t total_conn = m_p2p.get_connections_count();
-    res.outgoing_connections_count = m_p2p.get_outgoing_connections_count();
-    res.incoming_connections_count = total_conn - res.outgoing_connections_count;
-    res.rpc_connections_count = get_connections_count();
-    res.white_peerlist_size = m_p2p.get_peerlist_manager().get_white_peers_count();
-    res.grey_peerlist_size = m_p2p.get_peerlist_manager().get_gray_peers_count();
+    res.alt_blocks_count = m_restricted ? 0 : m_core.get_blockchain_storage().get_alternative_blocks_count();
+    uint64_t total_conn = m_restricted ? 0 : m_p2p.get_connections_count();
+    res.outgoing_connections_count = m_restricted ? 0 : m_p2p.get_outgoing_connections_count();
+    res.incoming_connections_count = m_restricted ? 0 : total_conn - res.outgoing_connections_count;
+    res.rpc_connections_count = m_restricted ? 0 : get_connections_count();
+    res.white_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_white_peers_count();
+    res.grey_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_gray_peers_count();
     res.mainnet = m_nettype == MAINNET;
     res.testnet = m_nettype == TESTNET;
     res.stagenet = m_nettype == STAGENET;
@@ -201,8 +201,11 @@ namespace cryptonote
     res.start_time = (uint64_t)m_core.get_start_time();
     res.free_space = m_restricted ? std::numeric_limits<uint64_t>::max() : m_core.get_free_space();
     res.offline = m_core.offline();
-    res.bootstrap_daemon_address = m_bootstrap_daemon_address;
-    res.height_without_bootstrap = res.height;
+    res.bootstrap_daemon_address = m_restricted ? "" : m_bootstrap_daemon_address;
+    res.height_without_bootstrap = m_restricted ? 0 : res.height;
+    if (m_restricted)
+      res.was_bootstrap_ever_used = false;
+    else
     {
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
@@ -1582,13 +1585,13 @@ namespace cryptonote
     res.target = DIFFICULTY_TARGET;
     res.tx_count = m_core.get_blockchain_storage().get_total_transactions() - res.height; //without coinbase
     res.tx_pool_size = m_core.get_pool_transactions_count();
-    res.alt_blocks_count = m_core.get_blockchain_storage().get_alternative_blocks_count();
-    uint64_t total_conn = m_p2p.get_connections_count();
-    res.outgoing_connections_count = m_p2p.get_outgoing_connections_count();
-    res.incoming_connections_count = total_conn - res.outgoing_connections_count;
-    res.rpc_connections_count = get_connections_count();
-    res.white_peerlist_size = m_p2p.get_peerlist_manager().get_white_peers_count();
-    res.grey_peerlist_size = m_p2p.get_peerlist_manager().get_gray_peers_count();
+    res.alt_blocks_count = m_restricted ? 0 : m_core.get_blockchain_storage().get_alternative_blocks_count();
+    uint64_t total_conn = m_restricted ? 0 : m_p2p.get_connections_count();
+    res.outgoing_connections_count = m_restricted ? 0 : m_p2p.get_outgoing_connections_count();
+    res.incoming_connections_count = m_restricted ? 0 : total_conn - res.outgoing_connections_count;
+    res.rpc_connections_count = m_restricted ? 0 : get_connections_count();
+    res.white_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_white_peers_count();
+    res.grey_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_gray_peers_count();
     res.mainnet = m_nettype == MAINNET;
     res.testnet = m_nettype == TESTNET;
     res.stagenet = m_nettype == STAGENET;
@@ -1596,11 +1599,14 @@ namespace cryptonote
     res.block_size_limit = m_core.get_blockchain_storage().get_current_cumulative_blocksize_limit();
     res.block_size_median = m_core.get_blockchain_storage().get_current_cumulative_blocksize_median();
     res.status = CORE_RPC_STATUS_OK;
-    res.start_time = (uint64_t)m_core.get_start_time();
+    res.start_time = m_restricted ? 0 : (uint64_t)m_core.get_start_time();
     res.free_space = m_restricted ? std::numeric_limits<uint64_t>::max() : m_core.get_free_space();
     res.offline = m_core.offline();
-    res.bootstrap_daemon_address = m_bootstrap_daemon_address;
-    res.height_without_bootstrap = res.height;
+    res.bootstrap_daemon_address = m_restricted ? "" : m_bootstrap_daemon_address;
+    res.height_without_bootstrap = m_restricted ? 0 : res.height;
+    if (m_restricted)
+      res.was_bootstrap_ever_used = false;
+    else
     {
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
