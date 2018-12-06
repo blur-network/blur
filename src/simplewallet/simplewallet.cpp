@@ -3807,7 +3807,7 @@ bool simple_wallet::refresh_main(uint64_t start_height, bool reset, bool is_init
     ok = true;
     // Clear line "Height xxx of xxx"
     std::cout << "\r                                                                \r";
-    success_msg_writer(true) << tr("Refresh done, blocks received: ") << fetched_blocks;
+    success_msg_writer(true) << tr("Refresh done, blocks refreshed: ") << fetched_blocks;
     if (is_init)
       print_accounts();
     show_balance_unlocked();
