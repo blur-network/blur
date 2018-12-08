@@ -43,6 +43,8 @@
 #include "cryptonote_basic/cryptonote_boost_serialization.h"
 #include "cryptonote_config.h"
 #include "cryptonote_basic/miner.h"
+#include "cryptonote_basic/cryptonote_format_utils.h"
+#include "cryptonote_basic/tx_extra.h"
 #include "misc_language.h"
 #include "profile_tools.h"
 #include "file_io_utils.h"
@@ -1442,6 +1444,14 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     {
       LOG_ERROR("CHECKPOINT VALIDATION FAILED");
       bvc.m_verifivation_failed = true;
+      return false;
+    }
+
+    // Disable merge mining tag
+    tx_extra_merge_mining_tag mm_tag;
+    if (get_merge_mining_tag_from_extra(b.miner_tx.extra))
+    {
+      MERROR_VER("Block with id: " << id << std::endl << " has merged mining tag in extra, which has been disabled.");
       return false;
     }
 
@@ -3162,6 +3172,17 @@ leave:
     goto leave;
   }
 
+  uint64_t height = 0;
+  tx_extra_merge_mining_tag mm_tag;
+  if (!get_block_height(bl))
+  {
+    if (get_merge_mining_tag_from_extra(bl.miner_tx.extra))
+    {
+      MERROR_VER("Block with id: " << id << std::endl << " has merged mining tag in extra, which has been disabled");
+      return false;
+    }
+  }
+
   TIME_MEASURE_FINISH(t1);
   TIME_MEASURE_START(t2);
 
@@ -3318,6 +3339,9 @@ leave:
       return_tx_to_pool(txs);
       goto leave;
     }
+
+
+
 
     TIME_MEASURE_FINISH(bb);
     t_pool += bb;
