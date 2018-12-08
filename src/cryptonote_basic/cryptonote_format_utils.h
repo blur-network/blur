@@ -65,6 +65,7 @@ namespace cryptonote
   }
 
   bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields);
+  bool get_merge_mining_tag_from_extra(const std::vector<uint8_t>& tx_extra);
   crypto::public_key get_tx_pub_key_from_extra(const std::vector<uint8_t>& tx_extra, size_t pk_index = 0);
   crypto::public_key get_tx_pub_key_from_extra(const transaction_prefix& tx, size_t pk_index = 0);
   crypto::public_key get_tx_pub_key_from_extra(const transaction& tx, size_t pk_index = 0);
