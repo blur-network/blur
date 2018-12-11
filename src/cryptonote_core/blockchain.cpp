@@ -1447,13 +1447,6 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
       return false;
     }
 
-    // Disable merge mining tag
-    tx_extra_merge_mining_tag mm_tag;
-    if (get_merge_mining_tag_from_extra(b.miner_tx.extra) && b.major_version >= 10)
-    {
-      MERROR_VER("Block with id: " << id << std::endl << " has merged mining tag in extra, which has been disabled.");
-      return false;
-    }
 
     // Check the block's hash against the difficulty target for its alt chain
     difficulty_type current_diff = get_next_difficulty_for_alternative_chain(alt_chain, bei);
@@ -3170,17 +3163,6 @@ leave:
     MERROR_VER("Block with id: " << id << std::endl << "has old version: " << (unsigned)bl.major_version << std::endl << "current: " << (unsigned)m_hardfork->get_current_version());
     bvc.m_verifivation_failed = true;
     goto leave;
-  }
-
-  uint64_t height = 0;
-  tx_extra_merge_mining_tag mm_tag;
-  if (!get_block_height(bl))
-  {
-    if (get_merge_mining_tag_from_extra(bl.miner_tx.extra) && bl.major_version >= 10)
-    {
-      MERROR_VER("Block with id: " << id << std::endl << " has merged mining tag in extra, which has been disabled");
-      return false;
-    }
   }
 
   TIME_MEASURE_FINISH(t1);
