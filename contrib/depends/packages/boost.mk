@@ -29,7 +29,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-  ./bootstrap.sh --with-libraries=$(boost_config_libraries)
+  ./bootstrap.sh --without-icu --with-libraries=$(boost_config_libraries)
 endef
 
 define $(package)_build_cmds
