@@ -60,4 +60,3 @@ int Notify::notify(const char *parameter)
 }
 
 }
-

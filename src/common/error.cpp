@@ -73,4 +73,3 @@ std::error_category const& common_category() noexcept
     return instance;
 }
 
-
