@@ -68,4 +68,3 @@ namespace detail
         throw std::system_error{ec};
     }
 } // detail
-

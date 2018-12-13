@@ -103,4 +103,3 @@ target_link_libraries(common
 
 #monero_install_headers(common
 #  ${common_headers})
-
