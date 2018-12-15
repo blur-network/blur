@@ -52,4 +52,3 @@ target_link_libraries(functional_tests
 set_property(TARGET functional_tests
   PROPERTY
     FOLDER "tests")
-

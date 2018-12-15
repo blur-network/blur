@@ -58,7 +58,7 @@ TEST(AddressFromTXT, Success)
 
   EXPECT_STREQ(addr.c_str(), res.c_str());
 
-  std::string txtr3 = "foobar oa1:msr tx_description=\"Donation for BLUR Development Fund\"; ";
+  std::string txtr3 = "foobar oa1:blur tx_description=\"Donation for Blur Network Development Fund\"; ";
   txtr3 += "recipient_address=";
   txtr3 += addr;
   txtr3 += "; foobar";
@@ -84,7 +84,7 @@ TEST(AddressFromTXT, Failure)
 
 TEST(AddressFromURL, Success)
 {
-  const std::string addr = HONEYPOT_DONATION_ADDR;
+  const std::string addr = BLUR_DONATION_ADDR;
   
   bool dnssec_result = false;
 

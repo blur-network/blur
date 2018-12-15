@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bash
 
-rlwrap monero-wallet-cli --wallet-file wallet_04.bin --password "" --testnet --trusted-daemon --daemon-address localhost:14894  --log-file wallet_04.log
+rlwrap blur-wallet-cli --wallet-file wallet_04 --password "" --testnet  --daemon-address localhost:13894  --log-file wallet_04.log
 

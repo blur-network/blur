@@ -793,7 +793,7 @@ TEST(Serialization, portability_wallet)
   }
 }
 
-#define OUTPUT_EXPORT_FILE_MAGIC "BLUR output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "Blur Network output export\003"
 TEST(Serialization, portability_outputs)
 {
   // read file
@@ -909,7 +909,7 @@ TEST(Serialization, portability_outputs)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define UNSIGNED_TX_PREFIX "BLUR unsigned tx set\003"
+#define UNSIGNED_TX_PREFIX "Blur Network unsigned tx set\003"
 TEST(Serialization, portability_unsigned_tx)
 {
   const boost::filesystem::path filename = unit_test::data_dir / "unsigned_blur_tx";
@@ -1057,7 +1057,7 @@ TEST(Serialization, portability_unsigned_tx)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define SIGNED_TX_PREFIX "BLUR signed tx set\003"
+#define SIGNED_TX_PREFIX "Blur Network signed tx set\003"
 TEST(Serialization, portability_signed_tx)
 {
   const boost::filesystem::path filename = unit_test::data_dir / "signed_blur_tx";
