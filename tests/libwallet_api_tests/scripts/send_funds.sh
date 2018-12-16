@@ -1,23 +1,23 @@
-#!/bash
+#!/bin/bash
 
 function send_funds {
     local amount=$1
     local dest=$(cat "$2.address.txt")
 
     blur-wallet-cli --wallet-file wallet_m --password "" \
-        --testnet  --daemon-address localhost:13894  --log-file wallet_m.log \
+        --testnet --trusted-daemon --daemon-address localhost:21111  --log-file wallet_m.log \
         --command transfer $dest $amount 
 }
 
 
 function seed_wallets {
     local amount=$1
-    send_funds $amount wallet_01
-    send_funds $amount wallet_02
-    send_funds $amount wallet_03
-    send_funds $amount wallet_04
-    send_funds $amount wallet_05
-    send_funds $amount wallet_06
+    send_funds $amount wallet_01.bin
+    send_funds $amount wallet_02.bin
+    send_funds $amount wallet_03.bin
+    send_funds $amount wallet_04.bin
+    send_funds $amount wallet_05.bin
+    send_funds $amount wallet_06.bin
 }
 
 seed_wallets 1
