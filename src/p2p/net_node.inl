@@ -60,7 +60,7 @@
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
-#define MIN_WANTED_SEED_NODES 3
+#define MIN_WANTED_SEED_NODES 12
 
 namespace nodetool
 {
@@ -373,7 +373,6 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (nettype == cryptonote::TESTNET)
     {
-     full_addrs.insert("206.189.163.61:11111");
      full_addrs.insert("104.248.69.152:11111");
      full_addrs.insert("104.248.182.234:11111");
     }
@@ -383,10 +382,14 @@ namespace nodetool
     }
     else
     {
+      full_addrs.insert("206.189.163.61:13894");
       full_addrs.insert("178.128.191.245:13894"); 
       full_addrs.insert("178.128.180.136:13894"); 
       full_addrs.insert("178.128.186.101:13894"); 
-  }
+      full_addrs.insert("66.70.189.131:13894");
+      full_addrs.insert("66.70.189.183:13894");
+      full_addrs.insert("66.70.188.178:13894");
+    }
     return full_addrs;
   }
 
@@ -401,12 +404,12 @@ namespace nodetool
 
     if (m_nettype == cryptonote::TESTNET)
     {
-      memcpy(&m_network_id, &::config::testnet::NETWORK_ID, 15);
+      memcpy(&m_network_id, &::config::testnet::NETWORK_ID, 16);
       full_addrs = get_seed_nodes(cryptonote::TESTNET);
     }
     else if (m_nettype == cryptonote::STAGENET)
     {
-      memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 14);
+      memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 16);
       full_addrs = get_seed_nodes(cryptonote::STAGENET);
     }
     else
