@@ -161,4 +161,3 @@ This inequality is true if sqrt_input > 1 and it's easy to check that s = 0 if s
   } while(0)
 
 #endif
-
