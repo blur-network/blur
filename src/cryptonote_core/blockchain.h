@@ -38,9 +38,11 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <atomic>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 
+#include "span.h"
 #include "syncobj.h"
 #include "string_tools.h"
 #include "cryptonote_basic/cryptonote_basic.h"
@@ -54,6 +56,8 @@
 #include "checkpoints/checkpoints.h"
 #include "cryptonote_basic/hardfork.h"
 #include "blockchain_db/blockchain_db.h"
+
+namespace tools { class Notify; }
 
 namespace cryptonote
 {
@@ -70,6 +74,15 @@ namespace cryptonote
     db_async, //!< handle syncing calls instead of the backing db, asynchronously
     db_nosync //!< Leave syncing up to the backing db (safest, but slowest because of disk I/O)
   };
+
+  /** 
+   * @brief Callback routine that returns checkpoints data for specific network type
+   * 
+   * @param network network type
+   * 
+   * @return checkpoints data, empty span if there ain't any checkpoints for specific network type
+   */
+  typedef std::function<const epee::span<const unsigned char>(cryptonote::network_type network)> GetCheckpointsCallback;
 
   /************************************************************************/
   /*                                                                      */

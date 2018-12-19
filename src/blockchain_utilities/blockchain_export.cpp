@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Masari Project
+// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -44,17 +44,6 @@ using namespace epee;
 
 int main(int argc, char* argv[])
 {
-#ifdef WIN32
-	std::vector<std::string> args;
-	std::vector<char*> argptrs;
-	command_line::set_console_utf8();
-	if(command_line::get_windows_args(args, argptrs))
-	{
-		argc = args.size();
-		argv = argptrs.data();
-	}
-#endif
-
   TRY_ENTRY();
 
   epee::string_tools::set_module_name_and_folder(argv[0]);
@@ -109,7 +98,7 @@ int main(int argc, char* argv[])
 
   if (command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
     return 1;
   }

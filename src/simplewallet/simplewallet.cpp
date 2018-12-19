@@ -44,6 +44,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 #include "include_base_utils.h"
 #include "common/i18n.h"
 #include "common/command_line.h"
@@ -63,10 +64,10 @@
 #include "ringct/rctSigs.h"
 #include "multisig/multisig.h"
 #include "wallet/wallet_args.h"
+#include "version.h"
 #include <stdexcept>
 
 #ifdef WIN32
-#include <windows.h>
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
 #endif
@@ -105,6 +106,7 @@ typedef cryptonote::simple_wallet sw;
 /*  if (auto_refresh_run)*/ \
     /*m_auto_refresh_thread.join();*/ \
   boost::unique_lock<boost::mutex> lock(m_idle_mutex); \
+  m_idle_cond.notify_all(); \
   epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler([&](){ \
     m_auto_refresh_enabled.store(auto_refresh_enabled, std::memory_order_relaxed); \
   })
@@ -147,26 +149,10 @@ namespace
 #endif
     std::cout << prompt;
 
-#ifdef WIN32
-	HANDLE hConIn = CreateFileW(L"CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
-	DWORD oldMode;
-	FlushConsoleInputBuffer(hConIn);
-	GetConsoleMode(hConIn, &oldMode);
-	SetConsoleMode(hConIn, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
-	wchar_t buffer[1024];
-	DWORD read;
-	ReadConsoleW(hConIn, buffer, sizeof(buffer)/sizeof(wchar_t)-1, &read, nullptr);
-	buffer[read] = 0;
-	SetConsoleMode(hConIn, oldMode);
-	CloseHandle(hConIn);
- 
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, NULL, 0, NULL, NULL);
-	std::string buf(size_needed, '\0');
-	WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &buf[0], size_needed, NULL, NULL);
-	buf.pop_back(); //size_needed includes null that we needed to have space for
-#else
-
     std::string buf;
+#ifdef _WIN32
+    buf = tools::input_line_win();
+#else
     std::getline(std::cin, buf);
 #endif
 
@@ -7258,15 +7244,6 @@ int main(int argc, char* argv[])
   // Activate UTF-8 support for Boost filesystem classes on Windows
   std::locale::global(boost::locale::generator().generate(""));
   boost::filesystem::path::imbue(std::locale());
-
-	std::vector<std::string> args;
-	std::vector<char*> argptrs;
-	command_line::set_console_utf8();
-	if(command_line::get_windows_args(args, argptrs))
-	{
-		argc = args.size();
-		argv = argptrs.data();
-	}
 #endif
 
   po::options_description desc_params(wallet_args::tr("Wallet options"));

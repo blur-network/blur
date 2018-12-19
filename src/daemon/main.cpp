@@ -59,18 +59,7 @@ namespace bf = boost::filesystem;
 
 int main(int argc, char* argv[])
 {
-#ifdef WIN32
-	std::vector<std::string> args;
-	std::vector<char*> argptrs;
-	command_line::set_console_utf8();
-	if(command_line::get_windows_args(args, argptrs))
-	{
-		argc = args.size();
-		argv = argptrs.data();
-	}
-#endif
-	try
-	{
+  try {
 
     // TODO parse the debug options like set log level right here at start
 
@@ -130,7 +119,7 @@ int main(int argc, char* argv[])
 
     if (command_line::get_arg(vm, command_line::arg_help))
     {
-      std::cout << "BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+      std::cout << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
       std::cout << "Usage: " + std::string{argv[0]} + " [options|settings] [daemon_command...]" << std::endl << std::endl;
       std::cout << visible_options << std::endl;
       return 0;
@@ -139,7 +128,7 @@ int main(int argc, char* argv[])
     // Monero Version
     if (command_line::get_arg(vm, command_line::arg_version))
     {
-      std::cout << "BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL;
+      std::cout << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL;
       return 0;
     }
 
@@ -275,6 +264,9 @@ int main(int argc, char* argv[])
         }
         else
         {
+#ifdef HAVE_READLINE
+          rdln::suspend_readline pause_readline;
+#endif
           std::cerr << "Unknown command: " << command.front() << std::endl;
           return 1;
         }
@@ -289,7 +281,7 @@ int main(int argc, char* argv[])
       tools::set_max_concurrency(command_line::get_arg(vm, daemon_args::arg_max_concurrency));
 
     // logging is now set up
-    MGINFO("BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")");
+    MGINFO("Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")");
 
     MINFO("Moving from main() into the daemonize now.");
 

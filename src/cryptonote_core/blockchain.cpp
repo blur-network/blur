@@ -56,6 +56,7 @@
 #include "cryptonote_core.h"
 #include "ringct/rctSigs.h"
 #include "common/perf_timer.h"
+#include "common/notify.h"
 #if defined(PER_BLOCK_CHECKPOINT)
 #include "blocks/blocks.h"
 #endif
@@ -604,7 +605,7 @@ block Blockchain::pop_block_from_blockchain()
     }
   }
 
-    m_blocks_longhash_table.clear();
+  m_blocks_longhash_table.clear();
   m_scan_table.clear();
   m_blocks_txs_check.clear();
   m_check_txin_table.clear();
@@ -1083,9 +1084,8 @@ bool Blockchain::prevalidate_miner_transaction(const block& b, uint64_t height)
     MWARNING("The miner transaction in block has invalid height: " << boost::get<txin_gen>(b.miner_tx.vin[0]).height << ", expected: " << height);
     return false;
   }
-  int unlock_window = b.major_version >= 6 ? CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6 : CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
   MDEBUG("Miner tx hash: " << get_transaction_hash(b.miner_tx));
-  CHECK_AND_ASSERT_MES(b.miner_tx.unlock_time == height + unlock_window, false, "coinbase transaction transaction has the wrong unlock time=" << b.miner_tx.unlock_time << ", expected " << height + unlock_window);
+  CHECK_AND_ASSERT_MES(b.miner_tx.unlock_time == height + CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW, false, "coinbase transaction transaction has the wrong unlock time=" << b.miner_tx.unlock_time << ", expected " << height + CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW);
 
   //check outs overflow
   //NOTE: not entirely sure this is necessary, given that this function is
@@ -3147,6 +3147,7 @@ bool Blockchain::handle_block_to_main_chain(const block& bl, const crypto::hash&
   if(bl.prev_id != get_tail_id())
   {
     MERROR_VER("Block with id: " << id << std::endl << "has wrong prev_id: " << bl.prev_id << std::endl << "expected: " << get_tail_id());
+    bvc.m_verifivation_failed = true;
 leave:
     m_db->block_txn_stop();
     return false;
@@ -3341,9 +3342,6 @@ leave:
       return_tx_to_pool(txs);
       goto leave;
     }
-
-
-
 
     TIME_MEASURE_FINISH(bb);
     t_pool += bb;

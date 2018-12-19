@@ -36,6 +36,7 @@
 #include <random>
 
 #include "string_tools.h"
+#include "file_io_utils.h"
 #include "common/util.h"
 #include "cryptonote_basic/cryptonote_format_utils.h"
 #include "crypto/crypto.h"
@@ -1077,7 +1078,10 @@ BlockchainLMDB::~BlockchainLMDB()
 
   // batch transaction shouldn't be active at this point. If it is, consider it aborted.
   if (m_batch_active)
-    batch_abort();
+  {
+    try { batch_abort(); }
+    catch (...) { /* ignore */ }
+  }
   if (m_open)
     close();
 }
@@ -2778,10 +2782,10 @@ void BlockchainLMDB::set_batch_transactions(bool batch_transactions)
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   if ((batch_transactions) && (m_batch_transactions))
   {
-    LOG_PRINT_L0("WARNING: batch transaction mode already enabled, but asked to enable batch mode");
+    MINFO("batch transaction mode already enabled, but asked to enable batch mode");
   }
   m_batch_transactions = batch_transactions;
-  LOG_PRINT_L3("batch transactions " << (m_batch_transactions ? "enabled" : "disabled"));
+  MINFO("batch transactions " << (m_batch_transactions ? "enabled" : "disabled"));
 }
 
 // return true if we started the txn, false if already started

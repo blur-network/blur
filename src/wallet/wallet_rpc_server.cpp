@@ -52,6 +52,7 @@ using namespace epee;
 #include "mnemonics/electrum-words.h"
 #include "rpc/rpc_args.h"
 #include "rpc/core_rpc_server_commands_defs.h"
+#include "daemonizer/daemonizer.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "wallet.rpc"
@@ -2872,16 +2873,6 @@ namespace tools
 
 int main(int argc, char** argv)
 {
-#ifdef WIN32
-	std::vector<std::string> args;
-	std::vector<char*> argptrs;
-	command_line::set_console_utf8();
-	if(command_line::get_windows_args(args, argptrs))
-	{
-		argc = args.size();
-		argv = argptrs.data();
-	}
-#endif
 
 namespace po = boost::program_options;
 
