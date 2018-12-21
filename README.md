@@ -30,7 +30,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
 **Algorithm:** | <center> Cryptonight-Dynamic </center>
    **Ports:** | <center> P2P port = 13894 </br>RPC port = 13895</br></center>
-   **Seed Nodes:** | <center> Node 1 = 178.128.191.245:13894</br> Node 2 = 178.128.180.136:13894 </br> Node 3 = 178.128.186.101:13894  </center>
+  **Seed Nodes:** | <center> <li>Node 1: 66.70.189.131:13894</li> <li>Node 2: 66.70.189.183:13894</li> <li>Node 3: 66.70.188.178:13894</li>  </center>
 
 # About the Project
 
