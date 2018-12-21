@@ -560,13 +560,13 @@ namespace tools
     void rewrite(const std::string& wallet_name, const epee::wipeable_string& password);
     void write_watch_only_wallet(const std::string& wallet_name, const epee::wipeable_string& password, std::string &new_keys_filename);
     void load(const std::string& wallet, const epee::wipeable_string& password);
-    void store();
+    void store(bool create_address_file = true);
     /*!
      * \brief store_to - stores wallet to another file(s), deleting old ones
      * \param path     - path to the wallet file (keys and address filenames will be generated based on this filename)
      * \param password - password to protect new wallet (TODO: probably better save the password in the wallet object?)
      */
-    void store_to(const std::string &path, const epee::wipeable_string &password);
+    void store_to(const std::string &path, const epee::wipeable_string &password, bool create_address_file = false);
 
     std::string path() const;
 
@@ -1110,6 +1110,7 @@ namespace tools
     bool generate_chacha_key_from_secret_keys(crypto::chacha_key &key) const;
     crypto::hash get_payment_id(const pending_tx &ptx) const;
     void check_acc_out_precomp(const cryptonote::tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info) const;
+    void check_acc_out_precomp_once(const cryptonote::tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info, bool &already_seen) const;
     void parse_block_round(const cryptonote::blobdata &blob, cryptonote::block &bl, crypto::hash &bl_id, bool &error) const;
     uint64_t get_upper_transaction_size_limit() const;
     std::vector<uint64_t> get_unspent_amounts_vector() const;
