@@ -402,10 +402,6 @@ namespace nodetool
     }
     else
     {
-      full_addrs.insert("206.189.163.61:13894");
-      full_addrs.insert("178.128.191.245:13894"); 
-      full_addrs.insert("178.128.180.136:13894"); 
-      full_addrs.insert("178.128.186.101:13894"); 
       full_addrs.insert("66.70.189.131:13894");
       full_addrs.insert("66.70.189.183:13894");
       full_addrs.insert("66.70.188.178:13894");
