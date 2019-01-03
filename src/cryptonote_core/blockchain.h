@@ -1402,14 +1402,5 @@ namespace cryptonote
      */
     bool expand_transaction_2(transaction &tx, const crypto::hash &tx_prefix_hash, const std::vector<std::vector<rct::ctkey>> &pubkeys);
 
-    /**
-     * @brief builds an alternative chain for a requested alt block
-     *
-     * @param h the hash
-     * @param alt_chain the altchain list in which to store it at
-     *
-     * @return if built successfully
-     */
-    bool get_alt_height_info(const crypto::hash h, difficulty_type &difficulty, difficulty_type &weight, difficulty_type &cumulative_difficulty, difficulty_type &cumulative_weight);
   };
 }  // namespace cryptonote

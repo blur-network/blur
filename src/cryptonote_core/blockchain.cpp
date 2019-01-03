@@ -806,8 +806,10 @@ difficulty_type get_next_difficulty(uint8_t version, std::vector<uint64_t> times
     return next_difficulty_v3(timestamps, cumulative_difficulties, target, false);
   } else if (version < 6) {
     return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
+  } else if (version < 10) {
+    return next_difficulty_v6(timestamps, cumulative_difficulties, target);
   } else {
-    return next_difficulty_v6(timestamps, cumulative_difficulties, version);
+    return next_difficulty_v7(timestamps, cumulative_difficulties, target);
   }
 }
 
