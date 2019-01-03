@@ -42,6 +42,7 @@
 #include "derive_public_key.h"
 #include "derive_secret_key.h"
 #include "ge_frombytes_vartime.h"
+#include "ge_tobytes.h"
 #include "generate_key_derivation.h"
 #include "generate_key_image.h"
 #include "generate_key_image_helper.h"

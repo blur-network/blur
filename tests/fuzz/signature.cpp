@@ -48,7 +48,7 @@ private:
 
 int SignatureFuzzer::init()
 {
-  static const char * const spendkey_hex = "0b4f47697ec99c3de6579304e5f25c68b07afbe55b71d99620bf6cbf4e45a80f";
+  static const char * const spendkey_hex = "aa8f071d0c5ae4025a7913d41e09443c0966e6c12852eaa243d0f7ee013cf702";
   crypto::secret_key spendkey;
   epee::string_tools::hex_to_pod(spendkey_hex, spendkey);
 
@@ -59,11 +59,12 @@ int SignatureFuzzer::init()
     wallet.generate("", "", spendkey, true, false);
 
     cryptonote::address_parse_info info;
-    if (!cryptonote::get_account_address_from_str_or_url(info, cryptonote::TESTNET, "9uVsvEryzpN8WH2t1WWhFFCG5tS8cBNdmJYNRuckLENFimfauV5pZKeS1P2CbxGkSDTUPHXWwiYE5ZGSXDAGbaZgDxobqDN"))
+    if (!cryptonote::get_account_address_from_str_or_url(info, cryptonote::TESTNET, "b8gfHK6ZLNPNQhXvjvVLFFQYQa3kUNBoQE47M48jPmyHGzZnPxq1Zvh6oMe6wpCZJ3bpUaPVarBTdHDZrCuphyUw2qEGxkkS7"))
     {
       std::cerr << "failed to parse address" << std::endl;
       return 1;
     }
+    address = info.address;
   }
   catch (const std::exception &e)
   {

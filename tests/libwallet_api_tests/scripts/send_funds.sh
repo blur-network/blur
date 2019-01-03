@@ -5,7 +5,7 @@ function send_funds {
     local dest=$(cat "$2.address.txt")
 
     blur-wallet-cli --wallet-file wallet_m --password "" \
-        --testnet --trusted-daemon --daemon-address localhost:21111  --log-file wallet_m.log \
+        --testnet --daemon-address localhost:21111  --log-file wallet_m.log \
         --command transfer $dest $amount 
 }
 

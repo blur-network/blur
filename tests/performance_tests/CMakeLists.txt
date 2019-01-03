@@ -42,6 +42,8 @@ set(performance_tests_headers
   generate_keypair.h
   is_out_to_acc.h
   subaddress_expand.h
+  sc_reduce32.h
+  sc_check.h
   multi_tx_test_base.h
   performance_tests.h
   performance_utils.h

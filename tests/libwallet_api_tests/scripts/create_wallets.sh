@@ -2,7 +2,7 @@
 
 function create_wallet {
     wallet_name=$1
-    echo 0 | blur-wallet-cli  --testnet --trusted-daemon --daemon-address localhost:21111 --generate-new-wallet $wallet_name --password "" --restore-height=1
+    echo 0 | blur-wallet-cli  --testnet --daemon-address localhost:21111 --generate-new-wallet $wallet_name --password "" --restore-height=1
 }
 
 

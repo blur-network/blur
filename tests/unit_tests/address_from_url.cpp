@@ -39,7 +39,7 @@ TEST(AddressFromTXT, Success)
 {
   std::string addr = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
 
-  std::string txtr = "oa1:msr";
+  std::string txtr = "oa1:blur";
   txtr += " recipient_address=";
   txtr += addr;
   txtr += ";";
@@ -70,7 +70,7 @@ TEST(AddressFromTXT, Success)
 
 TEST(AddressFromTXT, Failure)
 {
-  std::string txtr = "oa1:msr recipient_address=not a real address";
+  std::string txtr = "oa1:blur recipient_address=not a real address";
 
   std::string res = tools::dns_utils::address_from_txt_record(txtr);
 
