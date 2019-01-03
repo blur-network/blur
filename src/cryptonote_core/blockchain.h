@@ -1029,7 +1029,6 @@ namespace cryptonote
     // some invalid blocks
     blocks_ext_by_hash m_invalid_blocks;     // crypto::hash -> block_extended_info
 
-
     checkpoints m_checkpoints;
     bool m_enforce_dns_checkpoints;
 
@@ -1312,14 +1311,14 @@ namespace cryptonote
     /**
      * @brief wrapper for check_block_timestamp(const block& b)
      */
-     bool check_block_timestamp(std::vector<uint64_t>& timestamps, const block& b, uint64_t& median_ts) const;
+    bool check_block_timestamp(std::vector<uint64_t>& timestamps, const block& b, uint64_t& median_ts) const;
 
     /**
      * @brief checks and returns median block timestamp as defined by protocol
      */
-     bool check_median_block_timestamp(const block& b, uint64_t& median_ts) const;
+    bool check_median_block_timestamp(const block& b, uint64_t& median_ts) const;
 
-     /**
+    /**
      * @brief checks a block's timestamp
      *
      * If the block is not more recent than the median of the recent
@@ -1402,5 +1401,15 @@ namespace cryptonote
      * that implicit data.
      */
     bool expand_transaction_2(transaction &tx, const crypto::hash &tx_prefix_hash, const std::vector<std::vector<rct::ctkey>> &pubkeys);
+
+    /**
+     * @brief builds an alternative chain for a requested alt block
+     *
+     * @param h the hash
+     * @param alt_chain the altchain list in which to store it at
+     *
+     * @return if built successfully
+     */
+    bool get_alt_height_info(const crypto::hash h, difficulty_type &difficulty, difficulty_type &weight, difficulty_type &cumulative_difficulty, difficulty_type &cumulative_weight);
   };
 }  // namespace cryptonote

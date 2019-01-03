@@ -414,4 +414,60 @@ namespace cryptonote {
     next_difficulty = static_cast<uint64_t>(nextDifficulty);
     return next_difficulty;
   }
+
+difficulty_type next_difficulty_v7(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+
+    if(timestamps.size() > DIFFICULTY_WINDOW_V7)
+    {
+      timestamps.resize(DIFFICULTY_WINDOW_V7);
+      cumulative_difficulties.resize(DIFFICULTY_WINDOW_V7);
+    }
+
+
+    size_t length = timestamps.size();
+    assert(length == cumulative_difficulties.size());
+    if (length <= 1) {
+      return 1;
+    }
+    if(timestamps.size() > DIFFICULTY_WINDOW_V7)
+    {
+      timestamps.resize(DIFFICULTY_WINDOW_V7);
+      cumulative_difficulties.resize(DIFFICULTY_WINDOW_V7);
+    }
+
+
+    assert(length == cumulative_difficulties.size());
+    if (length <= 1) {
+      return 1;
+    }
+    static_assert(DIFFICULTY_WINDOW_V7 >= 2, "Window is too small");
+    assert(length <= DIFFICULTY_WINDOW_V7);
+    sort(timestamps.begin(), timestamps.end());
+    size_t cut_begin, cut_end;
+    static_assert(2 * DIFFICULTY_CUT_V7 <= DIFFICULTY_WINDOW_V7 - 2, "Cut length is too large");
+    if (length <= DIFFICULTY_WINDOW_V7 - 2 * DIFFICULTY_CUT_V7) {
+      cut_begin = 0;
+      cut_end = length;
+    } else {
+      cut_begin = (length - (DIFFICULTY_WINDOW_V7 - 2 * DIFFICULTY_CUT_V7) + 1) / 2;
+      cut_end = cut_begin + (DIFFICULTY_WINDOW_V7 - 2 * DIFFICULTY_CUT_V7);
+    }
+    assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
+    uint64_t time_span = timestamps[cut_end - 1] - timestamps[cut_begin];
+    if (time_span == 0) {
+      time_span = 1;
+    }
+    difficulty_type total_work = cumulative_difficulties[cut_end - 1] - cumulative_difficulties[cut_begin];
+    assert(total_work > 0);
+    uint64_t low, high;
+    mul(total_work, target_seconds, low, high);
+    // blockchain errors "difficulty overhead" if this function returns zero.
+    // TODO: consider throwing an exception instead
+    if (high != 0 || low + time_span - 1 < low) {
+      return 0;
+    }
+    return (low + time_span - 1) / time_span;
+  }
+
+
 }

@@ -43,7 +43,6 @@
 #define CRYPTONOTE_MAX_TX_SIZE                          1000000000
 #define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER          0
 #define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW            25
-#define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6         25
 #define CURRENT_TRANSACTION_VERSION                     1
 #define CURRENT_BLOCK_MAJOR_VERSION                     1
 #define CURRENT_BLOCK_MINOR_VERSION                     1
@@ -90,6 +89,10 @@
 
 #define DIFFICULTY_WINDOW_V6                            60
 #define DIFFICULTY_BLOCKS_COUNT_V6                      DIFFICULTY_WINDOW_V6 + 1
+
+#define DIFFICULTY_WINDOW_V7                            120
+#define DIFFICULTY_BLOCKS_COUNT_V7                      DIFFICULTY_WINDOW_V6 + 1
+#define DIFFICULTY_CUT_V7                               20
 
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
