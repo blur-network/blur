@@ -1,6 +1,6 @@
 # Blur Network 
 
-Copyright (c) 2018, Blur Network</br>
+Copyright (c) 2018-2019, Blur Network</br>
 
 *See [LICENSE](LICENSE).*<br>
 *See [Code of Conduct](CODE_OF_CONDUCT.md), Active as of 01/04/2019*<br>
@@ -146,10 +146,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-priority-node 178.128.191.245:13894 --add-priority-node 178.128.186.101:13894 --seed-node 178.128.180.136:13894`
+`./blurd --add-priority-node 66.70.189.131:13894 --add-priority-node 66.70.189.183:13894 --seed-node 66.70.188.178:13894`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-priority-node 178.128.191.245:13894 --add-priority-node 178.128.186.101:13894 --seed-node 178.128.180.136:13894`
+`blurd.exe --add-priority-node 66.70.189.131:13894 --add-priority-node 66.70.189.183:13894 --seed-node 66.70.188.178:13894`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
