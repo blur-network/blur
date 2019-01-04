@@ -17,7 +17,7 @@ size, abilty or disability, ethnicity, sex characteristics, gender identity and 
 level of experience, education, socio-economic status, nationality, personal
 appearance, race, religion, or sexual identity and orientation.  We endeavor to remove 
 the barriers between our contributors and users, as well as any characteristics that any 
-of them deems ancilliary to their (physical or digital) identity.
+one may deem ancilliary to their (physical or digital) identity.
 
 We do not align with deceit, censorship, or any realm of non-truth. We welcome all those
 who seek to contribute productively to our network and environment. 
