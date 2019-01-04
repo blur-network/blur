@@ -12,7 +12,7 @@ and its associated software is not intended for users who are not legal adults. 
 free-thinking minds, science-based conclusions, and getting your hands dirty to arrive at 
 worthwhile answers.  We endeavor to establish a hardworking, truth-aligned network --
 within our contributing developers, and our broader user-base.  Our community is inclusive
-and welcomes all denominations adults: regardless of age, identity, body
+and welcomes all denominations, regardless of age, identity, body
 size, abilty or disability, ethnicity, sex characteristics, gender identity and expression,
 level of experience, education, socio-economic status, nationality, personal
 appearance, race, religion, or sexual identity and orientation.  We endeavor to remove 
