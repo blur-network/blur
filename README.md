@@ -3,6 +3,7 @@
 Copyright (c) 2018, Blur Network</br>
 
 *See [LICENSE](LICENSE).*<br>
+*See [Code_Of_Conduct](Code of Conduct), Active as of 01/04/2018*<br>
 
 ### Donate to help support Blur:
 **BTC:** 19onVUREbP89qu4dYBfVqtGisWaoyWs3BX <br>
