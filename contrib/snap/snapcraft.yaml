@@ -1,5 +1,5 @@
 name: blur
-version: 0.1.8.1
+version: 0.1.8.2
 summary: "Blur Network: The private cryptocurrency (https://blur.cash)"
 description: |
     BLUR is a private & untraceable cryptocurrency based on the cryptonote protocol.
@@ -49,15 +49,15 @@ parts:
             - libsodium-dev
         stage-packages:
             - libunbound2
-            - libboost-serialization1.58.0
-            - libboost-chrono1.58.0
-            - libboost-system1.58.0
-            - libboost-thread1.58.0
-            - libboost-locale1.58.0
-            - libboost-atomic1.58.0
-            - libboost-filesystem1.58.0
-            - libboost-program-options1.58.0
-            - libboost-regex1.58.0
+            - libboost-serialization1.62.0
+            - libboost-chrono1.62.0
+            - libboost-system1.62.0
+            - libboost-thread1.62.0
+            - libboost-locale1.62.0
+            - libboost-atomic1.62.0
+            - libboost-filesystem1.62.0
+            - libboost-program-options1.62.0
+            - libboost-regex1.62.0
             - libzmq5
             - libsodium18
             - libstdc++6
