@@ -68,7 +68,7 @@ namespace cryptonote {
   /* Cryptonote helper functions                                          */
   /************************************************************************/
   //-----------------------------------------------------------------------------------------------
-  size_t get_min_block_size(uint8_t version)
+  size_t get_min_block_size()
   {
     return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
   }
@@ -83,7 +83,7 @@ namespace cryptonote {
     return CRYPTONOTE_MAX_TX_SIZE;
   }
   //-----------------------------------------------------------------------------------------------
-  bool get_block_reward(size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint8_t version) {
+  bool get_block_reward(size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward) {
     static_assert(DIFFICULTY_TARGET % 60 == 0,"difficulty targets must be a multiple of 60");
     const int target_minutes = DIFFICULTY_TARGET / 60;
     const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
@@ -100,7 +100,7 @@ namespace cryptonote {
       base_reward = FINAL_SUBSIDY_PER_MINUTE*target_minutes;
     }
 
-    uint64_t full_reward_zone = get_min_block_size(version);
+    uint64_t full_reward_zone = get_min_block_size();
 
     //make it soft
     if (median_size < full_reward_zone) {

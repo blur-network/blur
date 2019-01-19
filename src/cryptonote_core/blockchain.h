@@ -600,7 +600,7 @@ namespace cryptonote
      *
      * @return the per kB fee
      */
-    static uint64_t get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size, uint8_t version);
+    static uint64_t get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size);
 
     /**
      * @brief get dynamic per kB fee estimate for the next few blocks
@@ -1210,7 +1210,7 @@ namespace cryptonote
      *
      * @return false if anything is found wrong with the miner transaction, otherwise true
      */
-    bool validate_miner_transaction(const block& b, size_t cumulative_block_size, uint64_t fee, uint64_t& base_reward, uint64_t already_generated_coins, bool &partial_block_reward, uint8_t version);
+    bool validate_miner_transaction(const block& b, size_t cumulative_block_size, uint64_t fee, uint64_t& base_reward, uint64_t already_generated_coins, bool &partial_block_reward);
 
     /**
      * @brief reverts the blockchain to its previous state following a failed switch

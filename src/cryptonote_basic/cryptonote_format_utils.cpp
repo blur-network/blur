@@ -1009,7 +1009,7 @@ namespace cryptonote
 
           uint64_t stamp = b.timestamp;
 
-          cn_iters += (((stamp % height) + (height + 1))  % 4096);
+          cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
          }
 
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);

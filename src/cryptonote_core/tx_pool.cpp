@@ -83,7 +83,7 @@ namespace cryptonote
 
     uint64_t get_transaction_size_limit(uint8_t version)
     {
-      return get_min_block_size(version) - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+      return get_min_block_size() - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
     }
 
     // This class is meant to create a batch when none currently exists.
@@ -1047,9 +1047,9 @@ namespace cryptonote
     uint64_t best_coinbase = 0, coinbase = 0;
     total_size = 0;
     fee = 0;
-    
+
     //baseline empty block
-    get_block_reward(median_size, total_size, already_generated_coins, best_coinbase, version);
+    get_block_reward(median_size, total_size, already_generated_coins, best_coinbase);
 
 
     size_t max_total_size = 2 * median_size - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
@@ -1084,7 +1084,7 @@ namespace cryptonote
         // If we're getting lower coinbase tx,
         // stop including more tx
         uint64_t block_reward;
-        if(!get_block_reward(median_size, total_size + meta.blob_size, already_generated_coins, block_reward, version))
+        if(!get_block_reward(median_size, total_size + meta.blob_size, already_generated_coins, block_reward))
         {
           LOG_PRINT_L2("  would exceed maximum block size");
           sorted_it++;
