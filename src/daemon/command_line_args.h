@@ -1,4 +1,3 @@
-// Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -36,7 +35,7 @@
 
 namespace daemon_args
 {
-  std::string const WINDOWS_SERVICE_NAME = "BLUR Daemon";
+  std::string const WINDOWS_SERVICE_NAME = "Blur Network Daemon";
 
   const command_line::arg_descriptor<std::string, false, true, 2> arg_config_file = {
     "config-file"
@@ -72,6 +71,11 @@ namespace daemon_args
     "max-log-file-size"
   , "Specify maximum log file size [B]"
   , MAX_LOG_FILE_SIZE
+  };
+  const command_line::arg_descriptor<std::size_t> arg_max_log_files = {
+    "max-log-files"
+  , "Specify maximum number of rotated log files to be saved (no limit by setting to 0)"
+  , MAX_LOG_FILES
   };
   const command_line::arg_descriptor<std::string> arg_log_level = {
     "log-level"

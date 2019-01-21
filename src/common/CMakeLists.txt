@@ -49,6 +49,10 @@ if (STACK_TRACE)
   list(APPEND common_sources stack_trace.cpp)
 endif()
 
+if (BACKCOMPAT)
+  list(APPEND common_sources compat/glibc_compat.cpp)
+endif()
+
 set(common_headers)
 
 set(common_private_headers
@@ -62,7 +66,6 @@ set(common_private_headers
   error.h
   expect.h
   http_connection.h
-  int-util.h
   notify.h
   pod-class.h
   rpc_client.h

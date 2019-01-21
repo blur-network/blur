@@ -36,7 +36,6 @@
 
 #include "crypto/hash.h"
 #include "int-util.h"
-#include "util.h"
 #include "varint.h"
 
 namespace tools
@@ -235,7 +234,7 @@ namespace tools
       return encode(buf);
     }
 
-    bool decode_addr(std::string addr, uint64_t& tag, std::string& data)
+    bool decode_addr(const std::string &addr, uint64_t& tag, std::string& data)
     {
       std::string addr_data;
       bool r = decode(addr, addr_data);

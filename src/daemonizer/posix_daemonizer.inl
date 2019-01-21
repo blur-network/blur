@@ -1,4 +1,3 @@
-// Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -78,8 +77,10 @@ namespace daemonizer
 
   template <typename T_executor>
   inline bool daemonize(
-      int argc, char* argv[], T_executor &&executor // universal ref
-    , boost::program_options::variables_map const & vm)
+      int argc, char const * argv[]
+    , T_executor && executor // universal ref
+    , boost::program_options::variables_map const & vm
+    )
   {
     if (command_line::has_arg(vm, arg_detach))
     {
@@ -99,7 +100,7 @@ namespace daemonizer
     }
     else
     {
-      //LOG_PRINT_L0("BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL);
+      //LOG_PRINT_L0("Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL);
       return executor.run_interactive(vm);
     }
   }

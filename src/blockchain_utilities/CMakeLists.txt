@@ -94,8 +94,7 @@ monero_private_headers(blockchain_usage
 
 monero_add_executable(blockchain_import
   ${blockchain_import_sources}
-  ${blockchain_import_private_headers}
-  ${blocksdat})
+  ${blockchain_import_private_headers})
 
 target_link_libraries(blockchain_import
   PRIVATE
@@ -108,7 +107,8 @@ target_link_libraries(blockchain_import
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${EXTRA_LIBRARIES})
+    ${EXTRA_LIBRARIES}
+    ${Blocks})
 
 if(ARCH_WIDTH)
   target_compile_definitions(blockchain_import

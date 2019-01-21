@@ -42,8 +42,7 @@ parts:
             - pkg-config
             - libunbound-dev
             - libboost-all-dev
-            - liblzma-dev
-            - libldns-dev
+            - libssl-dev
             - libzmq3-dev
             - libpgm-dev
             - libsodium-dev
@@ -58,10 +57,14 @@ parts:
             - libboost-filesystem1.62.0
             - libboost-program-options1.62.0
             - libboost-regex1.62.0
+            - libboost-date-time1.62.0
+            - libssl-dev
             - libzmq5
             - libsodium18
             - libstdc++6
             - libgcc1
+            - libreadline7
+
         prime:
             - bin
             - usr/lib/

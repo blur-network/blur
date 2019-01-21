@@ -1,4 +1,3 @@
-// Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -63,7 +62,7 @@ namespace daemonizer
     , "Hidden -- true if running as windows service"
     };
 
-    std::string get_argument_string(int argc, char* argv[])
+    std::string get_argument_string(int argc, char const * argv[])
     {
       std::string result = "";
       for (int i = 1; i < argc; ++i)
@@ -130,8 +129,10 @@ namespace daemonizer
 
   template <typename T_executor>
   inline bool daemonize(
-      int argc, char* argv[], T_executor && executor // universal ref
-    , boost::program_options::variables_map const & vm)
+      int argc, char const * argv[]
+    , T_executor && executor // universal ref
+    , boost::program_options::variables_map const & vm
+    )
   {
     std::string arguments = get_argument_string(argc, argv);
 
@@ -175,7 +176,7 @@ namespace daemonizer
     }
     else // interactive
     {
-      //LOG_PRINT_L0("BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL);
+      //LOG_PRINT_L0("Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL);
       return executor.run_interactive(vm);
     }
 

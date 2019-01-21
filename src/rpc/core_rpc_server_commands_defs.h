@@ -33,6 +33,41 @@
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_basic/difficulty.h"
 #include "crypto/hash.h"
+#include "rpc/rpc_handler.h"
+#include "common/varint.h"
+#include "common/perf_timer.h"
+
+namespace
+{
+  template<typename T>
+  std::string compress_integer_array(const std::vector<T> &v)
+  {
+    std::string s;
+    s.resize(v.size() * (sizeof(T) * 8 / 7 + 1));
+    char *ptr = (char*)s.data();
+    for (const T &t: v)
+      tools::write_varint(ptr, t);
+    s.resize(ptr - s.data());
+    return s;
+  }
+
+  template<typename T>
+  std::vector<T> decompress_integer_array(const std::string &s)
+  {
+    std::vector<T> v;
+    v.reserve(s.size());
+    int read = 0;
+    const std::string::const_iterator end = s.end();
+    for (std::string::const_iterator i = s.begin(); i != end; std::advance(i, read))
+    {
+      T t;
+      read = tools::read_varint(std::string::const_iterator(i), s.end(), t);
+      CHECK_AND_ASSERT_THROW_MES(read > 0 && read <= 256, "Error decompressing data");
+      v.push_back(t);
+    }
+    return v;
+  }
+}
 
 namespace cryptonote
 {
@@ -953,6 +988,7 @@ namespace cryptonote
       bool mainnet;
       bool testnet;
       bool stagenet;
+      std::string nettype;
       std::string top_block_hash;
       uint64_t cumulative_difficulty;
       uint64_t block_size_limit;
@@ -983,6 +1019,7 @@ namespace cryptonote
         KV_SERIALIZE(mainnet)
         KV_SERIALIZE(testnet)
         KV_SERIALIZE(stagenet)
+        KV_SERIALIZE(nettype)
         KV_SERIALIZE(top_block_hash)
         KV_SERIALIZE(cumulative_difficulty)
         KV_SERIALIZE(block_size_limit)
@@ -2269,10 +2306,35 @@ namespace cryptonote
     {
       std::string status;
       std::vector<distribution> distributions;
+      bool untrusted;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
         KV_SERIALIZE(distributions)
+        KV_SERIALIZE(untrusted)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+
+  struct COMMAND_RPC_POP_BLOCKS
+  {
+    struct request
+    {
+      uint64_t nblocks;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(nblocks);
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      std::string status;
+      uint64_t height;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(status)
+        KV_SERIALIZE(height)
       END_KV_SERIALIZE_MAP()
     };
   };

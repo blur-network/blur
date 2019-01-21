@@ -38,11 +38,6 @@
 #include "math_helper.h"
 #ifdef _WIN32
 #include <windows.h>
-#elif defined(__linux__)
-#include <unistd.h>
-#include <sys/resource.h>
-#include <sys/times.h>
-#include <time.h>
 #endif
 
 namespace cryptonote
@@ -108,7 +103,7 @@ namespace cryptonote
     bool worker_thread();
     bool request_block_template();
     void  merge_hr();
-    
+
     struct miner_config
     {
       uint64_t current_extra_message_index;
@@ -126,7 +121,7 @@ namespace cryptonote
     std::atomic<uint32_t> m_starter_nonce;
     difficulty_type m_diffic;
     uint64_t m_height;
-    volatile uint32_t m_thread_index; 
+    volatile uint32_t m_thread_index;
     volatile uint32_t m_threads_total;
     std::atomic<int32_t> m_pausers_count;
     epee::critical_section m_miners_count_lock;
@@ -159,7 +154,7 @@ namespace cryptonote
     boost::condition_variable m_is_background_mining_enabled_cond;
     std::atomic<bool> m_is_background_mining_started;
     boost::mutex m_is_background_mining_started_mutex;
-    boost::condition_variable m_is_background_mining_started_cond;    
+    boost::condition_variable m_is_background_mining_started_cond;
     boost::thread m_background_mining_thread;
     uint64_t m_min_idle_seconds;
     uint8_t m_idle_threshold;

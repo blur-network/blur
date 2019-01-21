@@ -31,8 +31,11 @@
 #include <stdlib.h>
 #include <openssl/ssl.h>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
 #include "misc_log_ex.h"
+#include "span.h"
 #include "common/perf_timer.h"
+#include "cryptonote_config.h"
 extern "C"
 {
 #include "crypto/crypto-ops.h"
