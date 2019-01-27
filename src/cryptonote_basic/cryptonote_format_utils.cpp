@@ -1007,7 +1007,7 @@ namespace cryptonote
 	  if (b.major_version >= 9)
           {
 
-          uint64_t stamp = b.timestamp;
+          const uint64_t stamp = b.timestamp;
 
           cn_iters += (((stamp % height) + (height + 1))  % 4096);
          }
