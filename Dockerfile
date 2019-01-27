@@ -199,3 +199,4 @@ EXPOSE 13895
 ENTRYPOINT ["blurd", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=13894", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=13895", "--non-interactive", "--confirm-external-bind"]
 
 
+
