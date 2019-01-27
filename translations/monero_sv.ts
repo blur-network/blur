@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
-    <name>Blur::AddressBookImpl</name>
+    <name>Monero::AddressBookImpl</name>
     <message>
         <location filename="../src/wallet/api/address_book.cpp" line="53"/>
         <source>Invalid destination address</source>
@@ -25,7 +25,7 @@
     </message>
 </context>
 <context>
-    <name>Blur::PendingTransactionImpl</name>
+    <name>Monero::PendingTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/pending_transaction.cpp" line="90"/>
         <source>Attempting to save transaction to file, but specified file(s) exist. Exiting to not risk overwriting. File:</source>
@@ -68,7 +68,7 @@
     </message>
 </context>
 <context>
-    <name>Blur::UnsignedTransactionImpl</name>
+    <name>Monero::UnsignedTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/unsigned_transaction.cpp" line="75"/>
         <source>This is a watch only wallet</source>
@@ -122,7 +122,7 @@
     </message>
 </context>
 <context>
-    <name>Blur::WalletImpl</name>
+    <name>Monero::WalletImpl</name>
     <message>
         <location filename="../src/wallet/api/wallet.cpp" line="1111"/>
         <source>payment id has invalid format, expected 16 or 64 character hex string: </source>
