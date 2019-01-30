@@ -1001,7 +1001,7 @@ namespace cryptonote
 
 	  if (b.major_version <= 8)
           {
-            cn_iters += ((height + 1) % 1024);
+            cn_iters += ((height + 1) & 0x3FF);
           }
 
 	  if (b.major_version >= 9)
@@ -1009,7 +1009,7 @@ namespace cryptonote
 
           const uint64_t stamp = b.timestamp;
 
-          cn_iters += (((stamp % height) + (height + 1))  % 4096);
+          cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
          }
 
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
