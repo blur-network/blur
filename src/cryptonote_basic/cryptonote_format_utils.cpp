@@ -993,27 +993,34 @@ namespace cryptonote
     return p;
   }
 //--------------------------------------------------------------
-  bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
+  uint64_t get_block_longhash(const block& b, crypto::hash& res, uint64_t height, bool is_mining)
   {
     blobdata bd = get_block_hashing_blob(b);
-      int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
-      int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
+    int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
+    int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
 
-	  if (b.major_version <= 8)
-          {
-            cn_iters += ((height + 1) & 0x3FF);
-          }
+    if (b.major_version <= 8)
+      cn_iters += ((height + 1) & 0x3FF);
 
-	  if (b.major_version >= 9)
-          {
-
-          const uint64_t stamp = b.timestamp;
-
-          cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
-         }
+    if (b.major_version >= 9)
+    {
+      if (is_mining)
+      {
+        uint32_t old_iters = (((b.timestamp % height) + (height + 1)) & 0xFFF);
+        uint32_t new_iters = ((uint32_t)(old_iters / 256)) * 256; 
+        crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters + new_iters);
+        return (b.timestamp - old_iters) + new_iters;
+      }
+      else
+      {
+        cn_iters += (((b.timestamp % height) + (height + 1)) & 0xFFF);
+        crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
+        return b.timestamp;
+      }
+    }
 
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
-    return true;
+    return b.timestamp;
   }
   //---------------------------------------------------------------
   std::vector<uint64_t> relative_output_offsets_to_absolute(const std::vector<uint64_t>& off)
@@ -1039,7 +1046,7 @@ namespace cryptonote
   crypto::hash get_block_longhash(const block& b, uint64_t height)
   {
     crypto::hash p = null_hash;
-    get_block_longhash(b, p, height);
+    get_block_longhash(b, p, height, false);
     return p;
   }
   //---------------------------------------------------------------

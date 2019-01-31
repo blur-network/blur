@@ -486,7 +486,8 @@ namespace cryptonote
 
       b.nonce = nonce;
       crypto::hash h;
-      get_block_longhash(b, h, height);
+      uint64_t ts = get_block_longhash(b, h, height, true);
+      b.timestamp = ts;
 
       if(check_hash(h, local_diff))
       {
