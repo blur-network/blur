@@ -30,60 +30,43 @@
 
 #pragma once
 
-#if !defined(__cplusplus)
+#include <string.h>
+#include <sodium/crypto_verify_32.h>
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+struct memcmp32
+{
+  static const size_t loop_count = 1000000000;
+  static int call(const unsigned char *k0, const unsigned char *k1){ return memcmp(k0, k1, 32); }
+};
 
-#include "common/int-util.h"
-#include "warnings.h"
+struct verify32
+{
+  static const size_t loop_count = 10000000;
+  static int call(const unsigned char *k0, const unsigned char *k1){ return crypto_verify_32(k0, k1); }
+};
 
-static inline void *padd(void *p, size_t i) {
-  return (char *) p + i;
-}
+template<typename f, bool equal>
+class test_equality
+{
+public:
+  static const size_t loop_count = f::loop_count;
 
-static inline const void *cpadd(const void *p, size_t i) {
-  return (const char *) p + i;
-}
-
-PUSH_WARNINGS
-DISABLE_VS_WARNINGS(4267)
-static_assert(sizeof(size_t) == 4 || sizeof(size_t) == 8, "size_t must be 4 or 8 bytes long");
-static inline void place_length(uint8_t *buffer, size_t bufsize, size_t length) {
-  if (sizeof(size_t) == 4) {
-    *(uint32_t *) padd(buffer, bufsize - 4) = swap32be(length);
-  } else {
-    *(uint64_t *) padd(buffer, bufsize - 8) = swap64be(length);
+  bool init()
+  {
+    for (int n = 0; n < 32; ++n)
+      k0[n] = n;
+    for (int n = 0; n < 32; ++n)
+      k1[n] = equal ? n : n + 1;
+    return true;
   }
-}
-POP_WARNINGS
 
-#pragma pack(push, 1)
-union hash_state {
-  uint8_t b[200];
-  uint64_t w[25];
-};
-#pragma pack(pop)
-static_assert(sizeof(union hash_state) == 200, "Invalid structure size");
+  bool test()
+  {
+    return equal == !f::call(k0, k1);
+  }
 
-void hash_permutation(union hash_state *state);
-void hash_process(union hash_state *state, const uint8_t *buf, size_t count);
-
-#endif
-
-enum {
-  HASH_SIZE = 32,
-  HASH_DATA_AREA = 136
+private:
+  unsigned char k0[32];
+  unsigned char k1[32];
 };
 
-void cn_fast_hash(const void *data, size_t length, char *hash);
-void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, const uint32_t iters);
-
-void hash_extra_blake(const void *data, size_t length, char *hash);
-void hash_extra_groestl(const void *data, size_t length, char *hash);
-void hash_extra_jh(const void *data, size_t length, char *hash);
-void hash_extra_skein(const void *data, size_t length, char *hash);
-
-void tree_hash(const char (*hashes)[HASH_SIZE], size_t count, char *root_hash);

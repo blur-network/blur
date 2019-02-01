@@ -44,7 +44,7 @@
 #define AES_BLOCK_SIZE  16
 #define AES_KEY_SIZE    32
 #define INIT_SIZE_BLK   8
-#define INIT_SIZE_BYTE (INIT_SIZE_BLK * AES_BLOCK_SIZE)
+#define INIT_SIZE_BYTE  128
 
 extern void aesb_single_round(const uint8_t *in, uint8_t *out, const uint8_t *expandedKey);
 extern void aesb_pseudo_round(const uint8_t *in, uint8_t *out, const uint8_t *expandedKey);
@@ -693,7 +693,7 @@ void slow_hash_free_state(void)
  * @param length the length in bytes of the data
  * @param hash a pointer to a buffer in which the final 256 bit hash will be stored
  */
-void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, int iters)
+void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, uint32_t iters)
 {
     RDATA_ALIGN16 uint8_t expandedKey[240];  /* These buffers are aligned to use later with SSE functions */
 
@@ -737,7 +737,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     if(useAes)
     {
         aes_expand_key(state.hs.b, expandedKey);
-        for(i = 0; i < 8192; i++)
+        for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
         {
             aes_pseudo_round(text, text, expandedKey, INIT_SIZE_BLK);
             memcpy(&hp_state[i * INIT_SIZE_BYTE], text, INIT_SIZE_BYTE);
@@ -747,7 +747,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     {
         aes_ctx = (oaes_ctx *) oaes_alloc();
         oaes_key_import_data(aes_ctx, state.hs.b, AES_KEY_SIZE);
-        for(i = 0; i < 8192; i++)
+        for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
         {
             for(j = 0; j < INIT_SIZE_BLK; j++)
                 aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], aes_ctx->key->exp_data);
@@ -772,7 +772,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     // the useAes test is only performed once, not every iteration.
     if(useAes)
     {
-        for(i = 0; i < ((unsigned)iters/2); i++)
+        for(i = 0; i < (iters >> 1); i++)
         {
             pre_aes();
             _c = _mm_aesenc_si128(_c, _a);
@@ -781,7 +781,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     }
     else
     {
-        for(i = 0; i < ((unsigned)iters/2); i++)
+        for(i = 0; i < (iters >> 1); i++)
         {
             pre_aes();
             aesb_single_round((uint8_t *) &_c, (uint8_t *) &_c, (uint8_t *) &_a);
@@ -797,7 +797,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     if(useAes)
     {
         aes_expand_key(&state.hs.b[32], expandedKey);
-        for(i = 0; i < 8192; i++)
+        for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
         {
             // add the xor to the pseudo round
             aes_pseudo_round_xor(text, text, expandedKey, &hp_state[i * INIT_SIZE_BYTE], INIT_SIZE_BLK);
@@ -806,7 +806,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     else
     {
         oaes_key_import_data(aes_ctx, &state.hs.b[32], AES_KEY_SIZE);
-        for(i = 0; i < 8192; i++)
+        for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
         {
             for(j = 0; j < INIT_SIZE_BLK; j++)
             {
@@ -1062,7 +1062,7 @@ STATIC INLINE void aligned_free(void *ptr)
 }
 #endif /* FORCE_USE_HEAP */
 
-void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed,  int iters)
+void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed,  uint32_t iters)
 {
     RDATA_ALIGN16 uint8_t expandedKey[240];
 
@@ -1105,7 +1105,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
      */
 
     aes_expand_key(state.hs.b, expandedKey);
-    for(i = 0; i < 8192; i++)
+    for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
     {
         aes_pseudo_round(text, text, expandedKey, INIT_SIZE_BLK);
         memcpy(&hp_state[i * INIT_SIZE_BYTE], text, INIT_SIZE_BYTE);
@@ -1140,7 +1140,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     memcpy(text, state.init, INIT_SIZE_BYTE);
 
     aes_expand_key(&state.hs.b[32], expandedKey);
-    for(i = 0; i < 8192; i++)
+    for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
     {
         // add the xor to the pseudo round
         aes_pseudo_round_xor(text, text, expandedKey, &hp_state[i * INIT_SIZE_BYTE], INIT_SIZE_BLK);
@@ -1277,7 +1277,7 @@ STATIC INLINE void xor_blocks(uint8_t* a, const uint8_t* b)
   U64(a)[1] ^= U64(b)[1];
 }
 
-void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, int iters)
+void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, uint32_t iters)
 {
     uint8_t text[INIT_SIZE_BYTE];
     uint8_t a[AES_BLOCK_SIZE];
@@ -1319,7 +1319,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
 
     // use aligned data
     memcpy(expandedKey, aes_ctx->key->exp_data, aes_ctx->key->exp_data_len);
-    for(i = 0; i < 8192; i++)
+    for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
     {
         for(j = 0; j < INIT_SIZE_BLK; j++)
             aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], expandedKey);
@@ -1370,7 +1370,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     memcpy(text, state.init, INIT_SIZE_BYTE);
     oaes_key_import_data(aes_ctx, &state.hs.b[32], AES_KEY_SIZE);
     memcpy(expandedKey, aes_ctx->key->exp_data, aes_ctx->key->exp_data_len);
-    for(i = 0; i < 8192; i++)
+    for(i = 0; i < MEMORY / INIT_SIZE_BYTE; i++)
     {
         for(j = 0; j < INIT_SIZE_BLK; j++)
         {
@@ -1475,7 +1475,7 @@ union cn_slow_hash_state {
 };
 #pragma pack(pop)
 
-void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, int iters) {
+void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int prehashed, uint32_t iters) {
 #ifndef FORCE_USE_HEAP
   uint8_t long_state[MEMORY];
 #else
@@ -1506,7 +1506,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
   VARIANT2_PORTABLE_INIT();
 
   oaes_key_import_data(aes_ctx, aes_key, AES_KEY_SIZE);
-  for (i = 0; i < 8192; i++) {
+  for (i = 0; i < MEMORY / INIT_SIZE_BYTE; i++) {
     for (j = 0; j < INIT_SIZE_BLK; j++) {
       aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], aes_ctx->key->exp_data);
     }
@@ -1555,7 +1555,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
 
   memcpy(text, state.init, INIT_SIZE_BYTE);
   oaes_key_import_data(aes_ctx, &state.hs.b[32], AES_KEY_SIZE);
-  for (i = 0; i < 8192; i++) {
+  for (i = 0; i < MEMORY / INIT_SIZE_BYTE; i++) {
     for (j = 0; j < INIT_SIZE_BLK; j++) {
       xor_blocks(&text[j * AES_BLOCK_SIZE], &long_state[i * INIT_SIZE_BYTE + j * AES_BLOCK_SIZE]);
       aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], aes_ctx->key->exp_data);
