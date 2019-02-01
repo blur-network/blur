@@ -50,10 +50,9 @@
 #include "storages/levin_abstract_invoke2.h"
 #include "cryptonote_core/cryptonote_core.h"
 
-// We have to look for miniupnpc headers in different places, dependent on if its compiled or external
-  #include <miniupnp/miniupnpc/miniupnpc.h>
-  #include <miniupnp/miniupnpc/upnpcommands.h>
-  #include <miniupnp/miniupnpc/upnperrors.h>
+#include <miniupnp/miniupnpc/miniupnpc.h>
+#include <miniupnp/miniupnpc/upnpcommands.h>
+#include <miniupnp/miniupnpc/upnperrors.h>
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "net.p2p"
@@ -648,14 +647,10 @@ namespace nodetool
   {
     kill();
     m_peerlist.deinit();
-
-    if (!m_offline)
-    {
-      m_net_server.deinit_server();
-      // remove UPnP port mapping
-      if(!m_no_igd)
-        delete_upnp_port_mapping(m_listening_port);
-    }
+    m_net_server.deinit_server();
+    // remove UPnP port mapping
+    if(!m_no_igd)
+      delete_upnp_port_mapping(m_listening_port);
     return store_config();
   }
   //-----------------------------------------------------------------------------------
@@ -1327,19 +1322,12 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::check_incoming_connections()
   {
-    if (m_offline)
+    if (m_offline || m_hide_my_port)
       return true;
     if (get_incoming_connections_count() == 0)
     {
-      if (m_hide_my_port || m_config.m_net_config.max_in_connection_count == 0)
-      {
-        MGINFO("Incoming connections disabled, enable them for full connectivity");
-      }
-      else
-      {
-        const el::Level level = el::Level::Warning;
-        MCLOG_RED(level, "global", "No incoming connections - check firewalls/routers allow port " << get_this_peer_port());
-      }
+      const el::Level level = el::Level::Warning;
+      MCLOG_RED(level, "global", "No incoming connections - check firewalls/routers allow port " << get_this_peer_port());
     }
     return true;
   }
