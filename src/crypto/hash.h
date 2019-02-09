@@ -71,11 +71,11 @@ namespace crypto {
     return h;
   }
 
-  inline void cn_slow_hash(const void *data, std::size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x80000) {
+  inline void cn_slow_hash(const void *data, std::size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x41000) {
     cn_slow_hash(data, length, reinterpret_cast<char *>(&hash), variant, 0/*prehashed*/, iters);
   }
 
-  inline void cn_slow_hash_prehashed(const void *data, std::size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x80000) {
+  inline void cn_slow_hash_prehashed(const void *data, std::size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x41000) {
     cn_slow_hash(data, length, reinterpret_cast<char *>(&hash), variant, 1/*prehashed*/, iters);
   }
 
