@@ -41,9 +41,9 @@ BLUR takes a decentralized-by-design approach to mining.  The algorithm used to 
 
 **Blur uses the CMake build system and a top-level [Makefile](Makefile) that invokes cmake commands as needed.**
 
-**Step 1:** Clone this repository recursively, to pull in needed submodules:
+**Step 1:** Clone this repository's stable branch:
 
->`git clone https://github.com/blur-network/blur.git`
+>`git clone --branch stable https://github.com/blur-network/blur.git`
 
 **Step 2:** Install dependencies:
 
@@ -97,11 +97,11 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
->`cd ~/Downloads && tar xvzf blur-v0.1.7.6-linux-x86_64.tar.xz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.8.3-linux-x86_64.tar.xz`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
->`cd blur-v0.1.7.6-linux_x86_64 && ./blurd`
+>`cd blur-v0.1.8.3-linux_x86_64 && ./blurd`
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
