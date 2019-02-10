@@ -50,29 +50,12 @@
 #include "is_out_to_acc.h"
 #include "subaddress_expand.h"
 #include "sc_reduce32.h"
+#include "sc_check.h"
 #include "cn_fast_hash.h"
 #include "rct_mlsag.h"
+#include "equality.h"
 
 namespace po = boost::program_options;
-
-std::string glob_to_regex(const std::string &val)
-{
-  std::string newval;
-
-  bool escape = false;
-  for (char c: val)
-  {
-    if (c == '*')
-      newval += escape ? "*" : ".*";
-    else if (c == '?')
-      newval += escape ? "?" : ".";
-    else if (c == '\\')
-      newval += '\\', escape = !escape;
-    else
-      newval += c;
-  }
-  return newval;
-}
 
 int main(int argc, char** argv)
 {
@@ -82,11 +65,16 @@ int main(int argc, char** argv)
   set_thread_high_priority();
 
   mlog_configure(mlog_get_default_log_path("performance_tests.log"), true);
-  mlog_set_log_level(0);
 
   po::options_description desc_options("Command line options");
   const command_line::arg_descriptor<std::string> arg_filter = { "filter", "Regular expression filter for which tests to run" };
+  const command_line::arg_descriptor<bool> arg_verbose = { "verbose", "Verbose output", false };
+  const command_line::arg_descriptor<bool> arg_stats = { "stats", "Including statistics (min/median)", false };
+  const command_line::arg_descriptor<unsigned> arg_loop_multiplier = { "loop-multiplier", "Run for that many times more loops", 1 };
   command_line::add_arg(desc_options, arg_filter);
+  command_line::add_arg(desc_options, arg_verbose);
+  command_line::add_arg(desc_options, arg_stats);
+  command_line::add_arg(desc_options, arg_loop_multiplier);
 
   po::variables_map vm;
   bool r = command_line::handle_error_helper(desc_options, [&]()
@@ -98,83 +86,87 @@ int main(int argc, char** argv)
   if (!r)
     return 1;
 
-  const std::string filter = glob_to_regex(command_line::get_arg(vm, arg_filter));
+  const std::string filter = tools::glob_to_regex(command_line::get_arg(vm, arg_filter));
+  Params p;
+  p.verbose = command_line::get_arg(vm, arg_verbose);
+  p.stats = command_line::get_arg(vm, arg_stats);
+  p.loop_multiplier = command_line::get_arg(vm, arg_loop_multiplier);
 
   performance_timer timer;
   timer.start();
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 1, 1, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 1, 2, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 1, 10, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 1, 100, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 1, 1000, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 1, 1, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 1, 2, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 1, 10, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 1, 100, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 1, 1000, false);
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 1, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 2, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 10, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 100, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 1, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 2, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 10, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 100, false);
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 1, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 2, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 10, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 100, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 1, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 2, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 10, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 100, false);
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 1, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 2, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 10, false);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 100, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 1, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 2, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 10, false);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 100, false);
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 1, true);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 2, true);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 2, 10, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 1, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 2, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 2, 10, true);
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 1, true);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 2, true);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 10, 10, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 1, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 2, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 10, 10, true);
 
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 1, true);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 2, true);
-  TEST_PERFORMANCE3(filter, test_construct_tx, 100, 10, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 1, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 2, true);
+  TEST_PERFORMANCE3(filter, p, test_construct_tx, 100, 10, true);
 
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 1, false);
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 2, false);
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 10, false);
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 100, false);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 1, false);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 2, false);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 10, false);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 100, false);
 
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 2, true);
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 10, true);
-  TEST_PERFORMANCE2(filter, test_check_tx_signature, 100, true);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 2, true);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 10, true);
+  TEST_PERFORMANCE2(filter, p, test_check_tx_signature, 100, true);
 
-  TEST_PERFORMANCE0(filter, test_is_out_to_acc);
-  TEST_PERFORMANCE0(filter, test_is_out_to_acc_precomp);
-  TEST_PERFORMANCE0(filter, test_generate_key_image_helper);
-  TEST_PERFORMANCE0(filter, test_generate_key_derivation);
-  TEST_PERFORMANCE0(filter, test_generate_key_image);
-  TEST_PERFORMANCE0(filter, test_derive_public_key);
-  TEST_PERFORMANCE0(filter, test_derive_secret_key);
-  TEST_PERFORMANCE0(filter, test_ge_frombytes_vartime);
-  TEST_PERFORMANCE0(filter, test_generate_keypair);
-  TEST_PERFORMANCE0(filter, test_sc_reduce32);
+  TEST_PERFORMANCE0(filter, p, test_is_out_to_acc);
+  TEST_PERFORMANCE0(filter, p, test_is_out_to_acc_precomp);
+  TEST_PERFORMANCE0(filter, p, test_generate_key_image_helper);
+  TEST_PERFORMANCE0(filter, p, test_generate_key_derivation);
+  TEST_PERFORMANCE0(filter, p, test_generate_key_image);
+  TEST_PERFORMANCE0(filter, p, test_derive_public_key);
+  TEST_PERFORMANCE0(filter, p, test_derive_secret_key);
+  TEST_PERFORMANCE0(filter, p, test_ge_frombytes_vartime);
+  TEST_PERFORMANCE0(filter, p, test_generate_keypair);
+  TEST_PERFORMANCE0(filter, p, test_sc_reduce32);
 
-  TEST_PERFORMANCE2(filter, test_wallet2_expand_subaddresses, 50, 200);
+  TEST_PERFORMANCE2(filter, p, test_wallet2_expand_subaddresses, 50, 200);
 
-  TEST_PERFORMANCE0(filter, test_cn_slow_hash);
-  TEST_PERFORMANCE1(filter, test_cn_fast_hash, 32);
-  TEST_PERFORMANCE1(filter, test_cn_fast_hash, 16384);
+  TEST_PERFORMANCE0(filter, p, test_cn_slow_hash);
+  TEST_PERFORMANCE1(filter, p, test_cn_fast_hash, 32);
+  TEST_PERFORMANCE1(filter, p, test_cn_fast_hash, 16384);
 
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 3, false);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 5, false);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 10, false);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 100, false);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 3, true);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 5, true);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 10, true);
-  TEST_PERFORMANCE3(filter, test_ringct_mlsag, 1, 100, true);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 3, false);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 5, false);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 10, false);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 100, false);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 3, true);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 5, true);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 10, true);
+  TEST_PERFORMANCE3(filter, p, test_ringct_mlsag, 1, 100, true);
 
-  TEST_PERFORMANCE2(filter, test_equality, memcmp32, true);
-  TEST_PERFORMANCE2(filter, test_equality, memcmp32, false);
-  TEST_PERFORMANCE2(filter, test_equality, verify32, false);
-  TEST_PERFORMANCE2(filter, test_equality, verify32, false);
+  TEST_PERFORMANCE2(filter, p, test_equality, memcmp32, true);
+  TEST_PERFORMANCE2(filter, p, test_equality, memcmp32, false);
+  TEST_PERFORMANCE2(filter, p, test_equality, verify32, false);
+  TEST_PERFORMANCE2(filter, p, test_equality, verify32, false);
 
   std::cout << "Tests finished. Elapsed time: " << timer.elapsed_ms() / 1000 << " sec" << std::endl;
 
