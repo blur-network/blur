@@ -1,5 +1,6 @@
-# Blur Network 
 
+![Blur: The Private Cryptocurrency](https://i.imgur.com/PG8B6Ca.jpg)
+# Blur Network 
 Copyright (c) 2018-2019, Blur Network</br>
 
 *See [LICENSE](LICENSE).*<br>
