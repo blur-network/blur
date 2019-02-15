@@ -1216,10 +1216,10 @@ namespace cryptonote
   {
     struct request
     {
-      bool fill_pow_hash;
+      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE_OPT(fill_pow_hash, false);
+        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1243,11 +1243,11 @@ namespace cryptonote
     struct request
     {
       std::string hash;
-      bool fill_pow_hash;
+      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(hash)
-        KV_SERIALIZE(fill_pow_hash, false);
+        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1271,11 +1271,11 @@ namespace cryptonote
     struct request
     {
       uint64_t height;
-      bool fill_pow_hash;
+      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(height)
-        KV_SERIALIZE_OPT(fill_pow_hash, false);
+        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1300,12 +1300,12 @@ namespace cryptonote
     {
       std::string hash;
       uint64_t height;
-      bool fill_pow_hash;
+      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(hash)
         KV_SERIALIZE(height)
-        KV_SERIALIZE_OPT(fill_pow_hash, false);
+        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1660,12 +1660,12 @@ namespace cryptonote
     {
       uint64_t start_height;
       uint64_t end_height;
-      bool fill_pow_hash;
+      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(start_height)
         KV_SERIALIZE(end_height)
-        KV_SERIALIZE_OPT(fill_pow_hash, false);
+        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
