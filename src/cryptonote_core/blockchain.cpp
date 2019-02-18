@@ -94,15 +94,16 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  { 1, 1,      0, 1504387246 },
-  { 2, 2,      0, 1507601066 },
-  { 3, 3,      0, 1512206452 },
-  { 4, 4,      0, 1513136914 },
-  { 5, 5,      0, 1525150523 },
-  { 6, 7500,   0, 1529974332 },
-  { 7, 80000,  0, 1534323374 },
-  { 8, 185000, 0, 1540624740 },
-  { 9, 211000, 0, 1543147200 }
+  {  1, 1,      0, 1504387246 },
+  {  2, 2,      0, 1507601066 },
+  {  3, 3,      0, 1512206452 },
+  {  4, 4,      0, 1513136914 },
+  {  5, 5,      0, 1525150523 },
+  {  6, 7500,   0, 1529974332 },
+  {  7, 80000,  0, 1534323374 },
+  {  8, 185000, 0, 1540624740 },
+  {  9, 211000, 0, 1543147200 },
+  { 10, 338500, 0, 1550959200 }
 };
 
 static const struct {
@@ -111,16 +112,18 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } testnet_hard_forks[] = {
-  { 1, 1, 0, 1504374656 },
-  { 2, 2, 0, 1507182919 },
-  { 3, 3, 0, 1511981038 },
-  { 4, 4, 0, 1512627130 },
-  { 5, 5, 0, 1524112219 },
-  { 6, 6, 0, 1529841600 },
-  { 7, 7, 0, 1529841601 },
-  { 8, 8, 0, 1529841602 },
-  { 9, 140, 0, 1542681000 }
-}; //testnet hardfork v9 final testing
+  {  1, 1, 0, 1504374656 },
+  {  2, 2, 0, 1507182919 },
+  {  3, 3, 0, 1511981038 },
+  {  4, 4, 0, 1512627130 },
+  {  5, 5, 0, 1524112219 },
+  {  6, 6, 0, 1529841600 },
+  {  7, 7, 0, 1529841601 },
+  {  8, 8, 0, 1529841602 },
+  {  9, 20, 0, 1542681000 },
+  { 10, 40, 0, 1550449900 }
+
+}; //testnet hardfork v10 HF testing
 
 static const struct {
   uint8_t version;
@@ -1447,19 +1450,11 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
       return false;
     }
 
-    // Disable merge mining tag, at v10
-    tx_extra_merge_mining_tag mm_tag;
-    if (get_merge_mining_tag_from_extra(b.miner_tx.extra) && b.major_version >= 10)
-    {
-      MERROR_VER("Block with id: " << id << std::endl << " has merged mining tag in extra, which has been disabled.");
-      return false;
-    }
-
     // Check the block's hash against the difficulty target for its alt chain
     difficulty_type current_diff = get_next_difficulty_for_alternative_chain(alt_chain, bei);
     CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
     crypto::hash proof_of_work = null_hash;
-    get_block_longhash(bei.bl, proof_of_work, bei.height);
+    get_block_longhash(bei.bl, proof_of_work, bei.height, current_diff);
     if(!check_hash(proof_of_work, current_diff))
     {
       MERROR_VER("Block with id: " << id << std::endl << " for alternative chain, does not have enough proof of work: " << proof_of_work << std::endl << " expected difficulty: " << current_diff);
@@ -3176,19 +3171,6 @@ leave:
   TIME_MEASURE_FINISH(t1);
   TIME_MEASURE_START(t2);
 
-  // Disable merged mining tag, starting at v10
-  uint64_t height = 0;
-  tx_extra_merge_mining_tag mm_tag;
-  if (!get_block_height(bl))
-  {
-    if (get_merge_mining_tag_from_extra(bl.miner_tx.extra) && bl.major_version >= 10)
-    {
-      MERROR_VER("Block with id: " << id << std::endl << " has merged mining tag in extra, which has been disabled");
-    bvc.m_verifivation_failed = true;
-    goto leave;
-    }
-  }
-
   // make sure block timestamp is not less than the median timestamp
   // of a set number of the most recent blocks.
   if(!check_block_timestamp(bl))
@@ -3257,7 +3239,7 @@ leave:
       proof_of_work = it->second;
     }
     else
-      proof_of_work = get_block_longhash(bl, m_db->height());
+    proof_of_work = get_block_longhash(bl, m_db->height(), current_diffic);
 
     // validate proof_of_work versus difficulty target
     if(!check_hash(proof_of_work, current_diffic))
@@ -3627,6 +3609,7 @@ void Blockchain::set_enforce_dns_checkpoints(bool enforce_checkpoints)
 //------------------------------------------------------------------
 void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map) const
 {
+  CRITICAL_REGION_BEGIN(m_blockchain_lock);
   TIME_MEASURE_START(t);
   slow_hash_allocate_state();
 
@@ -3635,12 +3618,14 @@ void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block>
     if (m_cancel)
        break;
     crypto::hash id = get_block_hash(block);
-    crypto::hash pow = get_block_longhash(block, height++);
+    difficulty_type diffic = block_difficulty(height);
+    crypto::hash pow = get_block_longhash(block, height++, diffic);
     map.emplace(id, pow);
   }
 
   slow_hash_free_state();
   TIME_MEASURE_FINISH(t);
+  CRITICAL_REGION_END();
 }
 
 //------------------------------------------------------------------

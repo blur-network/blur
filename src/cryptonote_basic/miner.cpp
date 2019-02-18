@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -388,7 +389,7 @@ namespace cryptonote
     for(; bl.nonce != std::numeric_limits<uint32_t>::max(); bl.nonce++)
     {
       crypto::hash h;
-      get_block_longhash(bl, h, height);
+      get_block_longhash(bl, h, height, diffic);
 
       if(check_hash(h, diffic))
       {
@@ -458,12 +459,12 @@ namespace cryptonote
         while( !m_is_background_mining_started )
         {
           MGINFO("background mining is enabled, but not started, waiting until start triggers");
-          boost::unique_lock<boost::mutex> started_lock( m_is_background_mining_started_mutex );        
+          boost::unique_lock<boost::mutex> started_lock( m_is_background_mining_started_mutex );
           m_is_background_mining_started_cond.wait( started_lock );
           if( m_stop ) break;
         }
-        
-        if( m_stop ) continue;         
+
+        if( m_stop ) continue;
       }
 
       if(local_template_ver != m_template_no)
@@ -486,7 +487,7 @@ namespace cryptonote
 
       b.nonce = nonce;
       crypto::hash h;
-      get_block_longhash(b, h, height);
+      get_block_longhash(b, h, height, m_diffic);
 
       if(check_hash(h, local_diff))
       {

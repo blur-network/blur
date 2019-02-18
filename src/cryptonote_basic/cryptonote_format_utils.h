@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -32,6 +33,7 @@
 #include "blobdatatype.h"
 #include "cryptonote_basic_impl.h"
 #include "tx_extra.h"
+#include "difficulty.h"
 #include "account.h"
 #include "subaddress_index.h"
 #include "include_base_utils.h"
@@ -109,8 +111,8 @@ namespace cryptonote
   bool calculate_block_hash(const block& b, crypto::hash& res);
   bool get_block_hash(const block& b, crypto::hash& res);
   crypto::hash get_block_hash(const block& b);
-  bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height);
-  crypto::hash get_block_longhash(const block& b, uint64_t height);
+  bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height, const difficulty_type& next_difficulty);
+  crypto::hash get_block_longhash(const block& b, uint64_t height, const difficulty_type& next_difficulty);
   bool parse_and_validate_block_from_blob(const blobdata& b_blob, block& b);
   bool get_inputs_money_amount(const transaction& tx, uint64_t& money);
   uint64_t get_outs_money_amount(const transaction& tx);
