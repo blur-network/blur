@@ -43,7 +43,6 @@ using namespace epee;
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
 #include "ringct/rctSigs.h"
-#include "tx_extra.h"
 #include "difficulty.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
@@ -474,20 +473,6 @@ namespace cryptonote
   {
     return get_tx_pub_key_from_extra(tx.extra, pk_index);
   }
-  //---------------------------------------------------------------
-  bool get_merge_mining_tag_from_extra(const std::vector<uint8_t>& tx_extra)
-  {
-    std::vector<tx_extra_field> tx_extra_fields;
-    parse_tx_extra(tx_extra, tx_extra_fields);
-
-      tx_extra_merge_mining_tag mm_tag;
-      if (!find_tx_extra_field_by_type(tx_extra_fields, mm_tag))
-      {
-        return false;
-      }
-      else
-      return true;
-   }
   //---------------------------------------------------------------
   bool add_tx_pub_key_to_extra(transaction& tx, const crypto::public_key& tx_pub_key)
   {
