@@ -1011,7 +1011,7 @@ namespace cryptonote
         cn_diff = b_difficulty;
         const uint64_t stamp = m_stamp;
         const uint64_t diffdiv = cn_diff/3;
-        cn_iters += (((stamp % diffdiv) + (height + 1)) & 0xFFF);
+        cn_iters += (((stamp % diffdiv) + (height + 1)) & 0x7FFF);
 
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
