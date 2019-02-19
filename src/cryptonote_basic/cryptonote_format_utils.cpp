@@ -42,8 +42,8 @@ using namespace epee;
 #include "cryptonote_config.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
-#include "ringct/rctSigs.h"
 #include "difficulty.h"
+#include "ringct/rctSigs.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "cn"
@@ -51,8 +51,6 @@ using namespace epee;
 #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
 
 // #define ENABLE_HASH_CASH_INTEGRITY_CHECK
-
-
 
 using namespace crypto;
 
@@ -88,8 +86,6 @@ static std::atomic<uint64_t> block_hashes_cached_count(0);
 
 #define CHECK_AND_ASSERT_THROW_MES_L1(expr, message) {if(!(expr)) {MWARNING(message); throw std::runtime_error(message);}}
 
-
-  
 namespace cryptonote
 {
   static inline unsigned char *operator &(ec_point &point) {
