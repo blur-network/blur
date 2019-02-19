@@ -979,7 +979,7 @@ namespace cryptonote
     return p;
   }
 //--------------------------------------------------------------
-  bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height, const difficulty_type& next_difficulty)
+  bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
     const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
@@ -989,21 +989,29 @@ namespace cryptonote
       {
         cn_iters += ((height + 1) & 0x3FF);
       }
-      else if (b.major_version == 9)
+      else if (b.major_version >= 9)
       {
         const uint64_t stamp = b.timestamp;
         cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
       }
-      else
-      {
+
+    crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
+    return true;
+  }
+  //---------------------------------------------------------------
+  bool get_block_longhash_v10(const block& b, crypto::hash& res, uint64_t height, const difficulty_type& b_difficulty)
+  {
+   blobdata bd = get_block_hashing_blob(b);
+    const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
+    int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
+
         uint64_t m_stamp = 0;
         m_stamp = b.timestamp;
         uint64_t cn_diff = 1;
-        cn_diff = next_difficulty;
+        cn_diff = b_difficulty;
         const uint64_t stamp = m_stamp;
         const uint64_t diffdiv = cn_diff/3;
         cn_iters += (((stamp % diffdiv) + (height + 1)) & 0xFFF);
-      }
 
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
@@ -1029,10 +1037,18 @@ namespace cryptonote
     return res;
   }
   //---------------------------------------------------------------
-  crypto::hash get_block_longhash(const block& b, uint64_t height, const difficulty_type& next_difficulty)
+  crypto::hash get_block_longhash(const block& b, uint64_t height)
   {
     crypto::hash p = null_hash;
-    get_block_longhash(b, p, height, next_difficulty);
+    get_block_longhash(b, p, height);
+    return p;
+  }
+
+  //---------------------------------------------------------------
+  crypto::hash get_block_longhash_v10(const block& b, uint64_t height, const difficulty_type& b_difficulty)
+  {
+    crypto::hash p = null_hash;
+    get_block_longhash_v10(b, p, height, b_difficulty);
     return p;
   }
   //---------------------------------------------------------------
