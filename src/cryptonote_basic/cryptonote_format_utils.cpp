@@ -996,8 +996,11 @@ namespace cryptonote
       }
       else
       {
-        const uint64_t stamp = b.timestamp;
-        uint64_t cn_diff = next_difficulty;
+        uint64_t m_stamp = 0;
+        m_stamp = b.timestamp;
+        uint64_t cn_diff = 1;
+        cn_diff = next_difficulty;
+        const uint64_t stamp = m_stamp;
         const uint64_t diffdiv = cn_diff/3;
         cn_iters += (((stamp % diffdiv) + (height + 1)) & 0xFFF);
       }

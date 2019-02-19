@@ -3607,7 +3607,6 @@ void Blockchain::set_enforce_dns_checkpoints(bool enforce_checkpoints)
 //------------------------------------------------------------------
 void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map) const
 {
-  CRITICAL_REGION_BEGIN(m_blockchain_lock);
   TIME_MEASURE_START(t);
   slow_hash_allocate_state();
 
@@ -3616,14 +3615,13 @@ void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block>
     if (m_cancel)
        break;
     crypto::hash id = get_block_hash(block);
-    difficulty_type diffic = block_difficulty(height);
+    uint64_t diffic = m_db->get_block_cumulative_difficulty(m_db->height()-1);
     crypto::hash pow = get_block_longhash(block, height++, diffic);
     map.emplace(id, pow);
   }
 
   slow_hash_free_state();
   TIME_MEASURE_FINISH(t);
-  CRITICAL_REGION_END();
 }
 
 //------------------------------------------------------------------
