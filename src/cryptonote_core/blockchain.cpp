@@ -3237,7 +3237,7 @@ leave:
       proof_of_work = it->second;
     }
     else
-    bl.major_version < 10 ? proof_of_work = get_block_longhash(bl, m_db->height()) : proof_of_work = get_block_longhash_v10(bl, m_db->height(), current_diffic);
+      bl.major_version < 10 ? proof_of_work = get_block_longhash(bl, m_db->height()) : proof_of_work = get_block_longhash_v10(bl, m_db->height(), current_diffic);
 
     // validate proof_of_work versus difficulty target
     if(!check_hash(proof_of_work, current_diffic))
