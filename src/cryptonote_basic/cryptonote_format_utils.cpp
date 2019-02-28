@@ -35,6 +35,9 @@ using namespace epee;
 
 #include <atomic>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
+#include <sstream> 
+#include <stdio.h>
 #include "wipeable_string.h"
 #include "string_tools.h"
 #include "serialization/string.h"
@@ -974,7 +977,7 @@ namespace cryptonote
     get_block_hash(b, p);
     return p;
   }
-//--------------------------------------------------------------
+  //--------------------------------------------------------------
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
@@ -985,30 +988,23 @@ namespace cryptonote
       {
         cn_iters += ((height + 1) & 0x3FF);
       }
-      else if (b.major_version >= 9)
+      else if (b.major_version == 9)
       {
         const uint64_t stamp = b.timestamp;
         cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
       }
+      else if (b.major_version >= 10)
+      {
+        std::string hash_alpha = string_tools::pod_to_hex(b.prev_id);
+        std::string subhash = hash_alpha.substr(0,6);
+        unsigned int id_num = std::stoul(subhash, nullptr, 16);
+        LOG_PRINT_L1("\nPRNG from previous block ID : " << id_num); 
 
-    crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
-    return true;
-  }
-  //---------------------------------------------------------------
-  bool get_block_longhash_v10(const block& b, crypto::hash& res, uint64_t height, const difficulty_type& b_difficulty)
-  {
-   blobdata bd = get_block_hashing_blob(b);
-    const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
-    int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
-
-        uint64_t m_stamp = 0;
-        m_stamp = b.timestamp;
-        uint64_t cn_diff = 1;
-        cn_diff = b_difficulty;
+        uint64_t m_stamp = b.timestamp;
         const uint64_t stamp = m_stamp;
-        const uint64_t diffdiv = cn_diff/3;
-        cn_iters += (((stamp % diffdiv) + (height + 1)) & 0x7FFF);
-
+        cn_iters += (((stamp % id_num) + height) & 0x7FFF);
+        LOG_PRINT_L1("\nIterations : "<< cn_iters); 
+       }
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
     return true;
   }
@@ -1037,14 +1033,6 @@ namespace cryptonote
   {
     crypto::hash p = null_hash;
     get_block_longhash(b, p, height);
-    return p;
-  }
-
-  //---------------------------------------------------------------
-  crypto::hash get_block_longhash_v10(const block& b, uint64_t height, const difficulty_type& b_difficulty)
-  {
-    crypto::hash p = null_hash;
-    get_block_longhash_v10(b, p, height, b_difficulty);
     return p;
   }
   //---------------------------------------------------------------
