@@ -3,8 +3,8 @@
 # Blur Network 
 Copyright (c) 2018-2019, Blur Network</br>
 
-*See [LICENSE](LICENSE).*<br>
-*See [Code of Conduct](CODE_OF_CONDUCT.md), Active as of 01/04/2019*<br>
+*See [LICENSE](License).*<br>
+*See [Code of Conduct](CODE_OF_CONDUCT.md)<br>
 
 ### Donate to help support Blur:
 **BTC:** 19onVUREbP89qu4dYBfVqtGisWaoyWs3BX <br>
@@ -32,7 +32,8 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
 **Algorithm:** | <center> Cryptonight-Dynamic </center>
    **Ports:** | <center> P2P port = 13894 </br>RPC port = 13895</br></center>
-  **Seed Nodes:** | <center> <li>Node 1: 66.70.189.131:13894</li> <li>Node 2: 66.70.189.183:13894</li> <li>Node 3: 66.70.188.178:13894</li>  </center>
+  **Seed Nodes:** | <center><li>Node 1: 45.33.92.232:52541</li><li>Node 2: 45.79.85.65:52541</li><li>Node 3: 212.71.234.44:52541</li>
+  </center>
 
 # About the Project
 
@@ -74,13 +75,13 @@ Arch Linux One-Liner:
 For statically linked binaries (defaults to the platform configuration of the host compiler):
 >`make release-static`
 
-For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.7.6/contrib/depends">using contrib/depends system from Bitcoin</a>):
+For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.9.1/contrib/depends">using contrib/depends system from Bitcoin</a>):
 
 Follow the link above to setup build environment, then issue the command below
 
 >`make release-static-win64`
 
-*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.7.6/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
+*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.9.1/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
 
 For MacOS portable binaries:
 >`make release-static-mac-x86_64`
@@ -98,11 +99,11 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
->`cd ~/Downloads && tar xvzf blur-v0.1.8.3-linux-x86_64.tar.xz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.9.1-linux-x86_64.tar.xz`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
->`cd blur-v0.1.8.3-linux_x86_64 && ./blurd`
+>`cd blur-v0.1.9.1-linux_x86_64 && ./blurd`
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
@@ -147,12 +148,11 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-priority-node 66.70.189.131:13894 --add-priority-node 66.70.189.183:13894 --seed-node 66.70.188.178:13894`
+`./blurd --add-priority-node 45.33.92.232:52541 --add-priority-node 45.79.85.65:52541 --seed-node 212.71.234.44:52541`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-priority-node 66.70.189.131:13894 --add-priority-node 66.70.189.183:13894 --seed-node 66.70.188.178:13894`
+`blurd.exe --add-priority-node 45.33.92.232:52541 --add-priority-node 45.79.85.65:52541 --seed-node 212.71.234.44:52541`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
 You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions. 
-
