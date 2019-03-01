@@ -128,11 +128,11 @@
 
 #define ALLOW_DEBUG_COMMANDS
 
-#define CRYPTONOTE_NAME                         "blur-net"
+#define CRYPTONOTE_NAME                         "blurnetwork"
 #define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
-#define P2P_NET_DATA_FILENAME                   "peerstate.bin"
+#define P2P_NET_DATA_FILENAME                   "peers_state.bin"
 #define MINER_CONFIG_FILE_NAME                  "miner_conf.json"
 
 #define THREAD_STACK_SIZE                       5 * 1024 * 1024
@@ -152,9 +152,9 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 7757; // bL
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 15654; //uR
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 8597; // Ry
-  uint16_t const P2P_DEFAULT_PORT = 13894;
-  uint16_t const RPC_DEFAULT_PORT = 13895;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 13896;
+  uint16_t const P2P_DEFAULT_PORT = 52541;
+  uint16_t const RPC_DEFAULT_PORT = 52542;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 52543;
   boost::uuids::uuid const NETWORK_ID = { {
       0x1E,0x32, 0x11, 0x2F , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x2D
     } }; //
