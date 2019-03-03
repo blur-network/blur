@@ -1000,6 +1000,9 @@ namespace cryptonote
         unsigned int id_num = std::stoul(subhash, nullptr, 16);
         LOG_PRINT_L1("\nPRNG from previous block ID : " << id_num); 
 
+        if (id_num < 1) { // guard against small probability of zero case
+          id_num = 1; }   // in previous hash's first 6 characters
+
         uint64_t m_stamp = b.timestamp;
         const uint64_t stamp = m_stamp;
         cn_iters += (((stamp % id_num) + height) & 0x7FFF);
