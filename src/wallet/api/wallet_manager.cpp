@@ -101,6 +101,8 @@ Wallet *WalletManagerImpl::recoveryWallet(const std::string &path,
     WalletImpl * wallet = new WalletImpl(nettype);
     if(restoreHeight > 0){
         wallet->setRefreshFromBlockHeight(restoreHeight);
+    } else {
+       wallet->setRefreshFromBlockHeight(wallet->estimateBlockChainHeight());
     }
     wallet->recover(path, password, mnemonic);
     return wallet;

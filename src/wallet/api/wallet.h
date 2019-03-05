@@ -104,6 +104,7 @@ public:
     uint64_t unlockedBalance(uint32_t accountIndex = 0) const;
     uint64_t blockChainHeight() const;
     uint64_t approximateBlockChainHeight() const;
+    uint64_t estimateBlockChainHeight() const;
     uint64_t daemonBlockChainHeight() const;
     uint64_t daemonBlockChainTargetHeight() const;
     bool synchronized() const;
