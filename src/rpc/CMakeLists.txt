@@ -31,7 +31,6 @@ set(rpc_base_sources
 
 set(rpc_sources
   core_rpc_server.cpp
-  rpc_handler.cpp
   instanciations)
 
 set(daemon_messages_sources
@@ -46,8 +45,7 @@ set(daemon_rpc_server_sources
 set(rpc_base_headers
   rpc_args.h)
 
-set(rpc_headers
-  rpc_handler.cpp)
+set(rpc_headers)
 
 set(daemon_rpc_server_headers)
 
@@ -65,6 +63,7 @@ set(daemon_rpc_server_private_headers
   message.h
   daemon_messages.h
   daemon_handler.h
+  rpc_handler.h
   zmq_server.h)
 
 
@@ -112,6 +111,7 @@ target_link_libraries(rpc
     common
     cryptonote_core
     cryptonote_protocol
+    epee
     ${Boost_REGEX_LIBRARY}
     ${Boost_THREAD_LIBRARY}
   PRIVATE

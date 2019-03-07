@@ -59,7 +59,7 @@
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
-#define MIN_WANTED_SEED_NODES 12
+#define MIN_WANTED_SEED_NODES 3
 
 namespace nodetool
 {
@@ -68,7 +68,7 @@ namespace nodetool
   void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description& desc)
   {
     command_line::add_arg(desc, arg_p2p_bind_ip);
-    command_line::add_arg(desc, arg_p2p_bind_port, false);
+    command_line::add_arg(desc, arg_p2p_bind_port);
     command_line::add_arg(desc, arg_p2p_external_port);
     command_line::add_arg(desc, arg_p2p_allow_local_ip);
     command_line::add_arg(desc, arg_p2p_add_peer);
@@ -258,7 +258,19 @@ namespace nodetool
   {
     bool testnet = command_line::get_arg(vm, cryptonote::arg_testnet_on);
     bool stagenet = command_line::get_arg(vm, cryptonote::arg_stagenet_on);
-    m_nettype = testnet ? cryptonote::TESTNET : stagenet ? cryptonote::STAGENET : cryptonote::MAINNET;
+
+    if (testnet == true)
+    {
+     m_nettype = cryptonote::TESTNET;
+    }
+    else if (stagenet == true)
+    {
+     m_nettype = cryptonote::STAGENET;
+    }
+    else
+    {
+     m_nettype = cryptonote::MAINNET;
+    }
 
     m_bind_ip = command_line::get_arg(vm, arg_p2p_bind_ip);
     m_port = command_line::get_arg(vm, arg_p2p_bind_port);
@@ -382,7 +394,7 @@ namespace nodetool
     {
 
     }
-    else
+    else if (nettype == cryptonote::MAINNET)
     {
       full_addrs.insert("212.71.234.44:52541");
       full_addrs.insert("45.33.92.232:52541");
@@ -400,12 +412,15 @@ namespace nodetool
     bool res = handle_command_line(vm);
     CHECK_AND_ASSERT_MES(res, false, "Failed to handle command line");
 
-    if (m_nettype == cryptonote::TESTNET)
+    bool testnet = command_line::get_arg(vm, cryptonote::arg_testnet_on);
+    bool stagenet = command_line::get_arg(vm, cryptonote::arg_stagenet_on);
+
+    if (testnet == true)
     {
       memcpy(&m_network_id, &::config::testnet::NETWORK_ID, 16);
       full_addrs = get_seed_nodes(cryptonote::TESTNET);
     }
-    else if (m_nettype == cryptonote::STAGENET)
+    else if (stagenet == true)
     {
       memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 16);
       full_addrs = get_seed_nodes(cryptonote::STAGENET);
@@ -413,6 +428,8 @@ namespace nodetool
     else
     {
       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
+      full_addrs = get_seed_nodes(cryptonote::MAINNET);
+
       if (m_exclusive_peers.empty())
       {
       // for each hostname in the seed nodes list, attempt to DNS resolve and
@@ -491,8 +508,22 @@ namespace nodetool
         else
           MINFO("Not enough DNS seed nodes found, using fallback defaults too");
 
-        for (const auto &peer: get_seed_nodes(cryptonote::MAINNET))
-          full_addrs.insert(peer);
+        if (testnet == true)
+        {
+          for (const auto &peer: get_seed_nodes(cryptonote::TESTNET))
+            full_addrs.insert(peer);
+        }
+        else if (stagenet == true)
+        {
+          for (const auto &peer: get_seed_nodes(cryptonote::STAGENET))
+            full_addrs.insert(peer);
+        }
+        else
+        {
+          for (const auto &peer: get_seed_nodes(cryptonote::MAINNET))
+            full_addrs.insert(peer);
+        }
+
       }
     }
     }

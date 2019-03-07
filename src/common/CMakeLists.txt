@@ -32,7 +32,6 @@ set(common_sources
   base58.cpp
   command_line.cpp
   dns_utils.cpp
-  download.cpp
   error.cpp
   expect.cpp
   util.cpp
@@ -58,7 +57,6 @@ set(common_private_headers
   command_line.h
   common_fwd.h
   dns_utils.h
-  download.h
   error.h
   expect.h
   http_connection.h

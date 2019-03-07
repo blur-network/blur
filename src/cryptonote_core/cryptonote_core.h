@@ -38,7 +38,6 @@
 
 #include "cryptonote_protocol/cryptonote_protocol_handler_common.h"
 #include "storages/portable_storage_template_helper.h"
-#include "common/download.h"
 #include "common/threadpool.h"
 #include "common/command_line.h"
 #include "tx_pool.h"
@@ -933,13 +932,6 @@ namespace cryptonote
      bool relay_txpool_transactions();
 
      /**
-      * @brief checks DNS versions
-      *
-      * @return true on success, false otherwise
-      */
-     bool check_updates();
-
-     /**
       * @brief checks free disk space
       *
       * @return true on success, false otherwise
@@ -968,7 +960,6 @@ namespace cryptonote
      epee::math_helper::once_a_time_seconds<60*60*12, false> m_store_blockchain_interval; //!< interval for manual storing of Blockchain, if enabled
      epee::math_helper::once_a_time_seconds<60*60*2, true> m_fork_moaner; //!< interval for checking HardFork status
      epee::math_helper::once_a_time_seconds<60*2, false> m_txpool_auto_relayer; //!< interval for checking re-relaying txpool transactions
-     epee::math_helper::once_a_time_seconds<60*60*12, true> m_check_updates_interval; //!< interval for checking for new versions
      epee::math_helper::once_a_time_seconds<60*10, true> m_check_disk_space_interval; //!< interval for checking for disk space
 
      std::atomic<bool> m_starter_message_showed; //!< has the "daemon will sync now" message been shown?
@@ -992,17 +983,6 @@ namespace cryptonote
      boost::mutex bad_semantics_txes_lock;
 
      tools::threadpool& m_threadpool;
-
-     enum {
-       UPDATES_DISABLED,
-       UPDATES_NOTIFY,
-       UPDATES_DOWNLOAD,
-       UPDATES_UPDATE,
-     } check_updates_level;
-
-     tools::download_async_handle m_update_download;
-     size_t m_last_update_length;
-     boost::mutex m_update_mutex;
 
      bool m_fluffy_blocks_enabled;
      bool m_offline;

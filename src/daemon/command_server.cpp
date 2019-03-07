@@ -264,12 +264,6 @@ t_command_server::t_command_server(
     , "Print the information about current blockchain dynamic state."
     );
     m_command_lookup.set_handler(
-      "update"
-    , std::bind(&t_command_parser_executor::update, &m_parser, p::_1)
-    , "update (check|download)"
-    , "Check if an update is available, optionally downloads it if there is. Updating is not yet implemented."
-    );
-    m_command_lookup.set_handler(
       "relay_tx"
     , std::bind(&t_command_parser_executor::relay_tx, &m_parser, p::_1)
     , "relay_tx <txid>"
