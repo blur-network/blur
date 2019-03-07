@@ -1,5 +1,4 @@
 # Blur Network Code of Conduct
-Adapted from Contributor Covenant Code of Conduct
 
 **To contribute to the Blur Network, we ask that you that you hold yourself to the following ideals and their embodiment**
 
