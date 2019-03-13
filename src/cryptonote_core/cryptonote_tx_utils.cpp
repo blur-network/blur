@@ -531,7 +531,7 @@ namespace cryptonote
     size_t num_subaddresses = 0;
     account_public_address single_dest_subaddress;
     classify_addresses(destinations, change_addr, num_stdaddresses, num_subaddresses, single_dest_subaddress);
-    bool need_additional_txkeys = (num_subaddresses > 0) &&  (num_subaddresses + num_stdaddresses > 1);
+    bool need_additional_txkeys = (num_subaddresses > 0) && (num_stdaddresses + num_subaddresses > 1);
     if (need_additional_txkeys)
     {
       additional_tx_keys.clear();
