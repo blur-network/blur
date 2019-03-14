@@ -1,6 +1,6 @@
 # Blur Network Code of Conduct
 
-**To contribute to the Blur Network, we ask that you that you hold yourself to the following ideals and their embodiment**
+**To contribute to the Blur Network and its community, we ask that you that you hold yourself to the following ideals and their embodiment**
 
 ## Statement of Mission and Encouraged Conduct
 
@@ -76,6 +76,6 @@ members of the project's leadership.
 
 ## Attribution
 
-Much of this Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
+Much of this Code of Conduct is adapted from the Contributor Covenant, version 1.4,
 available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 while the parts not included at the above address are unique to Blur Network.
