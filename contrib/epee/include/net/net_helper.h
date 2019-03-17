@@ -106,8 +106,7 @@ namespace net_utils
 			~blocked_mode_client()
 		{
 			//profile_tools::local_coast lc("~blocked_mode_client()", 3);
-			try { shutdown(); }
-			catch(...) { /* ignore */ }
+			shutdown();
 		}
 
     inline
