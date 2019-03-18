@@ -477,7 +477,7 @@ namespace
       warn_of_possible_attack = false;
     }
     catch (const tools::error::wallet_internal_error& e)
-    {
+    {      
       LOG_ERROR("internal error: " << e.to_string());
       fail_msg_writer() << tr("internal error: ") << e.what();
     }
@@ -507,7 +507,6 @@ namespace
   }
 }
 
-bool parse_priority(const std::string& arg, uint32_t& priority)
 {
   auto priority_pos = std::find(
     allowed_priority_strings.begin(),
@@ -1623,7 +1622,7 @@ bool simple_wallet::set_default_priority(const std::vector<std::string> &args/* 
     }
     if (args[1] == "0")
     {
-      priority = 0;
+      priority = 2;
     }
     else
     {
