@@ -507,10 +507,10 @@ namespace
   }
 }
 
+bool parse_priority(const std::string& arg, uint32_t& priority)
 {
   auto priority_pos = std::find(
     allowed_priority_strings.begin(),
-    bool parse_priority(const std::string& arg, uint32_t& priority)
     allowed_priority_strings.end(),
     arg);
   if(priority_pos != allowed_priority_strings.end()) {
