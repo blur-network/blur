@@ -6,6 +6,12 @@ Copyright (c) 2018-2019, Blur Network</br>
 *See [LICENSE](License).*<br>
 *See [Code of Conduct](CODE_OF_CONDUCT.md)*<br>
 
+# About the Project
+
+The Blur Network is an experimental project based upon the premise that privacy and centralization cannot coexist.  We focus on maximizing accessibility to block rewards, while fostering an educational environment. We seek to create an ecosystem where individuals can take a first-hand role in protecting their right to privacy.
+
+The Blur Network employs a custom algorithm for mining, called CryptoNight-Dynamic.  The algorithm adjusts approximately once every five seconds, with a goal of maintaining CPU advantages over specialized mining hardware.  Making use of a Unix timestamp, the current block height, and the previous block’s hash,  CryptoNight-Dynamic varies iterations in the CryptoNight algorithm. Employing a timestamp in the calculation serves the purpose of dynamic iterations on an intra-block basis, while height and the previous block’s hash create variation on an inter-block basis.  The iterations necessary to mine each next block are directly dependent upon the result of the block before it. 
+
 ### Donate to help support Blur:
 **BTC:** 19onVUREbP89qu4dYBfVqtGisWaoyWs3BX <br>
 **LTC:** LM2tBw25UMfdjAJbo52tzh5r3R47a1aMeM <br>
@@ -34,10 +40,6 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
    **Ports:** | <center> P2P port = 52541 </br>RPC port = 52542</br></center>
   **Seed Nodes:** | <center><li>Node 1: 45.33.92.232:52541</li><li>Node 2: 45.79.85.65:52541</li><li>Node 3: 212.71.234.44:52541</li>
   </center>
-
-# About the Project
-
-BLUR takes a decentralized-by-design approach to mining.  The algorithm used to mine BLUR is incompatible with pooled mining (with current software) and is resistant to ASIC/GPU mining rigs. The BLUR network is comprised of individuals mining on individual computers. Visit our Bitcointalk.org thread or Blur.cash for more information.  Links to both can be found in the table immediately above. 
 
 <h1 id="compile-linux">Compiling from Source on Linux</h1>
 
