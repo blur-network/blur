@@ -33,6 +33,7 @@
 #include <vector>
 #include <string>
 #include "memwipe.h"
+#include "fnv1.h"
 
 namespace epee
 {
@@ -51,12 +52,12 @@ namespace epee
     ~wipeable_string();
     void wipe();
     void push_back(char c);
-    void pop_back();
     void operator+=(char c);
     void operator+=(const std::string &s);
     void operator+=(const epee::wipeable_string &s);
     void operator+=(const char *s);
     void append(const char *ptr, size_t len);
+    char pop_back();
     const char *data() const noexcept { return buffer.data(); }
     char *data() noexcept { return buffer.data(); }
     size_t size() const noexcept { return buffer.size(); }
@@ -95,5 +96,16 @@ namespace epee
     pod = *(const T*)blob->data();
     return true;
   }
+}
+
+namespace std
+{
+  template<> struct hash<epee::wipeable_string>
+  {
+    size_t operator()(const epee::wipeable_string &s) const
+    {
+      return epee::fnv::FNV1a(s.data(), s.size());
+    }
+  };
 }
 
