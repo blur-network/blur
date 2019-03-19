@@ -120,7 +120,7 @@ static const struct {
   {  8, 8, 0, 1529841602 },
   {  9, 20, 0, 1542681000 },
   { 10, 40, 0, 1550449900 },
-  { 11, 70, 0, 1550449900 }
+  { 11, 70, 0, 1550450000 }
 }; //testnet hardfork v11 HF testing
 
 static const struct {
