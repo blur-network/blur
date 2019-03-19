@@ -403,20 +403,6 @@ namespace cryptonote
      void set_checkpoints_file_path(const std::string& path);
 
      /**
-      * @brief set whether or not we enforce DNS checkpoints
-      *
-      * @param enforce_dns enforce DNS checkpoints or not
-      */
-     void set_enforce_dns_checkpoints(bool enforce_dns);
-
-     /**
-      * @brief set whether or not to enable or disable DNS checkpoints
-      *
-      * @param disble whether to disable DNS checkpoints
-      */
-     void disable_dns_checkpoints(bool disable = true) { m_disable_dns_checkpoints = disable; }
-
-     /**
       * @copydoc tx_memory_pool::have_tx
       *
       * @note see tx_memory_pool::have_tx
@@ -969,11 +955,9 @@ namespace cryptonote
      network_type m_nettype; //!< which network are we on?
 
      std::string m_checkpoints_path; //!< path to json checkpoints file
-     time_t m_last_dns_checkpoints_update; //!< time when dns checkpoints were last updated
      time_t m_last_json_checkpoints_update; //!< time when json checkpoints were last updated
 
      std::atomic_flag m_checkpoints_updating; //!< set if checkpoints are currently updating to avoid multiple threads attempting to update at once
-     bool m_disable_dns_checkpoints;
 
      size_t block_sync_size;
 
