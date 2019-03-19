@@ -314,7 +314,7 @@ namespace cryptonote
     // we don't need to include additional tx keys if:
     //   - all the destinations are standard addresses
     //   - there's only one destination which is a subaddress
-    bool need_additional_txkeys = (num_subaddresses > 0) && ((num_stdaddresses + num_subaddresses) > 1);
+    bool need_additional_txkeys = num_subaddresses > 0 && (num_stdaddresses > 0 || num_subaddresses > 1);
     bool additional_tx_keys_present = additional_tx_keys.size() > 0;
     if (need_additional_txkeys || (!need_additional_txkeys && additional_tx_keys_present))
       CHECK_AND_ASSERT_MES(destinations.size() == additional_tx_keys.size(), false, "Wrong amount of additional tx keys");
@@ -536,7 +536,7 @@ namespace cryptonote
     size_t num_subaddresses = 0;
     account_public_address single_dest_subaddress;
     classify_addresses(destinations, change_addr, num_stdaddresses, num_subaddresses, single_dest_subaddress);
-    bool need_additional_txkeys = (num_subaddresses > 0) && (num_stdaddresses + num_subaddresses > 1);
+    bool need_additional_txkeys = num_subaddresses > 0 && (num_stdaddresses || num_subaddresses > 1);
     bool additional_tx_keys_present = additional_tx_keys.size() > 0;
     if (need_additional_txkeys || (!need_additional_txkeys && additional_tx_keys_present))
     {
