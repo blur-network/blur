@@ -39,7 +39,6 @@ using namespace epee;
 #include "cryptonote_core.h"
 #include "common/command_line.h"
 #include "common/util.h"
-#include "common/updates.h"
 #include "common/threadpool.h"
 #include "common/command_line.h"
 #include "warnings.h"
