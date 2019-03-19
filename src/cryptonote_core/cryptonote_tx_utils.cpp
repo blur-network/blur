@@ -314,8 +314,9 @@ namespace cryptonote
     // we don't need to include additional tx keys if:
     //   - all the destinations are standard addresses
     //   - there's only one destination which is a subaddress
-    bool need_additional_txkeys = (num_subaddresses > 0) && (num_stdaddresses + num_subaddresses > 1);
-    if (need_additional_txkeys)
+    bool need_additional_txkeys = (num_subaddresses > 0) && ((num_stdaddresses + num_subaddresses) > 1);
+    bool additional_tx_keys_present = additional_tx_keys.size() > 0;
+    if (need_additional_txkeys || (!need_additional_txkeys && additional_tx_keys_present))
       CHECK_AND_ASSERT_MES(destinations.size() == additional_tx_keys.size(), false, "Wrong amount of additional tx keys");
 
     uint64_t summary_outs_money = 0;
@@ -328,7 +329,7 @@ namespace cryptonote
 
       // make additional tx pubkey if necessary
       keypair additional_txkey;
-      if (need_additional_txkeys)
+      if (need_additional_txkeys || (!need_additional_txkeys && additional_tx_keys_present))
       {
         additional_txkey.sec = additional_tx_keys[output_index];
         if (dst_entr.is_subaddress)
@@ -352,6 +353,10 @@ namespace cryptonote
       }
 
       if (need_additional_txkeys)
+      {
+        additional_tx_public_keys.push_back(additional_txkey.pub);
+      }
+      else if (additional_tx_keys_present)
       {
         additional_tx_public_keys.push_back(additional_txkey.pub);
       }
@@ -381,7 +386,7 @@ namespace cryptonote
     remove_field_from_tx_extra(tx.extra, typeid(tx_extra_additional_pub_keys));
 
     LOG_PRINT_L2("tx pubkey: " << txkey_pub);
-    if (need_additional_txkeys)
+    if (need_additional_txkeys || (!need_additional_txkeys && additional_tx_keys_present))
     {
       LOG_PRINT_L2("additional tx pubkeys: ");
       for (size_t i = 0; i < additional_tx_public_keys.size(); ++i)
@@ -532,7 +537,8 @@ namespace cryptonote
     account_public_address single_dest_subaddress;
     classify_addresses(destinations, change_addr, num_stdaddresses, num_subaddresses, single_dest_subaddress);
     bool need_additional_txkeys = (num_subaddresses > 0) && (num_stdaddresses + num_subaddresses > 1);
-    if (need_additional_txkeys)
+    bool additional_tx_keys_present = additional_tx_keys.size() > 0;
+    if (need_additional_txkeys || (!need_additional_txkeys && additional_tx_keys_present))
     {
       additional_tx_keys.clear();
       for (const auto &d: destinations)
