@@ -54,7 +54,6 @@
 #include "cryptonote_core.h"
 #include "ringct/rctSigs.h"
 #include "common/perf_timer.h"
-#include "common/notify.h"
 #if defined(PER_BLOCK_CHECKPOINT)
 #include "blocks/blocks.h"
 #endif
@@ -120,9 +119,9 @@ static const struct {
   {  7, 7, 0, 1529841601 },
   {  8, 8, 0, 1529841602 },
   {  9, 20, 0, 1542681000 },
-  { 10, 40, 0, 1550449900 }
-
-}; //testnet hardfork v10 HF testing
+  { 10, 40, 0, 1550449900 },
+  { 11, 70, 0, 1550449900 }
+}; //testnet hardfork v11 HF testing
 
 static const struct {
   uint8_t version;
@@ -141,7 +140,7 @@ static const struct {
 //------------------------------------------------------------------
 Blockchain::Blockchain(tx_memory_pool& tx_pool) :
   m_db(), m_tx_pool(tx_pool), m_hardfork(NULL), m_timestamps_and_difficulties_height(0), m_current_block_cumul_sz_limit(0), m_current_block_cumul_sz_median(0),
-  m_enforce_dns_checkpoints(false), m_max_prepare_blocks_threads(4), m_db_blocks_per_sync(1), m_db_sync_mode(db_async), m_db_default_sync(false), m_fast_sync(true), m_show_time_stats(false), m_sync_counter(0), m_cancel(false)
+  m_max_prepare_blocks_threads(4), m_db_blocks_per_sync(1), m_db_sync_mode(db_async), m_db_default_sync(false), m_fast_sync(true), m_show_time_stats(false), m_sync_counter(0), m_cancel(false)
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
 }
@@ -769,8 +768,51 @@ bool Blockchain::get_block_by_hash(const crypto::hash &h, block &blk, bool *orph
     throw;
   }
 
+  MDEBUG("Unable to find block " << h);
   return false;
 }
+
+//------------------------------------------------------------------
+size_t get_difficulty_blocks_count(uint8_t version)
+{
+  LOG_PRINT_L3("Blockchain::" << __func__);
+
+  if (version == 1) {
+    return DIFFICULTY_BLOCKS_COUNT;
+  } else if (version == 2) {
+    return DIFFICULTY_BLOCKS_COUNT_V2;
+  } else if (version < 6) {
+    return DIFFICULTY_BLOCKS_COUNT_V3;
+  } else if (version <= 10) {
+    return DIFFICULTY_BLOCKS_COUNT_V6;
+  } else {
+    return DIFFICULTY_BLOCKS_COUNT_V11;
+  }
+}
+//------------------------------------------------------------------
+
+difficulty_type get_next_difficulty(uint8_t version, std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties)
+{
+  LOG_PRINT_L3("Blockchain::" << __func__);
+
+  // FIXME: This will fail if fork activation heights are subject to voting
+  size_t target = DIFFICULTY_TARGET;
+  // calculate the difficulty target for the block and return it
+  if (version == 1) {
+    return next_difficulty(timestamps, cumulative_difficulties, target);
+  } else if (version == 2) {
+    return next_difficulty_v2(timestamps, cumulative_difficulties, target);
+  } else if (version == 3) {
+    return next_difficulty_v3(timestamps, cumulative_difficulties, target, false);
+  } else if (version < 6) {
+    return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
+  } else if (version < 11) {
+    return next_difficulty_v6(timestamps, cumulative_difficulties, target);
+  } else {
+    return next_difficulty_v11(timestamps, cumulative_difficulties, target);
+  }
+}
+
 //------------------------------------------------------------------
 // This function aggregates the cumulative difficulties and timestamps of the
 // last DIFFICULTY_BLOCKS_COUNT blocks and passes them to next_difficulty,
@@ -783,17 +825,8 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
-  size_t difficulty_blocks_count;
   uint8_t version = get_current_hard_fork_version();
-  if (version == 1) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
-  } else if (version == 2) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
-  } else if (version < 6) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V3;
-  } else {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V6;
-  }
+  size_t difficulty_blocks_count = get_difficulty_blocks_count(version);
 
   // ND: Speedup
   // 1. Keep a list of the last 735 (or less) blocks that is used to compute difficulty,
@@ -833,18 +866,8 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_timestamps = timestamps;
     m_difficulties = difficulties;
   }
-  size_t target = DIFFICULTY_TARGET;
-  if (version == 1) {
-    return next_difficulty(timestamps, difficulties, target);
-  } else if (version == 2) {
-    return next_difficulty_v2(timestamps, difficulties, target);
-  } else if (version == 3) {
-    return next_difficulty_v3(timestamps, difficulties, target, false);
-  } else if (version < 6) {
-    return next_difficulty_v3(timestamps, difficulties, target, true);
-  } else {
-    return next_difficulty_v6(timestamps, difficulties, target);
-  }
+
+  return get_next_difficulty(version, timestamps, difficulties);
 }
 //------------------------------------------------------------------
 // This function removes blocks from the blockchain until it gets to the
@@ -896,6 +919,8 @@ bool Blockchain::switch_to_alternative_blockchain(std::list<blocks_ext_by_hash::
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
+
+  MDEBUG("Switching to alternative blockchain with top block " << get_block_hash(alt_chain.back()->second.bl));
 
   m_timestamps_and_difficulties_height = 0;
 
@@ -992,17 +1017,8 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   LOG_PRINT_L3("Blockchain::" << __func__);
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> cumulative_difficulties;
-  size_t difficulty_blocks_count;
   uint8_t version = get_current_hard_fork_version();
-  if (version == 1) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
-  } else if (version == 2) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
-  } else if (version < 6) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V3;
-  } else {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V6;
-  }
+  size_t difficulty_blocks_count = get_difficulty_blocks_count(version);
 
   // if the alt chain isn't long enough to calculate the difficulty target
   // based on its blocks alone, need to get more blocks from the main chain
@@ -1054,21 +1070,7 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
     }
   }
 
-  // FIXME: This will fail if fork activation heights are subject to voting
-  size_t target = DIFFICULTY_TARGET;
-
-  // calculate the difficulty target for the block and return it
-  if (version == 1) {
-    return next_difficulty(timestamps, cumulative_difficulties, target);
-  } else if (version == 2) {
-    return next_difficulty_v2(timestamps, cumulative_difficulties, target);
-  } else if (version == 3) {
-    return next_difficulty_v3(timestamps, cumulative_difficulties, target, false);
-  } else if (version < 6) {
-    return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
-  } else {
-    return next_difficulty_v6(timestamps, cumulative_difficulties, target);
-  }
+  return get_next_difficulty(version, timestamps, cumulative_difficulties);
 }
 //------------------------------------------------------------------
 // This function does a sanity check on basic things that all miner
@@ -3440,6 +3442,7 @@ leave:
     {
       //TODO: figure out the best way to deal with this failure
       LOG_ERROR("Error adding block with hash: " << id << " to blockchain, what = " << e.what());
+      bvc.m_verifivation_failed = true;
       return_tx_to_pool(txs);
       return false;
     }
@@ -3552,7 +3555,7 @@ void Blockchain::check_against_checkpoints(const checkpoints& points, bool enfor
       }
       else
       {
-        LOG_ERROR("WARNING: local blockchain failed to pass a BLURPulse checkpoint, and you could be on a fork. You should either sync up from scratch, OR download a fresh blockchain bootstrap, OR enable checkpoint enforcing with the --enforce-dns-checkpointing command-line option");
+        LOG_ERROR("WARNING: local blockchain failed to pass a checkpoint, and you could be on a fork. You should either sync up from scratch, OR download a fresh blockchain bootstrap, OR enable checkpoint enforcing with the --enforce-dns-checkpointing command-line option");
       }
     }
   }
@@ -3563,46 +3566,17 @@ void Blockchain::check_against_checkpoints(const checkpoints& points, bool enfor
 // returns false if any of the checkpoints loading returns false.
 // That should happen only if a checkpoint is added that conflicts
 // with an existing checkpoint.
-bool Blockchain::update_checkpoints(const std::string& file_path, bool check_dns)
+bool Blockchain::update_checkpoints(const std::string& file_path)
 {
   if (!m_checkpoints.load_checkpoints_from_json(file_path))
   {
       return false;
   }
 
-  // if we're checking both dns and json, load checkpoints from dns.
-  // if we're not hard-enforcing dns checkpoints, handle accordingly
-  if (m_enforce_dns_checkpoints && check_dns && !m_offline)
-  {
-    if (!m_checkpoints.load_checkpoints_from_dns())
-    {
-      return false;
-    }
-  }
-  else if (check_dns && !m_offline)
-  {
-    checkpoints dns_points;
-    dns_points.load_checkpoints_from_dns();
-    if (m_checkpoints.check_for_conflicts(dns_points))
-    {
-      check_against_checkpoints(dns_points, false);
-    }
-    else
-    {
-      MERROR("One or more checkpoints fetched from DNS conflicted with existing checkpoints!");
-    }
-  }
-
   check_against_checkpoints(m_checkpoints, true);
 
   return true;
 }
-//------------------------------------------------------------------
-void Blockchain::set_enforce_dns_checkpoints(bool enforce_checkpoints)
-{
-  m_enforce_dns_checkpoints = enforce_checkpoints;
-}
-
 //------------------------------------------------------------------
 void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map) const
 {
@@ -3846,7 +3820,6 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
   while (!(stop_batch = m_db->batch_start(blocks_entry.size(), bytes))) {
     m_blockchain_lock.unlock();
     m_tx_pool.unlock();
-    epee::misc_utils::sleep_no_w(1000);
     m_tx_pool.lock();
     m_blockchain_lock.lock();
   }

@@ -92,11 +92,6 @@ namespace cryptonote
     "offline"
   , "Do not listen for peers, nor connect to any"
   };
-  const command_line::arg_descriptor<bool> arg_disable_dns_checkpoints = {
-    "disable-dns-checkpoints"
-  , "Do not retrieve checkpoints from DNS"
-  };
-
   static const command_line::arg_descriptor<bool> arg_test_drop_download = {
     "test-drop-download"
   , "For net tests: in download, discard ALL blocks instead checking/saving them (very fast)"
@@ -110,11 +105,6 @@ namespace cryptonote
     "test-dbg-lock-sleep"
   , "Sleep time in ms, defaults to 0 (off), used to debug before/after locking mutex. Values 100 to 1000 are good for tests."
   , 0
-  };
-  static const command_line::arg_descriptor<bool> arg_dns_checkpoints  = {
-    "enforce-dns-checkpointing"
-  , "checkpoints from DNS server will be enforced"
-  , false
   };
   static const command_line::arg_descriptor<uint64_t> arg_fast_block_sync = {
     "fast-block-sync"
@@ -161,9 +151,7 @@ namespace cryptonote
               m_starter_message_showed(false),
               m_target_blockchain_height(0),
               m_checkpoints_path(""),
-              m_last_dns_checkpoints_update(0),
               m_last_json_checkpoints_update(0),
-              m_disable_dns_checkpoints(false),
               m_threadpool(tools::threadpool::getInstance()),
               m_nettype(UNDEFINED)
   {
@@ -188,27 +176,16 @@ namespace cryptonote
     m_checkpoints_path = path;
   }
   //-----------------------------------------------------------------------------------
-  void core::set_enforce_dns_checkpoints(bool enforce_dns)
-  {
-    m_blockchain_storage.set_enforce_dns_checkpoints(enforce_dns);
-  }
-  //-----------------------------------------------------------------------------------------------
   bool core::update_checkpoints()
   {
-    if (m_nettype != MAINNET || m_disable_dns_checkpoints) return true;
+    if (m_nettype != MAINNET) return true;
 
     if (m_checkpoints_updating.test_and_set()) return true;
 
     bool res = true;
-    if (time(NULL) - m_last_dns_checkpoints_update >= 3600)
+    if (time(NULL) - m_last_json_checkpoints_update >= 600)
     {
-      res = m_blockchain_storage.update_checkpoints(m_checkpoints_path, true);
-      m_last_dns_checkpoints_update = time(NULL);
-      m_last_json_checkpoints_update = time(NULL);
-    }
-    else if (time(NULL) - m_last_json_checkpoints_update >= 600)
-    {
-      res = m_blockchain_storage.update_checkpoints(m_checkpoints_path, false);
+      res = m_blockchain_storage.update_checkpoints(m_checkpoints_path);
       m_last_json_checkpoints_update = time(NULL);
     }
 
@@ -236,7 +213,6 @@ namespace cryptonote
 
     command_line::add_arg(desc, arg_testnet_on);
     command_line::add_arg(desc, arg_stagenet_on);
-    command_line::add_arg(desc, arg_dns_checkpoints);
     command_line::add_arg(desc, arg_prep_blocks_threads);
     command_line::add_arg(desc, arg_fast_block_sync);
     command_line::add_arg(desc, arg_show_time_stats);
@@ -245,7 +221,6 @@ namespace cryptonote
     command_line::add_arg(desc, arg_no_fluffy_blocks);
     command_line::add_arg(desc, arg_test_dbg_lock_sleep);
     command_line::add_arg(desc, arg_offline);
-    command_line::add_arg(desc, arg_disable_dns_checkpoints);
     command_line::add_arg(desc, arg_max_txpool_size);
 
     miner::init_options(desc);
@@ -281,11 +256,9 @@ namespace cryptonote
     }
 
 
-    set_enforce_dns_checkpoints(command_line::get_arg(vm, arg_dns_checkpoints));
     test_drop_download_height(command_line::get_arg(vm, arg_test_drop_download_height));
     m_fluffy_blocks_enabled = !get_arg(vm, arg_no_fluffy_blocks);
     m_offline = get_arg(vm, arg_offline);
-    m_disable_dns_checkpoints = get_arg(vm, arg_disable_dns_checkpoints);
     if (!command_line::is_arg_defaulted(vm, arg_fluffy_blocks))
       MWARNING(arg_fluffy_blocks.name << " is obsolete, it is now default");
 
@@ -506,11 +479,9 @@ namespace cryptonote
 
     MGINFO("Loading checkpoints");
 
-    // load json & DNS checkpoints, and verify them
+    // load json checkpoints, and verify them
     // with respect to what blocks we already have
-    CHECK_AND_ASSERT_MES(update_checkpoints(), false, "One or more checkpoints loaded from json or dns conflicted with existing checkpoints.");
-
-   // DNS versions checking
+    CHECK_AND_ASSERT_MES(update_checkpoints(), false, "One or more checkpoints loaded from json conflicted with existing checkpoints.");
 
     r = m_miner.init(vm, m_nettype);
     CHECK_AND_ASSERT_MES(r, false, "Failed to initialize miner instance");
@@ -1192,9 +1163,9 @@ namespace cryptonote
   {
     TRY_ENTRY();
 
-    // load json & DNS checkpoints every 10min/hour respectively,
+    // load json checkpoints every 10min/hour respectively,
     // and verify them with respect to what blocks we already have
-    CHECK_AND_ASSERT_MES(update_checkpoints(), false, "One or more checkpoints loaded from json or dns conflicted with existing checkpoints.");
+    CHECK_AND_ASSERT_MES(update_checkpoints(), false, "One or more checkpoints loaded from json conflicted with existing checkpoints.");
 
     bvc = boost::value_initialized<block_verification_context>();
     if(block_blob.size() > get_max_block_size())

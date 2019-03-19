@@ -747,7 +747,6 @@ int main(int argc, char* argv[])
   try
   {
 
-  core.disable_dns_checkpoints(true);
   if (!core.init(vm, NULL))
   {
     std::cerr << "Failed to initialize core" << ENDL;
