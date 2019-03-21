@@ -150,10 +150,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-exclusive-node=45.33.92.232:52541 --add-exclusive-node=212.71.234.44:52541 --add-exclusive-node=45.79.85.65:52541 --p2p-bind-port 52541 --rpc-bind-port 52542 --rpc-bind-ip 127.0.0.1`
+`./blurd --add-priority-node=45.33.92.232:52541 --add-priority-node=212.71.234.44:52541 --add-priority-node=45.79.85.65:52541 --p2p-bind-port 52541 --rpc-bind-port 52542 --rpc-bind-ip 127.0.0.1`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-exclusive-node=45.33.92.232:52541 --add-exclusive-node=212.71.234.44:52541 --add-exclusive-node=45.79.85.65:52541 --p2p-bind-port=52541 --rpc-bind-port=52542 --rpc-bind-ip=127.0.0.1`
+`blurd.exe --add-priority-node=45.33.92.232:52541 --add-priority-node=212.71.234.44:52541 --add-priority-node=45.79.85.65:52541 --p2p-bind-port=52541 --rpc-bind-port=52542 --rpc-bind-ip=127.0.0.1`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
