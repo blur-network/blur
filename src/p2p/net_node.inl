@@ -556,8 +556,6 @@ namespace nodetool
     //only in case if we really sure that we have external visible ip
     m_have_address = true;
     m_ip_address = 0;
-    m_last_stat_request_time = 0;
-
     //configure self
     m_net_server.set_threads_prefix("P2P");
     m_net_server.get_config_object().set_handler(this);
@@ -1391,64 +1389,9 @@ namespace nodetool
     return true;
   }
   //-----------------------------------------------------------------------------------
-#ifdef ALLOW_DEBUG_COMMANDS
-  template<class t_payload_net_handler>
-  bool node_server<t_payload_net_handler>::check_trust(const proof_of_trust& tr)
-  {
-    uint64_t local_time = time(NULL);
-    uint64_t time_delata = local_time > tr.time ? local_time - tr.time: tr.time - local_time;
-    if(time_delata > 24*60*60 )
-    {
-      MWARNING("check_trust failed to check time conditions, local_time=" <<  local_time << ", proof_time=" << tr.time);
-      return false;
-    }
-    if(m_last_stat_request_time >= tr.time )
-    {
-      MWARNING("check_trust failed to check time conditions, last_stat_request_time=" <<  m_last_stat_request_time << ", proof_time=" << tr.time);
-      return false;
-    }
-    if(m_config.m_peer_id != tr.peer_id)
-    {
-      MWARNING("check_trust failed: peer_id mismatch (passed " << tr.peer_id << ", expected " << m_config.m_peer_id<< ")");
-      return false;
-    }
-    crypto::public_key pk = AUTO_VAL_INIT(pk);
-    epee::string_tools::hex_to_pod(::config::P2P_REMOTE_DEBUG_TRUSTED_PUB_KEY, pk);
-    crypto::hash h = get_proof_of_trust_hash(tr);
-    if(!crypto::check_signature(h, pk, tr.sign))
-    {
-      MWARNING("check_trust failed: sign check failed");
-      return false;
-    }
-    //update last request time
-    m_last_stat_request_time = tr.time;
-    return true;
-  }
-  //-----------------------------------------------------------------------------------
-  template<class t_payload_net_handler>
-  int node_server<t_payload_net_handler>::handle_get_stat_info(int command, typename COMMAND_REQUEST_STAT_INFO::request& arg, typename COMMAND_REQUEST_STAT_INFO::response& rsp, p2p_connection_context& context)
-  {
-    if(!check_trust(arg.tr))
-    {
-      drop_connection(context);
-      return 1;
-    }
-    rsp.connections_count = m_net_server.get_config_object().get_connections_count();
-    rsp.incoming_connections_count = rsp.connections_count - get_outgoing_connections_count();
-    rsp.version = MONERO_VERSION_FULL;
-    rsp.os_version = tools::get_os_version_string();
-    m_payload_handler.get_stat_info(rsp.payload_info);
-    return 1;
-  }
-  //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   int node_server<t_payload_net_handler>::handle_get_network_state(int command, COMMAND_REQUEST_NETWORK_STATE::request& arg, COMMAND_REQUEST_NETWORK_STATE::response& rsp, p2p_connection_context& context)
   {
-    if(!check_trust(arg.tr))
-    {
-      drop_connection(context);
-      return 1;
-    }
     m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
     {
       connection_entry ce;
@@ -1471,7 +1414,6 @@ namespace nodetool
     rsp.my_id = m_config.m_peer_id;
     return 1;
   }
-#endif
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   int node_server<t_payload_net_handler>::handle_get_support_flags(int command, COMMAND_REQUEST_SUPPORT_FLAGS::request& arg, COMMAND_REQUEST_SUPPORT_FLAGS::response& rsp, p2p_connection_context& context)
