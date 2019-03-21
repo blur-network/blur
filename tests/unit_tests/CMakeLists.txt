@@ -28,7 +28,6 @@
 
 set(unit_tests_sources
   apply_permutation.cpp
-  address_from_url.cpp
   ban.cpp
   base58.cpp
   blockchain_db.cpp
@@ -64,7 +63,6 @@ set(unit_tests_sources
   test_protocol_pack.cpp
   hardfork.cpp
   unbound.cpp
-  uri.cpp
   varint.cpp
   ringct.cpp
   output_selection.cpp
