@@ -41,7 +41,7 @@
 
 using namespace std;
 
-#define DEFAULT_TEST_DIFFICULTY_TARGET        120
+#define DEFAULT_TEST_DIFFICULTY_TARGET        60
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -56,12 +56,12 @@ int main(int argc, char *argv[]) {
     size_t n = 0;
     while (data >> timestamp >> difficulty) {
         size_t begin, end;
-        if (n < DIFFICULTY_WINDOW + DIFFICULTY_LAG) {
+        if (n < DIFFICULTY_WINDOW_V11 + DIFFICULTY_LAG_V11) {
             begin = 0;
-            end = min(n, (size_t) DIFFICULTY_WINDOW);
+            end = min(n, (size_t) DIFFICULTY_WINDOW_V11);
         } else {
-            end = n - DIFFICULTY_LAG;
-            begin = end - DIFFICULTY_WINDOW;
+            end = n - DIFFICULTY_LAG_V11;
+            begin = end - DIFFICULTY_WINDOW_V11;
         }
         uint64_t res = cryptonote::next_difficulty(
             vector<uint64_t>(timestamps.begin() + begin, timestamps.begin() + end),
