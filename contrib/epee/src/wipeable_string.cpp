@@ -253,4 +253,3 @@ wipeable_string &wipeable_string::operator=(const wipeable_string &other)
 }
 
 }
-

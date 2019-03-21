@@ -31,8 +31,8 @@
 
 // Previously pulled in by ASIO, further cleanup still required ...
 #ifdef _WIN32
-# include <winsock2.h>
 # include <windows.h>
+# include <winsock2.h>
 #endif
 
 #include <string.h>

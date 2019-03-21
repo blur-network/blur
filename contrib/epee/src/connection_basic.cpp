@@ -93,6 +93,7 @@ namespace net_utils
 
   std::string to_string(t_connection_type type)
   {
+
 	  if (type == e_connection_type_NET)
 		return std::string("NET");
 	  else if (type == e_connection_type_RPC)
@@ -280,8 +281,8 @@ double connection_basic::get_sleep_time(size_t cb) {
     return t;
 }
 
-void connection_basic::set_save_graph(bool save_graph) {
-}
+//void connection_basic::set_save_graph(bool save_graph) {
+//}
 
 
 } // namespace

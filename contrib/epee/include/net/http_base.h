@@ -58,7 +58,7 @@ namespace net_utils
 		enum http_content_type
 		{
 			http_content_type_text_html,
-			http_content_type_image_gif, 
+			http_content_type_image_gif,
 			http_content_type_other,
 			http_content_type_not_set
 		};
@@ -153,11 +153,11 @@ namespace net_utils
     };
 
 
-		struct http_request_info 
+		struct http_request_info
 		{
-			http_request_info():m_http_method(http_method_unknown), 
-				m_http_ver_hi(0), 
-				m_http_ver_lo(0), 
+			http_request_info():m_http_method(http_method_unknown),
+				m_http_ver_hi(0),
+				m_http_ver_lo(0),
 				m_have_to_block(false),
 				m_full_request_buf_size(0)
 			{}
@@ -184,7 +184,7 @@ namespace net_utils
 		};
 
 
-		struct http_response_info 
+		struct http_response_info
 		{
 			int					m_response_code;
 			std::string			m_response_comment;

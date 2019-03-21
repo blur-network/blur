@@ -79,7 +79,7 @@ class connection_basic_pimpl; // PIMPL for this class
 	  e_connection_type_RPC = 1, // the rpc commands  (probably not rate limited, not chunked, etc)
 	  e_connection_type_P2P = 2  // to other p2p node (probably limited)
   };
-  
+
   std::string to_string(t_connection_type type);
 
 class connection_basic { // not-templated base class for rapid developmet of some code parts
@@ -115,7 +115,7 @@ class connection_basic { // not-templated base class for rapid developmet of som
 		void set_start_time();
 
 		// config for rate limit
-		
+
 		static void set_rate_up_limit(uint64_t limit);
 		static void set_rate_down_limit(uint64_t limit);
 		static uint64_t get_rate_up_limit();
@@ -129,8 +129,8 @@ class connection_basic { // not-templated base class for rapid developmet of som
 		void sleep_before_packet(size_t packet_size, int phase, int q_len); // execute a sleep ; phase is not really used now(?)
 		static void save_limit_to_file(int limit); ///< for dr-monero
 		static double get_sleep_time(size_t cb);
-		
-		static void set_save_graph(bool save_graph);
+
+//		static void set_save_graph(bool save_graph);
 };
 
 } // nameserver
