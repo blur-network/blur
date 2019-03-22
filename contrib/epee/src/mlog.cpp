@@ -28,6 +28,13 @@
 #ifndef _MLOG_H_
 #define _MLOG_H_
 
+#ifdef _WIN32
+#include <windows.h>
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING  0x0004
+#endif
+#endif
+
 #include <time.h>
 #include <atomic>
 #include <boost/filesystem.hpp>
@@ -47,6 +54,7 @@ using namespace epee;
 static std::string generate_log_filename(const char *base)
 {
   std::string filename(base);
+  static unsigned int fallback_counter = 0;
   char tmp[200];
   struct tm tm;
   time_t now = time(NULL);
@@ -56,7 +64,7 @@ static std::string generate_log_filename(const char *base)
 #else
   (!gmtime_r(&now, &tm))
 #endif
-    strcpy(tmp, "unknown");
+    snprintf(tmp, sizeof(tmp), "part-%u", ++fallback_counter);
   else
     strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", &tm);
   tmp[sizeof(tmp) - 1] = 0;
@@ -116,7 +124,32 @@ static const char *get_default_categories(int level)
   return categories;
 }
 
-void mlog_configure(const std::string &filename_base, bool console, const std::size_t max_log_file_size)
+#ifdef WIN32
+bool EnableVTMode()
+{
+  // Set output mode to handle virtual terminal sequences
+  HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  if (hOut == INVALID_HANDLE_VALUE)
+  {
+    return false;
+  }
+
+  DWORD dwMode = 0;
+  if (!GetConsoleMode(hOut, &dwMode))
+  {
+    return false;
+  }
+
+  dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  if (!SetConsoleMode(hOut, dwMode))
+  {
+    return false;
+  }
+  return true;
+}
+#endif
+
+void mlog_configure(const std::string &filename_base, bool console, const std::size_t max_log_file_size, const std::size_t max_log_files)
 {
   el::Configurations c;
   c.setGlobally(el::ConfigurationType::Filename, filename_base);
@@ -145,6 +178,9 @@ void mlog_configure(const std::string &filename_base, bool console, const std::s
     monero_log = get_default_categories(0);
   }
   mlog_set_log(monero_log);
+#ifdef WIN32
+  EnableVTMode();
+#endif
 }
 
 void mlog_set_categories(const char *categories)
@@ -202,7 +238,12 @@ void mlog_set_log(const char *log)
   long level;
   char *ptr = NULL;
 
-  level = strtoll(log, &ptr, 10);
+  if (!*log)
+  {
+    mlog_set_categories(log);
+    return;
+  }
+  level = strtol(log, &ptr, 10);
   if (ptr && *ptr)
   {
     // we can have a default level, eg, 2,foo:ERROR
