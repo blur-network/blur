@@ -131,8 +131,6 @@
 #define P2P_SUPPORT_FLAG_FLUFFY_BLOCKS                  0x01
 #define P2P_SUPPORT_FLAGS                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS
 
-#define ALLOW_DEBUG_COMMANDS
-
 #define CRYPTONOTE_NAME                         "blurnetwork"
 #define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
@@ -152,7 +150,6 @@
 namespace config
 {
   uint64_t const DEFAULT_DUST_THRESHOLD = 0; // deprecated
-  std::string const P2P_REMOTE_DEBUG_TRUSTED_PUB_KEY = "0000000000000000000000000000000000000000000000000000000000000000";
 
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 7757; // bL
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 15654; //uR
