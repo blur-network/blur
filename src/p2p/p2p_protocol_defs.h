@@ -321,59 +321,6 @@ namespace nodetool
   /************************************************************************/
   /*                                                                      */
   /************************************************************************/
-  struct COMMAND_REQUEST_NETWORK_STATE
-  {
-    const static int ID = P2P_COMMANDS_POOL_BASE + 5;
-
-    struct request
-    {
-      BEGIN_KV_SERIALIZE_MAP()
-      END_KV_SERIALIZE_MAP()    
-    };
-
-    struct response
-    {
-      std::list<peerlist_entry> local_peerlist_white; 
-      std::list<peerlist_entry> local_peerlist_gray; 
-      std::list<connection_entry> connections_list; 
-      peerid_type my_id;
-      uint64_t    local_time;
-      BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE_CONTAINER_POD_AS_BLOB(local_peerlist_white)
-        KV_SERIALIZE_CONTAINER_POD_AS_BLOB(local_peerlist_gray)
-        KV_SERIALIZE_CONTAINER_POD_AS_BLOB(connections_list)
-        KV_SERIALIZE(my_id)
-        KV_SERIALIZE(local_time)
-      END_KV_SERIALIZE_MAP()    
-    };
-  };
-
-  /************************************************************************/
-  /*                                                                      */
-  /************************************************************************/
-  struct COMMAND_REQUEST_PEER_ID
-  {
-    const static int ID = P2P_COMMANDS_POOL_BASE + 6;
-
-    struct request
-    {
-      BEGIN_KV_SERIALIZE_MAP()
-      END_KV_SERIALIZE_MAP()    
-    };
-
-    struct response
-    {
-      peerid_type my_id;
-
-      BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE(my_id)
-      END_KV_SERIALIZE_MAP()    
-    };
-  };
-
-  /************************************************************************/
-  /*                                                                      */
-  /************************************************************************/
   struct COMMAND_REQUEST_SUPPORT_FLAGS
   {
     const static int ID = P2P_COMMANDS_POOL_BASE + 7;
