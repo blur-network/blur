@@ -999,7 +999,7 @@ namespace cryptonote
         std::string subhash = hash_alpha.substr(0,6);
         unsigned int id_num = std::stoul(subhash, nullptr, 16);
 
-        LOG_PRINT_L1("\nPRNG from previous block ID : " << id_num);
+        LOG_PRINT_L2("\nPRNG from previous block ID : " << id_num);
 
         if (id_num < 1) { // guard against small probability of zero case
           id_num = 1; }   // in previous hash's first 6 characters
@@ -1014,7 +1014,7 @@ namespace cryptonote
         else if (!two) {
           cn_iters += (((stamp % id_num) + height) & 0x7FFF);  }
 
-        LOG_PRINT_L1("\nIterations : "<< cn_iters);
+        LOG_PRINT_L2("\nIterations : "<< cn_iters);
 
        }
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
