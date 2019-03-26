@@ -29,6 +29,7 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
+#include "memwipe.h"
 #include "string_tools.h"
 #include "common/password.h"
 #include "common/scoped_message_writer.h"
@@ -36,6 +37,7 @@
 #include "rpc/core_rpc_server_commands_defs.h"
 #include "cryptonote_core/cryptonote_core.h"
 #include "cryptonote_basic/hardfork.h"
+#include <boost/core/ref.hpp>
 #include <boost/format.hpp>
 #include <ctime>
 #include <string>
@@ -714,7 +716,8 @@ bool t_rpc_command_executor::print_block_by_height(uint64_t height) {
 
 bool t_rpc_command_executor::print_transaction(crypto::hash transaction_hash,
   bool include_hex,
-  bool include_json) {
+  bool include_json,
+  bool prune) {
   cryptonote::COMMAND_RPC_GET_TRANSACTIONS::request req;
   cryptonote::COMMAND_RPC_GET_TRANSACTIONS::response res;
 
@@ -722,6 +725,7 @@ bool t_rpc_command_executor::print_transaction(crypto::hash transaction_hash,
 
   req.txs_hashes.push_back(epee::string_tools::pod_to_hex(transaction_hash));
   req.decode_as_json = false;
+  req.prune = include_hex && prune ? true : false;
   if (m_is_rpc)
   {
     if (!m_rpc_client->rpc_request(req, res, "/gettransactions", fail_message.c_str()))
@@ -770,7 +774,15 @@ bool t_rpc_command_executor::print_transaction(crypto::hash transaction_hash,
       }
       else
       {
-        tools::success_msg_writer() << cryptonote::obj_to_json_str(tx) << std::endl;
+        if(prune)
+        {
+          std::stringstream ss;
+          json_archive<true> ar(ss);
+          tx.serialize_base(ar);
+          tools::success_msg_writer() << ss.str() << std::endl;
+        }
+        else
+          tools::success_msg_writer() << cryptonote::obj_to_json_str(tx) << std::endl;
       }
     }
   }
@@ -974,7 +986,7 @@ bool t_rpc_command_executor::print_transaction_pool_stats() {
   }
   else
   {
-    res.pool_stats = {};
+    memset(static_cast<void*>(&res.pool_stats), 0, sizeof(res.pool_stats));
     if (!m_rpc_server->on_get_transaction_pool_stats(req, res, false) || res.status != CORE_RPC_STATUS_OK)
     {
       tools::fail_msg_writer() << make_error(fail_message, res.status);
