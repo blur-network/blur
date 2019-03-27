@@ -41,10 +41,6 @@ set(common_sources
   threadpool.cpp
   aligned.c)
 
-if (STACK_TRACE)
-  list(APPEND common_sources stack_trace.cpp)
-endif()
-
 set(common_headers)
 
 set(common_private_headers
@@ -67,7 +63,6 @@ set(common_private_headers
   i18n.h
   password.h
   perf_timer.h
-  stack_trace.h
   threadpool.h
   aligned.h)
 
