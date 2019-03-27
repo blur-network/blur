@@ -47,7 +47,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 **Step 1:** Clone this repository's stable branch:
 
->`git clone --branch stable https://github.com/blur-network/blur.git`
+>`git clone --recursive https://github.com/blur-network/blur.git`
 
 **Step 2:** Install dependencies:
 
