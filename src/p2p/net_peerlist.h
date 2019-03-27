@@ -33,6 +33,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <stdlib.h>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/portable_binary_oarchive.hpp>
 #include <boost/archive/portable_binary_iarchive.hpp>
@@ -455,7 +456,7 @@ namespace nodetool
       return false;
     }
 
-    size_t random_index = crypto::rand<size_t>() % m_peers_gray.size();
+    size_t random_index = rand() % m_peers_gray.size();
 
     peers_indexed::index<by_time>::type& by_time_index = m_peers_gray.get<by_time>();
     pe = *epee::misc_utils::move_it_backward(--by_time_index.end(), random_index);
