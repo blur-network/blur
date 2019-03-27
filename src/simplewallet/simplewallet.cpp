@@ -44,7 +44,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
-#include <boost/range/adaptor/transformed.hpp>
 #include "include_base_utils.h"
 #include "common/i18n.h"
 #include "common/command_line.h"
@@ -64,7 +63,6 @@
 #include "ringct/rctSigs.h"
 #include "multisig/multisig.h"
 #include "wallet/wallet_args.h"
-#include "version.h"
 #include <stdexcept>
 
 #ifdef WIN32
@@ -106,7 +104,6 @@ typedef cryptonote::simple_wallet sw;
 /*  if (auto_refresh_run)*/ \
     /*m_auto_refresh_thread.join();*/ \
   boost::unique_lock<boost::mutex> lock(m_idle_mutex); \
-  m_idle_cond.notify_all(); \
   epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler([&](){ \
     m_auto_refresh_enabled.store(auto_refresh_enabled, std::memory_order_relaxed); \
   })
@@ -2370,27 +2367,27 @@ bool simple_wallet::set_log(const std::vector<std::string> &args)
   }
   if (!args.empty())
   {
-      try
+    try
+    {
+      uint64_t log_level_numeric = boost::lexical_cast<uint64_t>(args[0]);
+      if(log_level_numeric > 4)
       {
-        uint64_t log_level_numeric = boost::lexical_cast<uint64_t>(args[0]);
-        if(log_level_numeric > 4)
-        {
-          fail_msg_writer() << tr("log level must be between 0 and 4");
-          return true;
-        }
-
-        mlog_set_log_level(log_level_numeric);
-        success_msg_writer() << boost::format(tr("Set log level: %u")) % log_level_numeric;
+        fail_msg_writer() << tr("log level must be between 0 and 4");
+        return true;
       }
-
-      catch(boost::bad_lexical_cast &)
-      {
-        // If the cast doesn't succeed then log categories are being used instead of the default levels
-        mlog_set_log(args[0].c_str());
-      }
+      
+      mlog_set_log_level(log_level_numeric);
+      success_msg_writer() << boost::format(tr("Set log level: %u")) % log_level_numeric;
     }
-
-  success_msg_writer() << "New log categories: " << mlog_get_categories();
+    
+    catch(boost::bad_lexical_cast &)
+    {
+      // If the cast doesn't succeed then log categories are being used instead of the default levels
+      mlog_set_log(args[0].c_str());
+    }
+  }
+  
+  success_msg_writer() << "Log categories in use: " << mlog_get_categories();
   return true;
 }
 //----------------------------------------------------------------------------------------------------
@@ -3858,14 +3855,41 @@ bool simple_wallet::refresh(const std::vector<std::string>& args)
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::show_balance_unlocked(bool detailed)
 {
+  if(detailed)
+    print_accounts();
+ 
   std::string extra;
   if (m_wallet->has_multisig_partial_key_images())
     extra = tr(" (Some owned outputs have partial key images - import_multisig_info needed)");
   success_msg_writer() << tr("Currently selected account: [") << m_current_subaddress_account << tr("] ") << m_wallet->get_subaddress_label({m_current_subaddress_account, 0});
-  const std::string tag = m_wallet->get_account_tags().second[m_current_subaddress_account];
-  success_msg_writer() << tr("Tag: ") << (tag.empty() ? std::string{tr("(No tag assigned)")} : tag);
-  success_msg_writer() << tr("Balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
-    << tr("unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << extra;
+  const std::pair<std::map<std::string, std::string>, std::vector<std::string>>& account_tags = m_wallet->get_account_tags();
+  const std::string tag = account_tags.second[m_current_subaddress_account];
+  if(!detailed)
+  { 
+    success_msg_writer() << tr("Tag: ") << (tag.empty() ? std::string{tr("(No tag assigned)")} : tag);
+  
+    uint64_t total_balance = 0, total_unlocked_balance = 0;
+    for (uint32_t account_index = 0; account_index < m_wallet->get_num_subaddress_accounts(); ++account_index)
+    {
+      if (account_tags.second[account_index] != tag)
+        continue;
+      total_balance += m_wallet->balance(account_index);
+      total_unlocked_balance += m_wallet->unlocked_balance(account_index);
+    }
+  
+    if(total_balance != m_wallet->balance(m_current_subaddress_account))
+    {
+      success_msg_writer() << tr("Account #") << m_current_subaddress_account << tr(" balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
+      << tr("Account #") << m_current_subaddress_account << tr(" unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << std::endl
+      << tr("Total balance: ") << print_money(total_balance) << ", " << tr("Total unlocked balance: ") << print_money(total_unlocked_balance) << extra;
+    }
+    else
+    {
+      success_msg_writer() << tr("Balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
+      << tr("unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << extra;
+    }
+  }
+  
   std::map<uint32_t, uint64_t> balance_per_subaddress = m_wallet->balance_per_subaddress(m_current_subaddress_account);
   std::map<uint32_t, uint64_t> unlocked_balance_per_subaddress = m_wallet->unlocked_balance_per_subaddress(m_current_subaddress_account);
   if (!detailed || balance_per_subaddress.empty())
@@ -6738,7 +6762,9 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
   {
     description = "<Not set>"; 
   }
-  message_writer() << tr("Filename: ") << m_wallet->get_wallet_file();
+  std::string wallet_file_name = m_wallet->get_wallet_file();
+  message_writer() << tr("Wallet name: ") << string_tools::cut_off_extension(wallet_file_name);
+  message_writer() << tr("File name: ") << wallet_file_name;
   message_writer() << tr("Description: ") << description;
   message_writer() << tr("Address: ") << m_wallet->get_account().get_public_address_str(m_wallet->nettype());
   std::string type;
@@ -6752,6 +6778,20 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
   message_writer() << tr("Network type: ") << (
     m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
     m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") : tr("Mainnet"));
+  
+  tools::wallet2::transfer_container transfers;
+  m_wallet->get_transfers(transfers);
+  uint64_t min_height = std::numeric_limits<uint64_t>::max();
+  for (const auto& td : transfers)
+  {
+    if (min_height > td.m_block_height && !td.m_spent)
+      min_height = td.m_block_height;
+  }
+  if(min_height == std::numeric_limits<uint64_t>::max())
+    message_writer() << "Earliest unspent output: N/A";
+  else
+    message_writer() << "Earliest unspent output: " << min_height;
+  
   return true;
 }
 //----------------------------------------------------------------------------------------------------

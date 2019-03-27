@@ -49,7 +49,7 @@ namespace cryptonote
 // advance which version they will stop working with
 // Don't go over 32767 for any of these
 #define CORE_RPC_VERSION_MAJOR 1
-#define CORE_RPC_VERSION_MINOR 20
+#define CORE_RPC_VERSION_MINOR 21
 #define MAKE_CORE_RPC_VERSION(major,minor) (((major)<<16)|(minor))
 #define CORE_RPC_VERSION MAKE_CORE_RPC_VERSION(CORE_RPC_VERSION_MAJOR, CORE_RPC_VERSION_MINOR)
 
@@ -621,6 +621,70 @@ namespace cryptonote
   };
 
   //-----------------------------------------------
+  struct COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS
+  {
+    struct request
+    {
+      std::vector<uint64_t> heights;
+      bool decode_as_json;
+      bool prune;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(heights)
+        KV_SERIALIZE(decode_as_json)
+        KV_SERIALIZE_OPT(prune, false)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct entry
+    {
+      std::string tx_hash;
+      std::string as_hex;
+      std::string as_json;
+      bool in_pool;
+      bool double_spend_seen;
+      uint64_t block_height;
+      uint64_t block_timestamp;
+      std::vector<uint64_t> output_indices;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(tx_hash)
+        KV_SERIALIZE(as_hex)
+        KV_SERIALIZE(as_json)
+        KV_SERIALIZE(in_pool)
+        KV_SERIALIZE(double_spend_seen)
+        KV_SERIALIZE(block_height)
+        KV_SERIALIZE(block_timestamp)
+        KV_SERIALIZE(output_indices)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      // older compatibility stuff
+      std::list<std::string> txs_as_hex;  //transactions blobs as hex (old compat)
+      std::list<std::string> txs_as_json; //transactions decoded as json (old compat)
+
+      // in both old and new
+      std::list<std::string> missed_tx;   //not found transactions
+
+      // new style
+      std::vector<entry> txs;
+      std::string status;
+      bool untrusted;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(txs_as_hex)
+        KV_SERIALIZE(txs_as_json)
+        KV_SERIALIZE(txs)
+        KV_SERIALIZE(missed_tx)
+        KV_SERIALIZE(status)
+        KV_SERIALIZE(untrusted)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+  //-----------------------------------------------
+  
   struct COMMAND_RPC_IS_KEY_IMAGE_SPENT
   {
     enum STATUS {
@@ -964,8 +1028,8 @@ namespace cryptonote
       std::string bootstrap_daemon_address;
       uint64_t height_without_bootstrap;
       bool was_bootstrap_ever_used;
-	  std::string version;
-	  
+      std::string version;
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
         KV_SERIALIZE(height)
@@ -994,7 +1058,7 @@ namespace cryptonote
         KV_SERIALIZE(bootstrap_daemon_address)
         KV_SERIALIZE(height_without_bootstrap)
         KV_SERIALIZE(was_bootstrap_ever_used)
-	    KV_SERIALIZE(version)
+	KV_SERIALIZE(version)
       END_KV_SERIALIZE_MAP()
     };
   };
@@ -1494,7 +1558,9 @@ namespace cryptonote
   {
     struct request
     {
+      bool json_only;
       BEGIN_KV_SERIALIZE_MAP()
+      KV_SERIALIZE_OPT(json_only, false)
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1531,6 +1597,28 @@ namespace cryptonote
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
         KV_SERIALIZE_CONTAINER_POD_AS_BLOB(tx_hashes)
+        KV_SERIALIZE(untrusted)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+  
+  struct COMMAND_RPC_GET_BLOCKS_JSON
+  {
+    struct request
+    {
+      std::vector<uint64_t> heights;
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(heights)
+      END_KV_SERIALIZE_MAP()
+    };
+    struct response
+    {
+      std::string status;
+      std::vector<std::string> blocks;
+      bool untrusted;
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(status)
+        KV_SERIALIZE(blocks)
         KV_SERIALIZE(untrusted)
       END_KV_SERIALIZE_MAP()
     };
@@ -1591,8 +1679,6 @@ namespace cryptonote
     uint64_t histo_98pc;
     std::vector<txpool_histo> histo;
     uint32_t num_double_spends;
-
-    txpool_stats(): bytes_total(0), bytes_min(0), bytes_max(0), bytes_med(0), fee_total(0), oldest(0), txs_total(0), num_failing(0), num_10m(0), num_not_relayed(0), histo_98pc(0), num_double_spends(0) {}
 
     BEGIN_KV_SERIALIZE_MAP()
       KV_SERIALIZE(bytes_total)

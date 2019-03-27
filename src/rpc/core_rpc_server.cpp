@@ -182,13 +182,13 @@ namespace cryptonote
     res.target = m_core.get_blockchain_storage().get_difficulty_target();
     res.tx_count = m_core.get_blockchain_storage().get_total_transactions() - res.height; //without coinbase
     res.tx_pool_size = m_core.get_pool_transactions_count();
-    res.alt_blocks_count = m_restricted ? 0 : m_core.get_blockchain_storage().get_alternative_blocks_count();
-    uint64_t total_conn = m_restricted ? 0 : m_p2p.get_connections_count();
-    res.outgoing_connections_count = m_restricted ? 0 : m_p2p.get_outgoing_connections_count();
-    res.incoming_connections_count = m_restricted ? 0 : total_conn - res.outgoing_connections_count;
-    res.rpc_connections_count = m_restricted ? 0 : get_connections_count();
-    res.white_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_white_peers_count();
-    res.grey_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_gray_peers_count();
+    res.alt_blocks_count = m_core.get_blockchain_storage().get_alternative_blocks_count();
+    uint64_t total_conn = m_p2p.get_connections_count();
+    res.outgoing_connections_count = m_p2p.get_outgoing_connections_count();
+    res.incoming_connections_count = total_conn - res.outgoing_connections_count;
+    res.rpc_connections_count = get_connections_count();
+    res.white_peerlist_size = m_p2p.get_peerlist_manager().get_white_peers_count();
+    res.grey_peerlist_size = m_p2p.get_peerlist_manager().get_gray_peers_count();
     res.mainnet = m_nettype == MAINNET;
     res.testnet = m_nettype == TESTNET;
     res.stagenet = m_nettype == STAGENET;
@@ -199,11 +199,8 @@ namespace cryptonote
     res.start_time = (uint64_t)m_core.get_start_time();
     res.free_space = m_restricted ? std::numeric_limits<uint64_t>::max() : m_core.get_free_space();
     res.offline = m_core.offline();
-    res.bootstrap_daemon_address = m_restricted ? "" : m_bootstrap_daemon_address;
-    res.height_without_bootstrap = m_restricted ? 0 : res.height;
-    if (m_restricted)
-      res.was_bootstrap_ever_used = false;
-    else
+    res.bootstrap_daemon_address = m_bootstrap_daemon_address;
+    res.height_without_bootstrap = res.height;
     {
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
@@ -233,7 +230,16 @@ namespace cryptonote
 
     return get_pruned_tx_blob(tx);
   }
-  //-----------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------
+  static cryptonote::blobdata get_pruned_tx_json(cryptonote::transaction &tx)
+  {
+    std::stringstream ss;
+    json_archive<true> ar(ss);
+    bool r = tx.serialize_base(ar);
+    CHECK_AND_ASSERT_MES(r, cryptonote::blobdata(), "Failed to serialize rct signatures base");
+    return ss.str();
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_get_blocks(const COMMAND_RPC_GET_BLOCKS_FAST::request& req, COMMAND_RPC_GET_BLOCKS_FAST::response& res)
   {
     PERF_TIMER(on_get_blocks);
@@ -644,7 +650,7 @@ namespace cryptonote
       blobdata blob = req.prune ? get_pruned_tx_blob(tx) : t_serializable_object_to_blob(tx);
       e.as_hex = string_tools::buff_to_hex_nodelimer(blob);
       if (req.decode_as_json)
-        e.as_json = obj_to_json_str(tx);
+        e.as_json = req.prune ? get_pruned_tx_json(tx) : obj_to_json_str(tx);
       e.in_pool = pool_tx_hashes.find(tx_hash) != pool_tx_hashes.end();
       if (e.in_pool)
       {
@@ -666,10 +672,156 @@ namespace cryptonote
         e.double_spend_seen = false;
       }
 
-      // fill up old style responses too, in case an old wallet asks
-      res.txs_as_hex.push_back(e.as_hex);
+      // output indices too if not in pool
+      if (pool_tx_hashes.find(tx_hash) == pool_tx_hashes.end())
+      {
+        bool r = m_core.get_tx_outputs_gindexs(tx_hash, e.output_indices);
+        if (!r)
+        {
+          res.status = "Failed";
+          return false;
+        }
+      }
+    }
+
+    for(const auto& miss_tx: missed_txs)
+    {
+      res.missed_tx.push_back(string_tools::pod_to_hex(miss_tx));
+    }
+
+    LOG_PRINT_L2(res.txs.size() << " transactions found, " << res.missed_tx.size() << " not found");
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_transactions_by_heights(const COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS::request& req, COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS::response& res)
+  {
+    PERF_TIMER(on_get_transactions_by_heights);
+    bool ok;
+    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS>(invoke_http_mode::JON, "/gettransactions_by_heights", req, res, ok))
+      return ok;
+
+    std::vector<crypto::hash> vh;
+    
+    for (size_t i = 0; i < req.heights.size(); i++)
+    {
+      block blk;
+      bool orphan = false;
+      crypto::hash block_hash = m_core.get_block_id_by_height(req.heights[i]);
+      bool have_block = m_core.get_block_by_hash(block_hash, blk, &orphan);
+    
+      for(auto& btxs: blk.tx_hashes)
+        vh.push_back(btxs);
+    }
+    
+    std::list<crypto::hash> missed_txs;
+    std::list<transaction> txs;
+    bool r = m_core.get_transactions(vh, txs, missed_txs);
+    
+    std::list<std::string> tx_hashes;
+    for(auto& tx: txs)
+      tx_hashes.push_back(string_tools::pod_to_hex(get_transaction_hash(tx)));
+    
+    if(!r)
+    {
+      res.status = "Failed";
+      return true;
+    }
+    LOG_PRINT_L2("Found " << txs.size() << "/" << vh.size() << " transactions on the blockchain");
+
+    // try the pool for any missing txes
+    size_t found_in_pool = 0;
+    std::unordered_set<crypto::hash> pool_tx_hashes;
+    std::unordered_map<crypto::hash, bool> double_spend_seen;
+    if (!missed_txs.empty())
+    {
+      std::vector<tx_info> pool_tx_info;
+      std::vector<spent_key_image_info> pool_key_image_info;
+      bool r = m_core.get_pool_transactions_and_spent_keys_info(pool_tx_info, pool_key_image_info);
+      if(r)
+      {
+        // sort to match original request
+        std::list<transaction> sorted_txs;
+        std::vector<tx_info>::const_iterator i;
+        for (const crypto::hash &h: vh)
+        {
+          if (std::find(missed_txs.begin(), missed_txs.end(), h) == missed_txs.end())
+          {
+            if (txs.empty())
+            {
+              res.status = "Failed: internal error - txs is empty";
+              return true;
+            }
+            // core returns the ones it finds in the right order
+            if (get_transaction_hash(txs.front()) != h)
+            {
+              res.status = "Failed: tx hash mismatch";
+              return true;
+            }
+            sorted_txs.push_back(std::move(txs.front()));
+            txs.pop_front();
+          }
+          else if ((i = std::find_if(pool_tx_info.begin(), pool_tx_info.end(), [h](const tx_info &txi) { return epee::string_tools::pod_to_hex(h) == txi.id_hash; })) != pool_tx_info.end())
+          {
+            cryptonote::transaction tx;
+            if (!cryptonote::parse_and_validate_tx_from_blob(i->tx_blob, tx))
+            {
+              res.status = "Failed to parse and validate tx from blob";
+              return true;
+            }
+            sorted_txs.push_back(tx);
+            missed_txs.remove(h);
+            pool_tx_hashes.insert(h);
+            const std::string hash_string = epee::string_tools::pod_to_hex(h);
+            for (const auto &ti: pool_tx_info)
+            {
+              if (ti.id_hash == hash_string)
+              {
+                double_spend_seen.insert(std::make_pair(h, ti.double_spend_seen));
+                break;
+              }
+            }
+            ++found_in_pool;
+          }
+        }
+        txs = sorted_txs;
+      }
+      LOG_PRINT_L2("Found " << found_in_pool << "/" << vh.size() << " transactions in the pool");
+    }
+
+    std::list<std::string>::const_iterator txhi = tx_hashes.begin();
+    std::vector<crypto::hash>::const_iterator vhi = vh.begin();
+    for(auto& tx: txs)
+    {
+      res.txs.push_back(COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS::entry());
+      COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS::entry &e = res.txs.back();
+
+      crypto::hash tx_hash = *vhi++;
+      e.tx_hash = *txhi++;
+      blobdata blob = req.prune ? get_pruned_tx_blob(tx) : t_serializable_object_to_blob(tx);
+      e.as_hex = string_tools::buff_to_hex_nodelimer(blob);
       if (req.decode_as_json)
-        res.txs_as_json.push_back(e.as_json);
+        e.as_json = req.prune ? get_pruned_tx_json(tx) : obj_to_json_str(tx);
+      e.in_pool = pool_tx_hashes.find(tx_hash) != pool_tx_hashes.end();
+      if (e.in_pool)
+      {
+        e.block_height = e.block_timestamp = std::numeric_limits<uint64_t>::max();
+        if (double_spend_seen.find(tx_hash) != double_spend_seen.end())
+        {
+          e.double_spend_seen = double_spend_seen[tx_hash];
+        }
+        else
+        {
+          MERROR("Failed to determine double spend status for " << tx_hash);
+          e.double_spend_seen = false;
+        }
+      }
+      else
+      {
+        e.block_height = m_core.get_blockchain_storage().get_db().get_tx_block_height(tx_hash);
+        e.block_timestamp = m_core.get_blockchain_storage().get_db().get_block_timestamp(e.block_height);
+        e.double_spend_seen = false;
+      }
 
       // output indices too if not in pool
       if (pool_tx_hashes.find(tx_hash) == pool_tx_hashes.end())
@@ -832,16 +984,18 @@ namespace cryptonote
   {
     PERF_TIMER(on_start_mining);
     CHECK_CORE_READY();
+    cryptonote::miner &miner= m_core.get_miner();
+    if(miner.is_mining())
+    {
+      res.status = "Already mining";
+      LOG_PRINT_L0(res.status);
+      return true;
+    }
+    
     cryptonote::address_parse_info info;
     if(!get_account_address_from_str(info, m_nettype, req.miner_address))
     {
       res.status = "Failed, wrong address";
-      LOG_PRINT_L0(res.status);
-      return true;
-    }
-    if (info.is_subaddress)
-    {
-      res.status = "Mining to subaddress isn't supported yet";
       LOG_PRINT_L0(res.status);
       return true;
     }
@@ -866,7 +1020,7 @@ namespace cryptonote
     boost::thread::attributes attrs;
     attrs.set_stack_size(THREAD_STACK_SIZE);
 
-    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
+    if(!miner.start(req.miner_address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
     {
       res.status = "Failed, mining not started";
       LOG_PRINT_L0(res.status);
@@ -879,7 +1033,14 @@ namespace cryptonote
   bool core_rpc_server::on_stop_mining(const COMMAND_RPC_STOP_MINING::request& req, COMMAND_RPC_STOP_MINING::response& res)
   {
     PERF_TIMER(on_stop_mining);
-    if(!m_core.get_miner().stop())
+    cryptonote::miner &miner= m_core.get_miner();
+    if(!miner.is_mining())
+    {
+      res.status = "Mining never started";
+      LOG_PRINT_L0(res.status);
+      return true;
+    }
+    if(!miner.stop())
     {
       res.status = "Failed, mining not stopped";
       LOG_PRINT_L0(res.status);
@@ -900,8 +1061,7 @@ namespace cryptonote
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
       res.threads_count = lMiner.get_threads_count();
-      const account_public_address& lMiningAdr = lMiner.get_mining_address();
-      res.address = get_account_address_as_str(m_nettype, false, lMiningAdr);
+      res.address = lMiner.get_mining_address();
     }
 
     res.status = CORE_RPC_STATUS_OK;
@@ -916,9 +1076,16 @@ namespace cryptonote
     
     if(height == 0)
     {
+      CHECK_CORE_READY();
       height = m_core.get_current_blockchain_height() - 1;
     }
-    
+
+    if(m_core.get_current_blockchain_height() <= req.height)
+    {
+      res.status = std::string("Requested block height: ") + std::to_string(req.height) + " greater than current top block height: " +  std::to_string(m_core.get_current_blockchain_height() - 1);
+      return true;
+    }
+
     res.amount = m_core.get_generated_coins(height);
     
     res.status = CORE_RPC_STATUS_OK;
@@ -1012,8 +1179,15 @@ namespace cryptonote
       return r;
 
     m_core.get_pool_transactions_and_spent_keys_info(res.transactions, res.spent_key_images, !request_has_rpc_origin || !m_restricted);
-    for (tx_info& txi : res.transactions)
-      txi.tx_blob = epee::string_tools::buff_to_hex_nodelimer(txi.tx_blob);
+    
+    if (req.json_only)
+    {
+      for(auto& tx: res.transactions)
+      {
+        tx.blob_size = 0;
+        tx.tx_blob = "";
+      }
+    }
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -1026,6 +1200,35 @@ namespace cryptonote
       return r;
 
     m_core.get_pool_transaction_hashes(res.tx_hashes, !request_has_rpc_origin || !m_restricted);
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_blocks_json(const COMMAND_RPC_GET_BLOCKS_JSON::request& req, COMMAND_RPC_GET_BLOCKS_JSON::response& res, bool request_has_rpc_origin)
+  {
+    PERF_TIMER(on_get_blocks_json);
+    bool r;
+    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_BLOCKS_JSON>(invoke_http_mode::JON, "/get_blocks_json", req, res, r))
+      return r;
+    
+    for (size_t i = 0; i < req.heights.size(); i++)
+    {
+      if(m_core.get_current_blockchain_height() <= req.heights[i])
+      {
+        LOG_ERROR("Requested block at height " << req.heights[i] << " which is greater than top block height " << m_core.get_current_blockchain_height() - 1);
+        continue;
+      }
+      
+      block blk;
+      bool orphan = false;
+      crypto::hash block_hash = m_core.get_block_id_by_height(req.heights[i]);
+      if (!m_core.get_block_by_hash(block_hash, blk, &orphan))
+      {
+        LOG_ERROR("Block with hash " << block_hash << " not found in database");
+      }
+    
+      res.blocks.push_back(obj_to_json_str(blk));
+    }
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -1089,7 +1292,7 @@ namespace cryptonote
     if(m_core.get_current_blockchain_height() <= h)
     {
       error_resp.code = CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT;
-      error_resp.message = std::string("Too big height: ") + std::to_string(h) + ", current blockchain height = " +  std::to_string(m_core.get_current_blockchain_height());
+      error_resp.message = std::string("Requested block height: ") + std::to_string(h) + " greater than current top block height: " +  std::to_string(m_core.get_current_blockchain_height() - 1);
     }
     res = string_tools::pod_to_hex(m_core.get_block_id_by_height(h));
     return true;
@@ -1151,7 +1354,7 @@ namespace cryptonote
     block b = AUTO_VAL_INIT(b);
     cryptonote::blobdata blob_reserve;
     blob_reserve.resize(req.reserve_size, 0);
-    if(!m_core.get_block_template(b, info.address, res.difficulty, res.height, res.expected_reward, blob_reserve))
+    if(!m_core.get_block_template(b, req.wallet_address, res.difficulty, res.height, res.expected_reward, blob_reserve))
     {
       error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
       error_resp.message = "Internal error: failed to create block template";
@@ -1180,7 +1383,7 @@ namespace cryptonote
     {
       error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
       error_resp.message = "Internal error: failed to create block template";
-      LOG_ERROR("Failed to calculate offset for ");
+      LOG_ERROR("Failed to calculate tx pub key reserved offset");
       return false;
     }
     blobdata hashing_blob = get_block_hashing_blob(b);
@@ -1216,7 +1419,7 @@ namespace cryptonote
       error_resp.message = "Wrong block blob";
       return false;
     }
-
+    
     // Fixing of high orphan issue for most pools
     // Thanks Boolberry!
     block b = AUTO_VAL_INIT(b);
@@ -1591,13 +1794,13 @@ namespace cryptonote
     res.target = DIFFICULTY_TARGET;
     res.tx_count = m_core.get_blockchain_storage().get_total_transactions() - res.height; //without coinbase
     res.tx_pool_size = m_core.get_pool_transactions_count();
-    res.alt_blocks_count = m_restricted ? 0 : m_core.get_blockchain_storage().get_alternative_blocks_count();
-    uint64_t total_conn = m_restricted ? 0 : m_p2p.get_connections_count();
-    res.outgoing_connections_count = m_restricted ? 0 : m_p2p.get_outgoing_connections_count();
-    res.incoming_connections_count = m_restricted ? 0 : total_conn - res.outgoing_connections_count;
-    res.rpc_connections_count = m_restricted ? 0 : get_connections_count();
-    res.white_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_white_peers_count();
-    res.grey_peerlist_size = m_restricted ? 0 : m_p2p.get_peerlist_manager().get_gray_peers_count();
+    res.alt_blocks_count = m_core.get_blockchain_storage().get_alternative_blocks_count();
+    uint64_t total_conn = m_p2p.get_connections_count();
+    res.outgoing_connections_count = m_p2p.get_outgoing_connections_count();
+    res.incoming_connections_count = total_conn - res.outgoing_connections_count;
+    res.rpc_connections_count = get_connections_count();
+    res.white_peerlist_size = m_p2p.get_peerlist_manager().get_white_peers_count();
+    res.grey_peerlist_size = m_p2p.get_peerlist_manager().get_gray_peers_count();
     res.mainnet = m_nettype == MAINNET;
     res.testnet = m_nettype == TESTNET;
     res.stagenet = m_nettype == STAGENET;
@@ -1605,14 +1808,11 @@ namespace cryptonote
     res.block_size_limit = m_core.get_blockchain_storage().get_current_cumulative_blocksize_limit();
     res.block_size_median = m_core.get_blockchain_storage().get_current_cumulative_blocksize_median();
     res.status = CORE_RPC_STATUS_OK;
-    res.start_time = m_restricted ? 0 : (uint64_t)m_core.get_start_time();
+    res.start_time = (uint64_t)m_core.get_start_time();
     res.free_space = m_restricted ? std::numeric_limits<uint64_t>::max() : m_core.get_free_space();
     res.offline = m_core.offline();
-    res.bootstrap_daemon_address = m_restricted ? "" : m_bootstrap_daemon_address;
-    res.height_without_bootstrap = m_restricted ? 0 : res.height;
-    if (m_restricted)
-      res.was_bootstrap_ever_used = false;
-    else
+    res.bootstrap_daemon_address = m_bootstrap_daemon_address;
+    res.height_without_bootstrap = res.height;
     {
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;

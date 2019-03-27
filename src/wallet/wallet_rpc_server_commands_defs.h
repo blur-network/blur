@@ -786,20 +786,10 @@ namespace wallet_rpc
 
     struct response
     {
-      std::string public_view_key;
-      std::string private_view_key;
-      
-      std::string public_spend_key;
-      std::string private_spend_key;
-      
-      std::string mnemonic;
+      std::string key;
 
       BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE(public_view_key)
-        KV_SERIALIZE(private_view_key)
-        KV_SERIALIZE(public_spend_key)
-        KV_SERIALIZE(private_spend_key)
-        KV_SERIALIZE(mnemonic)
+        KV_SERIALIZE(key)
       END_KV_SERIALIZE_MAP()
     };
   };
