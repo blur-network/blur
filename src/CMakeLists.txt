@@ -52,17 +52,6 @@ function (monero_install_headers subdir)
     COMPONENT   development)
 endfunction ()
 
-function (enable_stack_trace target)
-  if(STACK_TRACE)
-    set_property(TARGET ${target}
-      APPEND PROPERTY COMPILE_DEFINITIONS "STACK_TRACE")
-    if (STATIC)
-      set_property(TARGET "${target}"
-        APPEND PROPERTY LINK_FLAGS "-Wl,--wrap=__cxa_throw")
-    endif()
-  endif()
-endfunction()
-
 function (monero_add_executable name)
   source_group("${name}"
     FILES
@@ -79,7 +68,6 @@ function (monero_add_executable name)
   set_property(TARGET "${name}"
     PROPERTY
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-  enable_stack_trace("${name}")
 endfunction ()
 
 function (monero_add_library name)
