@@ -456,6 +456,7 @@ namespace nodetool
       return false;
     }
 
+    size_t srand (time(NULL));
     size_t random_index = rand() % m_peers_gray.size();
 
     peers_indexed::index<by_time>::type& by_time_index = m_peers_gray.get<by_time>();
