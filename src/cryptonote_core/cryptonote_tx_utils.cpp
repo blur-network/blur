@@ -102,17 +102,13 @@ namespace cryptonote
 #endif
     block_reward += fee;
 
-    uint64_t summary_amounts = 0;
-    for (size_t no = 0; no < out_amounts.size(); no++)
-    {
-      crypto::key_derivation derivation = AUTO_VAL_INIT(derivation);;
-      crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
-      bool r = crypto::generate_key_derivation(miner_address.m_view_public_key, txkey.sec, derivation);
-      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to generate_key_derivation(" << miner_address.m_view_public_key << ", " << txkey.sec << ")");
+    crypto::key_derivation derivation = AUTO_VAL_INIT(derivation);;
+    crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
+    bool r = crypto::generate_key_derivation(miner_address.m_view_public_key, txkey.sec, derivation);
+    CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to generate_key_derivation(" << miner_address.m_view_public_key << ", " << txkey.sec << ")");
 
-      r = crypto::derive_public_key(derivation, no, miner_address.m_spend_public_key, out_eph_public_key);
-      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to derive_public_key(" << derivation << ", " << no << ", "<< miner_address.m_spend_public_key << ")");
-
+    r = crypto::derive_public_key(derivation, 0, miner_address.m_spend_public_key, out_eph_public_key);
+    CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to derive_public_key(" << derivation << ", " << miner_address.m_spend_public_key << ")");
 
     txout_to_key tk;
     tk.key = out_eph_public_key;
@@ -213,8 +209,6 @@ namespace cryptonote
             LOG_ERROR("Failed to add encrypted payment id to tx extra");
             return false;
           }
-          LOG_PRINT_L1("Encrypted payment ID: " << payment_id8);
-          add_dummy_payment_id = false;
         }
         else if (get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
         {
@@ -222,23 +216,6 @@ namespace cryptonote
         }
       }
 
-      // we don't add one if we've got more than the usual 1 destination plus change
-      if (destinations.size() > 2)
-        add_dummy_payment_id = false;
-
-      if (add_dummy_payment_id)
-      {
-        // if we have neither long nor short payment id, add a dummy short one,
-        // this should end up being the vast majority of txes as time goes on
-        std::string extra_nonce;
-        crypto::hash8 payment_id8 = null_hash8;
-        crypto::public_key view_key_pub = get_destination_view_key_pub(destinations, change_addr);
-        if (view_key_pub == null_pkey)
-        {
-          LOG_ERROR("Failed to get key to encrypt dummy payment id with");
-        }
-        else
-        {
           hwdev.encrypt_payment_id(payment_id8, view_key_pub, tx_key);
           set_encrypted_payment_id_to_tx_extra_nonce(extra_nonce, payment_id8);
           if (!add_extra_nonce_to_tx_extra(tx.extra, extra_nonce))
@@ -246,7 +223,6 @@ namespace cryptonote
             LOG_ERROR("Failed to add dummy encrypted payment id to tx extra");
             // continue anyway
           }
-        }
       }
     }
     else
@@ -309,10 +285,9 @@ namespace cryptonote
       tx.vin.push_back(input_to_key);
     }
 
-    if (shuffle_outs)
-    {
-      std::shuffle(destinations.begin(), destinations.end(), std::default_random_engine(crypto::rand<unsigned int>()));
-    }
+    // "Shuffle" outs
+    std::vector<tx_destination_entry> shuffled_dsts(destinations);
+    std::random_shuffle(shuffled_dsts.begin(), shuffled_dsts.end(), [](unsigned int i) { return crypto::rand<unsigned int>() % i; });
 
     // sort ins by their key image
     std::vector<size_t> ins_order(sources.size());
@@ -479,7 +454,6 @@ namespace cryptonote
 
       uint64_t amount_in = 0, amount_out = 0;
       rct::ctkeyV inSk;
-      inSk.reserve(sources.size());
       // mixRing indexing is done the other way round for simple
       rct::ctkeyM mixRing(use_simple_rct ? sources.size() : n_total_outs);
       rct::keyV destinations;
@@ -496,7 +470,6 @@ namespace cryptonote
         ctkey.dest = rct::sk2rct(in_contexts[i].in_ephemeral.sec);
         ctkey.mask = sources[i].mask;
         inSk.push_back(ctkey);
-        memwipe(&ctkey, sizeof(rct::ctkey));
         // inPk: (public key, commitment)
         // will be done when filling in mixRing
         if (msout)
@@ -555,7 +528,6 @@ namespace cryptonote
         tx.rct_signatures = rct::genRctSimple(rct::hash2rct(tx_prefix_hash), inSk, destinations, inamounts, outamounts, amount_in - amount_out, mixRing, amount_keys, msout ? &kLRki : NULL, msout, index, outSk, bulletproof, hwdev);
       else
         tx.rct_signatures = rct::genRct(rct::hash2rct(tx_prefix_hash), inSk, destinations, outamounts, mixRing, amount_keys, msout ? &kLRki[0] : NULL, msout, sources[0].real_output, outSk, bulletproof, hwdev); // same index assumption
-      memwipe(inSk.data(), inSk.size() * sizeof(rct::ctkey));
 
       CHECK_AND_ASSERT_MES(tx.vout.size() == outSk.size(), false, "outSk size does not match vout");
 
@@ -567,7 +539,7 @@ namespace cryptonote
     return true;
   }
   //---------------------------------------------------------------
-  bool construct_tx_and_get_tx_key(const account_keys& sender_account_keys, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, std::vector<tx_source_entry>& sources, std::vector<tx_destination_entry>& destinations, const boost::optional<cryptonote::account_public_address>& change_addr, std::vector<uint8_t> extra, transaction& tx, uint64_t unlock_time, crypto::secret_key &tx_key, std::vector<crypto::secret_key> &additional_tx_keys, bool rct, bool bulletproof, rct::multisig_out *msout)
+  bool construct_tx_and_get_tx_key(const account_keys& sender_account_keys, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, std::vector<tx_source_entry>& sources, const std::vector<tx_destination_entry>& destinations, const boost::optional<cryptonote::account_public_address>& change_addr, std::vector<uint8_t> extra, transaction& tx, uint64_t unlock_time, crypto::secret_key &tx_key, std::vector<crypto::secret_key> &additional_tx_keys, bool rct, bool bulletproof, rct::multisig_out *msout)
   {
     hw::device &hwdev = sender_account_keys.get_device();
     hwdev.open_tx(tx_key);
