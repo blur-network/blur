@@ -192,6 +192,7 @@ namespace cryptonote
     res.mainnet = m_nettype == MAINNET;
     res.testnet = m_nettype == TESTNET;
     res.stagenet = m_nettype == STAGENET;
+    res.nettype = m_nettype == MAINNET ? "mainnet" : m_nettype == TESTNET ? "testnet" : m_nettype == STAGENET ? "stagenet" : "fakechain";
     res.cumulative_difficulty = m_core.get_blockchain_storage().get_db().get_block_cumulative_difficulty(res.height - 1);
     res.block_size_limit = m_core.get_blockchain_storage().get_current_cumulative_blocksize_limit();
     res.block_size_median = m_core.get_blockchain_storage().get_current_cumulative_blocksize_median();
@@ -984,18 +985,16 @@ namespace cryptonote
   {
     PERF_TIMER(on_start_mining);
     CHECK_CORE_READY();
-    cryptonote::miner &miner= m_core.get_miner();
-    if(miner.is_mining())
-    {
-      res.status = "Already mining";
-      LOG_PRINT_L0(res.status);
-      return true;
-    }
-    
     cryptonote::address_parse_info info;
     if(!get_account_address_from_str(info, m_nettype, req.miner_address))
     {
       res.status = "Failed, wrong address";
+      LOG_PRINT_L0(res.status);
+      return true;
+    }
+    if (info.is_subaddress)
+    {
+      res.status = "Mining to subaddress isn't supported yet";
       LOG_PRINT_L0(res.status);
       return true;
     }
@@ -1020,7 +1019,13 @@ namespace cryptonote
     boost::thread::attributes attrs;
     attrs.set_stack_size(THREAD_STACK_SIZE);
 
-    if(!miner.start(req.miner_address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
+    cryptonote::miner &miner= m_core.get_miner();
+    if (miner.is_mining())
+    {
+      res.status = "Already mining";
+      return true;
+    }
+    if(!miner.start(info.address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
     {
       res.status = "Failed, mining not started";
       LOG_PRINT_L0(res.status);
@@ -1033,14 +1038,7 @@ namespace cryptonote
   bool core_rpc_server::on_stop_mining(const COMMAND_RPC_STOP_MINING::request& req, COMMAND_RPC_STOP_MINING::response& res)
   {
     PERF_TIMER(on_stop_mining);
-    cryptonote::miner &miner= m_core.get_miner();
-    if(!miner.is_mining())
-    {
-      res.status = "Mining never started";
-      LOG_PRINT_L0(res.status);
-      return true;
-    }
-    if(!miner.stop())
+    if(!m_core.get_miner().stop())
     {
       res.status = "Failed, mining not stopped";
       LOG_PRINT_L0(res.status);
@@ -1061,33 +1059,10 @@ namespace cryptonote
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
       res.threads_count = lMiner.get_threads_count();
-      res.address = lMiner.get_mining_address();
+      const account_public_address& lMiningAdr = lMiner.get_mining_address();
+      res.address = get_account_address_as_str(m_nettype, false, lMiningAdr);
     }
 
-    res.status = CORE_RPC_STATUS_OK;
-    return true;
-  }
-  //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::on_get_generated_coins(const COMMAND_RPC_GET_GENERATED_COINS::request& req, COMMAND_RPC_GET_GENERATED_COINS::response& res)
-  {
-    PERF_TIMER(on_get_generated_coins);
-    
-    uint64_t height = req.height;
-    
-    if(height == 0)
-    {
-      CHECK_CORE_READY();
-      height = m_core.get_current_blockchain_height() - 1;
-    }
-
-    if(m_core.get_current_blockchain_height() <= req.height)
-    {
-      res.status = std::string("Requested block height: ") + std::to_string(req.height) + " greater than current top block height: " +  std::to_string(m_core.get_current_blockchain_height() - 1);
-      return true;
-    }
-
-    res.amount = m_core.get_generated_coins(height);
-    
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -1179,15 +1154,20 @@ namespace cryptonote
       return r;
 
     m_core.get_pool_transactions_and_spent_keys_info(res.transactions, res.spent_key_images, !request_has_rpc_origin || !m_restricted);
-    
-    if (req.json_only)
-    {
-      for(auto& tx: res.transactions)
-      {
-        tx.blob_size = 0;
-        tx.tx_blob = "";
-      }
-    }
+    for (tx_info& txi : res.transactions)
+      txi.tx_blob = epee::string_tools::buff_to_hex_nodelimer(txi.tx_blob);
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_transaction_pool_hashes_bin(const COMMAND_RPC_GET_TRANSACTION_POOL_HASHES_BIN::request& req, COMMAND_RPC_GET_TRANSACTION_POOL_HASHES_BIN::response& res, bool request_has_rpc_origin)
+  {
+    PERF_TIMER(on_get_transaction_pool_hashes);
+    bool r;
+    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_TRANSACTION_POOL_HASHES_BIN>(invoke_http_mode::JON, "/get_transaction_pool_hashes.bin", req, res, r))
+      return r;
+
+    m_core.get_pool_transaction_hashes(res.tx_hashes, !request_has_rpc_origin || !m_restricted);
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -1196,39 +1176,14 @@ namespace cryptonote
   {
     PERF_TIMER(on_get_transaction_pool_hashes);
     bool r;
-    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_TRANSACTION_POOL_HASHES>(invoke_http_mode::JON, "/get_transaction_pool_hashes.bin", req, res, r))
+    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_TRANSACTION_POOL_HASHES>(invoke_http_mode::JON, "/get_transaction_pool_hashes", req, res, r))
       return r;
 
-    m_core.get_pool_transaction_hashes(res.tx_hashes, !request_has_rpc_origin || !m_restricted);
-    res.status = CORE_RPC_STATUS_OK;
-    return true;
-  }
-  //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::on_get_blocks_json(const COMMAND_RPC_GET_BLOCKS_JSON::request& req, COMMAND_RPC_GET_BLOCKS_JSON::response& res, bool request_has_rpc_origin)
-  {
-    PERF_TIMER(on_get_blocks_json);
-    bool r;
-    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_BLOCKS_JSON>(invoke_http_mode::JON, "/get_blocks_json", req, res, r))
-      return r;
-    
-    for (size_t i = 0; i < req.heights.size(); i++)
-    {
-      if(m_core.get_current_blockchain_height() <= req.heights[i])
-      {
-        LOG_ERROR("Requested block at height " << req.heights[i] << " which is greater than top block height " << m_core.get_current_blockchain_height() - 1);
-        continue;
-      }
-      
-      block blk;
-      bool orphan = false;
-      crypto::hash block_hash = m_core.get_block_id_by_height(req.heights[i]);
-      if (!m_core.get_block_by_hash(block_hash, blk, &orphan))
-      {
-        LOG_ERROR("Block with hash " << block_hash << " not found in database");
-      }
-    
-      res.blocks.push_back(obj_to_json_str(blk));
-    }
+    std::vector<crypto::hash> tx_hashes;
+    m_core.get_pool_transaction_hashes(tx_hashes, !request_has_rpc_origin || !m_restricted);
+    res.tx_hashes.reserve(tx_hashes.size());
+    for (const crypto::hash &tx_hash: tx_hashes)
+      res.tx_hashes.push_back(epee::string_tools::pod_to_hex(tx_hash));
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -1354,7 +1309,7 @@ namespace cryptonote
     block b = AUTO_VAL_INIT(b);
     cryptonote::blobdata blob_reserve;
     blob_reserve.resize(req.reserve_size, 0);
-    if(!m_core.get_block_template(b, req.wallet_address, res.difficulty, res.height, res.expected_reward, blob_reserve))
+    if(!m_core.get_block_template(b, info.address, res.difficulty, res.height, res.expected_reward, blob_reserve))
     {
       error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
       error_resp.message = "Internal error: failed to create block template";
@@ -1804,6 +1759,7 @@ namespace cryptonote
     res.mainnet = m_nettype == MAINNET;
     res.testnet = m_nettype == TESTNET;
     res.stagenet = m_nettype == STAGENET;
+    res.nettype = m_nettype == MAINNET ? "mainnet" : m_nettype == TESTNET ? "testnet" : m_nettype == STAGENET ? "stagenet" : "fakechain";
     res.cumulative_difficulty = m_core.get_blockchain_storage().get_db().get_block_cumulative_difficulty(res.height - 1);
     res.block_size_limit = m_core.get_blockchain_storage().get_current_cumulative_blocksize_limit();
     res.block_size_median = m_core.get_blockchain_storage().get_current_cumulative_blocksize_median();

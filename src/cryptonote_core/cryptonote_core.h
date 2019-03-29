@@ -201,7 +201,7 @@ namespace cryptonote
       *
       * @note see Blockchain::create_block_template
       */
-     virtual bool get_block_template(block& b, std::string adr, difficulty_type& diffic, uint64_t& height, uint64_t& expected_reward, const blobdata& ex_nonce);
+     virtual bool get_block_template(block& b, const account_public_address& adr, difficulty_type& diffic, uint64_t& height, uint64_t& expected_reward, const blobdata& ex_nonce);
 
      /**
       * @brief called when a transaction is relayed
@@ -722,13 +722,6 @@ namespace cryptonote
       * @return the number of blocks to sync in one go
       */
      std::pair<uint64_t, uint64_t> get_coinbase_tx_sum(const uint64_t start_offset, const size_t count);
-     
-     /**
-      * @copydoc BlockchainDB::get_already_generated_coins
-      *
-      * @note BlockchainDB::get_already_generated_coins
-      */
-     uint64_t get_generated_coins(uint64_t height) const;
      
      /**
       * @brief get the network type we're on

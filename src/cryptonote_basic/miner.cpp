@@ -1,4 +1,3 @@
-// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -122,7 +121,8 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------------
   miner::~miner()
   {
-    stop();
+    try { stop(); }
+    catch (...) { /* ignore */ }
   }
   //-----------------------------------------------------------------------------------------------------
   bool miner::set_block_template(const block& bl, const difficulty_type& di, uint64_t height)
@@ -199,8 +199,9 @@ namespace cryptonote
       {
         uint64_t total_hr = std::accumulate(m_last_hash_rates.begin(), m_last_hash_rates.end(), 0);
         float hr = static_cast<float>(total_hr)/static_cast<float>(m_last_hash_rates.size());
+        const auto flags = std::cout.flags();
         const auto precision = std::cout.precision();
-        std::cout << "hashrate: " << std::setprecision(4) << std::fixed << hr << precision << ENDL;
+        std::cout << "hashrate: " << std::setprecision(4) << std::fixed << hr << flags << precision << ENDL;
       }
     }
     m_last_hr_merge_time = misc_utils::get_tick_count();
@@ -252,7 +253,7 @@ namespace cryptonote
         LOG_ERROR("Target account address " << command_line::get_arg(vm, arg_start_mining) << " has wrong format, starting daemon canceled");
         return false;
       }
-      m_mine_address = command_line::get_arg(vm, arg_start_mining);
+      m_mine_address = info.address;
       m_threads_total = 1;
       m_do_mining = true;
       if(command_line::has_arg(vm, arg_mining_threads))
@@ -282,7 +283,7 @@ namespace cryptonote
     return !m_stop;
   }
   //-----------------------------------------------------------------------------------------------------
-  std::string miner::get_mining_address() const
+  const account_public_address& miner::get_mining_address() const
   {
     return m_mine_address;
   }
@@ -291,7 +292,7 @@ namespace cryptonote
     return m_threads_total;
   }
   //-----------------------------------------------------------------------------------------------------
-  bool miner::start(std::string adr, size_t threads_count, const boost::thread::attributes& attrs, bool do_background, bool ignore_battery)
+  bool miner::start(const account_public_address& adr, size_t threads_count, const boost::thread::attributes& attrs, bool do_background, bool ignore_battery)
   {
     m_mine_address = adr;
     m_threads_total = static_cast<uint32_t>(threads_count);
@@ -315,7 +316,7 @@ namespace cryptonote
     boost::interprocess::ipcdetail::atomic_write32(&m_thread_index, 0);
     set_is_background_mining_enabled(do_background);
     set_ignore_battery(ignore_battery);
-
+    
     for(size_t i = 0; i != threads_count; i++)
     {
       m_threads.push_back(boost::thread(attrs, boost::bind(&miner::worker_thread, this)));
@@ -333,6 +334,7 @@ namespace cryptonote
     {
       MINFO("Ignoring battery");
     }
+
     return true;
   }
   //-----------------------------------------------------------------------------------------------------
@@ -456,12 +458,12 @@ namespace cryptonote
         while( !m_is_background_mining_started )
         {
           MGINFO("background mining is enabled, but not started, waiting until start triggers");
-          boost::unique_lock<boost::mutex> started_lock( m_is_background_mining_started_mutex );
+          boost::unique_lock<boost::mutex> started_lock( m_is_background_mining_started_mutex );        
           m_is_background_mining_started_cond.wait( started_lock );
           if( m_stop ) break;
         }
-
-        if( m_stop ) continue;
+        
+        if( m_stop ) continue;         
       }
 
       if(local_template_ver != m_template_no)

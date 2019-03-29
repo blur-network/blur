@@ -650,6 +650,7 @@ namespace cryptonote
   bool core::handle_incoming_txs(const std::list<blobdata>& tx_blobs, std::vector<tx_verification_context>& tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
   {
     TRY_ENTRY();
+    CRITICAL_REGION_LOCAL(m_incoming_tx_lock);
 
     struct result { bool res; cryptonote::transaction tx; crypto::hash hash; crypto::hash prefix_hash; bool in_txpool; bool in_blockchain; };
     std::vector<result> results(tx_blobs.size());
@@ -901,11 +902,6 @@ namespace cryptonote
     return std::pair<uint64_t, uint64_t>(emission_amount, total_fee_amount);
   }
   //-----------------------------------------------------------------------------------------------
-  uint64_t core::get_generated_coins(uint64_t height) const
-  {
-    return m_blockchain_storage.get_db().get_block_already_generated_coins(height);
-  }
-  //-----------------------------------------------------------------------------------------------
   bool core::check_tx_inputs_keyimages_diff(const transaction& tx) const
   {
     std::unordered_set<crypto::key_image> ki;
@@ -1011,7 +1007,7 @@ namespace cryptonote
     m_mempool.set_relayed(txs);
   }
   //-----------------------------------------------------------------------------------------------
-  bool core::get_block_template(block& b, std::string adr, difficulty_type& diffic, uint64_t& height, uint64_t& expected_reward, const blobdata& ex_nonce)
+  bool core::get_block_template(block& b, const account_public_address& adr, difficulty_type& diffic, uint64_t& height, uint64_t& expected_reward, const blobdata& ex_nonce)
   {
     return m_blockchain_storage.create_block_template(b, adr, diffic, height, expected_reward, ex_nonce);
   }
