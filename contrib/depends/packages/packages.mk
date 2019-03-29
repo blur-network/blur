@@ -1,4 +1,4 @@
-packages:=boost openssl zeromq cppzmq expat cppzmq readline libiconv qt hidapi libusb
+packages:=boost openssl zeromq cppzmq expat cppzmq readline libiconv qt
 native_packages := native_ccache
 
 darwin_native_packages = native_biplist native_ds_store native_mac_alias
