@@ -108,6 +108,14 @@ typedef cryptonote::simple_wallet sw;
     m_auto_refresh_enabled.store(auto_refresh_enabled, std::memory_order_relaxed); \
   })
 
+#define LONG_PAYMENT_ID_SUPPORT_CHECK() \
+  do { \
+    if (!m_long_payment_id_support) { \
+      fail_msg_writer() << tr("Long payment IDs are obsolete. Use --long-payment-id-support if you really must use one, and warn the recipient they are using an obsolete feature that will disappear in the future."); \
+      return true; \
+    } \
+  } while(0)
+
 enum TransferType {
   Transfer,
   TransferLocked,
@@ -136,6 +144,7 @@ namespace
   const command_line::arg_descriptor<bool> arg_create_address_file = {"create-address-file", sw::tr("Create an address file for new wallets"), false};
   const command_line::arg_descriptor<std::string> arg_subaddress_lookahead = {"subaddress-lookahead", tools::wallet2::tr("Set subaddress lookahead sizes to <major>:<minor>"), ""};
   const command_line::arg_descriptor<bool> arg_use_english_language_names = {"use-english-language-names", sw::tr("Display English language names"), false};
+  const command_line::arg_descriptor<bool> arg_long_payment_id_support = {"long-payment-id-support", sw::tr("Support obsolete long (unencrypted) payment ids"), false};
 
   const command_line::arg_descriptor< std::vector<std::string> > arg_command = {"command", ""};
 
@@ -717,6 +726,8 @@ bool simple_wallet::change_password(const std::vector<std::string> &args)
 
 bool simple_wallet::payment_id(const std::vector<std::string> &args/* = std::vector<std::string>()*/)
 {
+  LONG_PAYMENT_ID_SUPPORT_CHECK();
+
   crypto::hash payment_id;
   if (args.size() > 0)
   {
@@ -1689,6 +1700,8 @@ bool simple_wallet::set_refresh_type(const std::vector<std::string> &args/* = st
 
 bool simple_wallet::set_confirm_missing_payment_id(const std::vector<std::string> &args/* = std::vector<std::string>()*/)
 {
+  LONG_PAYMENT_ID_SUPPORT_CHECK();
+
   const auto pwd_container = get_and_verify_password();
   if (pwd_container)
   {
@@ -1999,7 +2012,7 @@ simple_wallet::simple_wallet()
   m_cmd_binder.set_handler("donate",
                            boost::bind(&simple_wallet::donate, this, _1),
                            tr("donate [index=<N1>[,<N2>,...]] [<priority>] <amount> [<payment_id>]"),
-                           tr("Donate <amount> to the development team (getblur.org)."));
+                           tr("Donate <amount> to the development team ."));
   m_cmd_binder.set_handler("sign_transfer",
                            boost::bind(&simple_wallet::sign_transfer, this, _1),
                            tr("sign_transfer <file>"),
@@ -2151,7 +2164,7 @@ simple_wallet::simple_wallet()
                            tr("Show the unspent outputs of a specified address within an optional amount range."));
   m_cmd_binder.set_handler("rescan_bc",
                            boost::bind(&simple_wallet::rescan_blockchain, this, _1),
-                           tr("Rescan the blockchain from scratch."));
+                           tr("Rescan the blockchain from scratch, losing any information which can not be recovered from the blockchain itself."));
   m_cmd_binder.set_handler("set_tx_note",
                            boost::bind(&simple_wallet::set_tx_note, this, _1),
                            tr("set_tx_note <txid> [free text note]"),
@@ -3735,6 +3748,21 @@ void simple_wallet::on_money_received(uint64_t height, const crypto::hash &txid,
     tr("txid ") << txid << ", " <<
     print_money(amount) << ", " <<
     tr("idx ") << subaddr_index;
+
+  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1 : m_wallet->nettype() == STAGENET ? 1 : 380000;
+  if (height >= warn_height)
+  {
+    std::vector<tx_extra_field> tx_extra_fields;
+    parse_tx_extra(tx.extra, tx_extra_fields); // failure ok
+    tx_extra_nonce extra_nonce;
+    if (find_tx_extra_field_by_type(tx_extra_fields, extra_nonce))
+    {
+      crypto::hash payment_id = crypto::null_hash;
+      if (get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
+        message_writer(console_color_red, false) <<
+          (m_long_payment_id_support ? tr("WARNING: this transaction uses an unencrypted payment ID: consider using subaddresses instead.") : tr("WARNING: this transaction uses an unencrypted payment ID: these are obsolete. Support will be withdrawn in the future. Use subaddresses instead."));
+   }
+  }
   if (m_auto_refresh_refreshing)
     m_cmd_binder.print_prompt();
   else
@@ -3855,39 +3883,33 @@ bool simple_wallet::refresh(const std::vector<std::string>& args)
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::show_balance_unlocked(bool detailed)
 {
-  if(detailed)
-    print_accounts();
- 
   std::string extra;
   if (m_wallet->has_multisig_partial_key_images())
     extra = tr(" (Some owned outputs have partial key images - import_multisig_info needed)");
   success_msg_writer() << tr("Currently selected account: [") << m_current_subaddress_account << tr("] ") << m_wallet->get_subaddress_label({m_current_subaddress_account, 0});
   const std::pair<std::map<std::string, std::string>, std::vector<std::string>>& account_tags = m_wallet->get_account_tags();
   const std::string tag = account_tags.second[m_current_subaddress_account];
-  if(!detailed)
-  { 
-    success_msg_writer() << tr("Tag: ") << (tag.empty() ? std::string{tr("(No tag assigned)")} : tag);
+  success_msg_writer() << tr("Tag: ") << (tag.empty() ? std::string{tr("(No tag assigned)")} : tag);
   
-    uint64_t total_balance = 0, total_unlocked_balance = 0;
-    for (uint32_t account_index = 0; account_index < m_wallet->get_num_subaddress_accounts(); ++account_index)
-    {
-      if (account_tags.second[account_index] != tag)
-        continue;
-      total_balance += m_wallet->balance(account_index);
-      total_unlocked_balance += m_wallet->unlocked_balance(account_index);
-    }
+  uint64_t total_balance = 0, total_unlocked_balance = 0;
+  for (uint32_t account_index = 0; account_index < m_wallet->get_num_subaddress_accounts(); ++account_index)
+  {
+    if (account_tags.second[account_index] != tag)
+      continue;
+    total_balance += m_wallet->balance(account_index);
+    total_unlocked_balance += m_wallet->unlocked_balance(account_index);
+  }
   
-    if(total_balance != m_wallet->balance(m_current_subaddress_account))
-    {
-      success_msg_writer() << tr("Account #") << m_current_subaddress_account << tr(" balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
-      << tr("Account #") << m_current_subaddress_account << tr(" unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << std::endl
-      << tr("Total balance: ") << print_money(total_balance) << ", " << tr("Total unlocked balance: ") << print_money(total_unlocked_balance) << extra;
-    }
-    else
-    {
-      success_msg_writer() << tr("Balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
-      << tr("unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << extra;
-    }
+  if(total_balance != m_wallet->balance(m_current_subaddress_account))
+  {
+    success_msg_writer() << tr("Account #") << m_current_subaddress_account << tr(" balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
+    << tr("Account #") << m_current_subaddress_account << tr(" unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << std::endl
+    << tr("Total balance: ") << print_money(total_balance) << ", " << tr("Total unlocked balance: ") << print_money(total_unlocked_balance) << extra;
+  }
+  else
+  {
+    success_msg_writer() << tr("Balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
+    << tr("unlocked balance: ") << print_money(m_wallet->unlocked_balance(m_current_subaddress_account)) << extra;
   }
   
   std::map<uint32_t, uint64_t> balance_per_subaddress = m_wallet->balance_per_subaddress(m_current_subaddress_account);
@@ -5784,10 +5806,7 @@ static std::string get_human_readable_timestamp(uint64_t ts)
 #endif
   uint64_t now = time(NULL);
   uint64_t diff = ts > now ? ts - now : now - ts;
-  if (diff > 24*3600)
-    strftime(buffer, sizeof(buffer), "%Y-%m-%d", &tm);
-  else
-    strftime(buffer, sizeof(buffer), "%I:%M:%S %p", &tm);
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
   return std::string(buffer);
 }
 //----------------------------------------------------------------------------------------------------
@@ -6129,6 +6148,14 @@ bool simple_wallet::unspent_outputs(const std::vector<std::string> &args_)
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::rescan_blockchain(const std::vector<std::string> &args_)
 {
+  message_writer() << tr("Warning: this will lose any information which can not be recovered from the blockchain.");
+  message_writer() << tr("This includes destination addresses, tx secret keys, tx notes, etc");
+  std::string confirm = input_line(tr("Rescan anyway ? (Y/Yes/N/No): "));
+  if(!std::cin.eof())
+  {
+    if (!command_line::is_yes(confirm))
+      return true;
+  }
   return refresh_main(0, true);
 }
 //----------------------------------------------------------------------------------------------------
@@ -6592,6 +6619,7 @@ bool simple_wallet::address_book(const std::vector<std::string> &args/* = std::v
     {
       if (tools::wallet2::parse_long_payment_id(args[3], payment_id))
       {
+        LONG_PAYMENT_ID_SUPPORT_CHECK();
         description_start += 2;
       }
       else if (tools::wallet2::parse_short_payment_id(args[3], info.payment_id))
@@ -6778,20 +6806,6 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
   message_writer() << tr("Network type: ") << (
     m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
     m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") : tr("Mainnet"));
-  
-  tools::wallet2::transfer_container transfers;
-  m_wallet->get_transfers(transfers);
-  uint64_t min_height = std::numeric_limits<uint64_t>::max();
-  for (const auto& td : transfers)
-  {
-    if (min_height > td.m_block_height && !td.m_spent)
-      min_height = td.m_block_height;
-  }
-  if(min_height == std::numeric_limits<uint64_t>::max())
-    message_writer() << "Earliest unspent output: N/A";
-  else
-    message_writer() << "Earliest unspent output: " << min_height;
-  
   return true;
 }
 //----------------------------------------------------------------------------------------------------
@@ -7310,6 +7324,7 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_params, arg_create_address_file);
   command_line::add_arg(desc_params, arg_subaddress_lookahead);
   command_line::add_arg(desc_params, arg_use_english_language_names);
+  command_line::add_arg(desc_params, arg_long_payment_id_support);
 
   po::positional_options_description positional_options;
   positional_options.add(arg_command.name, -1);
