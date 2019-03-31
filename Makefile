@@ -108,7 +108,7 @@ release-static-linux-i686:
 
 release-cross-linux-x86_64:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-pc-linux/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
 
 release-static-win64:
 	mkdir -p build/release
