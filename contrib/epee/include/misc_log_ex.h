@@ -34,7 +34,7 @@
 
 #define MONERO_DEFAULT_LOG_CATEGORY "default"
 #define MAX_LOG_FILE_SIZE 104850000 // 100 MB - 7600 bytes
-#define MAX_LOG_FILES 0
+#define MAX_LOG_FILES 50
 
 #define MCFATAL(cat,x) CLOG(FATAL,cat) << x
 #define MCERROR(cat,x) CLOG(ERROR,cat) << x
