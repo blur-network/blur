@@ -157,16 +157,15 @@ namespace cryptonote
     /**
      * @brief load new checkpoints
      *
-     * Loads new checkpoints from the specified json file, as well as
-     * (optionally) from DNS.
+     * Loads new checkpoints from the specified json file.
+     *
      *
      * @param json_hashfile_fullpath path to the json checkpoints file
      * @param nettype network type
-     * @param dns whether or not to load DNS checkpoints
      *
      * @return true if loading successful and no conflicts
      */
-    bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype=MAINNET, bool dns=true);
+    bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype=MAINNET);
 
     /**
      * @brief load new checkpoints from json
@@ -176,15 +175,6 @@ namespace cryptonote
      * @return true if loading successful and no conflicts
      */
     bool load_checkpoints_from_json(const std::string &json_hashfile_fullpath);
-
-    /**
-     * @brief load new checkpoints from DNS
-     *
-     * @param nettype network type
-     *
-     * @return true if loading successful and no conflicts
-     */
-    bool load_checkpoints_from_dns(network_type nettype = MAINNET);
 
   private:
     std::map<uint64_t, crypto::hash> m_points; //!< the checkpoints container
