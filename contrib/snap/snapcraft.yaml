@@ -34,34 +34,35 @@ parts:
         plugin: cmake
         configflags:
             - -DCMAKE_BUILD_TYPE=release
+            - -DMANUAL_SUBMODULES=1
             - -DBUILD_TESTS=OFF
             - -DARCH=default
+            - -DSTATIC=1
         source: .
         build-packages:
             - gcc
             - pkg-config
             - libunbound-dev
             - libboost-all-dev
-            - liblzma-dev
             - libssl-dev
             - libzmq3-dev
             - libpgm-dev
             - libsodium-dev
         stage-packages:
             - libunbound2
-            - libboost-date-time1.62.0
-            - libboost-serialization1.62.0
-            - libboost-chrono1.62.0
-            - libboost-system1.62.0
-            - libboost-thread1.62.0
-            - libboost-locale1.62.0
-            - libboost-atomic1.62.0
-            - libboost-filesystem1.62.0
-            - libboost-program-options1.62.0
-            - libboost-regex1.62.0
+            - libboost-date-time1.58.0
+            - libboost-serialization1.58.0
+            - libboost-chrono1.58.0
+            - libboost-system1.58.0
+            - libboost-thread1.58.0
+            - libboost-locale1.58.0
+            - libboost-atomic1.58.0
+            - libboost-filesystem1.58.0
+            - libboost-program-options1.58.0
+            - libboost-regex1.58.0
             - libssl-dev
             - libzmq5
-            - libsodium23
+            - libsodium18
             - libstdc++6
             - libgcc1
         prime:
