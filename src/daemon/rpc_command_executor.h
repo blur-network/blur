@@ -1,11 +1,3 @@
-/**
-@file
-@details
-
-@image html images/other/runtime-commands.png
-
-*/
-
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.

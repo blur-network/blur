@@ -501,12 +501,11 @@ bool t_rpc_command_executor::print_connections() {
 
   for (auto & info : res.connections)
   {
-    std::string address = info.incoming ? "INC " : "OUT ";
-    address += info.ip + ":" + info.port;
-    //std::string in_out = info.incoming ? "INC " : "OUT ";
-    tools::msg_writer() 
-     //<< std::setw(30) << std::left << in_out
+    std::string address = info.ip + ":" + info.port;
+    std::string in_out = info.incoming ? "INC " : "OUT ";
+    tools::msg_writer()
      << std::setw(30) << std::left << address
+     << std::setw(30) << std::left << in_out
      << std::setw(20) << epee::string_tools::pad_string(info.peer_id, 16, '0', true)
      << std::setw(20) << info.support_flags
      << std::setw(30) << std::to_string(info.recv_count) + "("  + std::to_string(info.recv_idle_time) + ")/" + std::to_string(info.send_count) + "(" + std::to_string(info.send_idle_time) + ")"
@@ -516,11 +515,11 @@ bool t_rpc_command_executor::print_connections() {
      << std::setw(14) << info.current_download
      << std::setw(10) << info.avg_upload
      << std::setw(13) << info.current_upload
-     
+
      << std::left << (info.localhost ? "[LOCALHOST]" : "")
      << std::left << (info.local_ip ? "[LAN]" : "");
-    //tools::msg_writer() << boost::format("%-25s peer_id: %-25s %s") % address % info.peer_id % in_out;
-    
+    tools::msg_writer() << boost::format("%-25s peer_id: %-25s %s") % address % info.peer_id % in_out;
+
   }
 
   return true;
