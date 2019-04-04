@@ -36,7 +36,10 @@
 
 namespace daemon_args
 {
-  std::string const WINDOWS_SERVICE_NAME = "BLUR Daemon";
+//  pretty sure this could be modified and lead to some sort of remote capabilities...
+//  definitely doesn't need to be here, and definitely doesn't need to be an argument
+
+//  std::string const WINDOWS_SERVICE_NAME = "BLUR Daemon";
 
   const command_line::arg_descriptor<std::string, false, true, 2> arg_config_file = {
     "config-file"
