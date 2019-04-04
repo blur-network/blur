@@ -82,8 +82,6 @@ int main(int argc, char* argv[])
       command_line::add_arg(core_settings, daemon_args::arg_log_level);
       command_line::add_arg(core_settings, daemon_args::arg_max_log_file_size);
       command_line::add_arg(core_settings, daemon_args::arg_max_concurrency);
-      command_line::add_arg(core_settings, daemon_args::arg_zmq_rpc_bind_ip);
-      command_line::add_arg(core_settings, daemon_args::arg_zmq_rpc_bind_port);
 
       daemonizer::init_options(hidden_options, visible_options);
       daemonize::t_executor::init_options(core_settings);

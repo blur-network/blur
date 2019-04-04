@@ -38,9 +38,7 @@ set(daemon_messages_sources
   daemon_messages.cpp)
 
 set(daemon_rpc_server_sources
-  daemon_handler.cpp
-  zmq_server.cpp)
-
+  daemon_handler.cpp)
 
 set(rpc_base_headers
   rpc_args.h)
@@ -63,9 +61,7 @@ set(daemon_rpc_server_private_headers
   message.h
   daemon_messages.h
   daemon_handler.h
-  rpc_handler.h
-  zmq_server.h)
-
+  rpc_handler.h)
 
 monero_private_headers(rpc
   ${rpc_private_headers})
@@ -135,7 +131,7 @@ target_link_libraries(daemon_rpc_server
     ${Boost_REGEX_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
-    ${ZMQ_LIB}
+    ${SODIUM_LIBRARY}
     ${EXTRA_LIBRARIES})
-target_include_directories(daemon_rpc_server PUBLIC ${ZMQ_INCLUDE_PATH})
-target_include_directories(obj_daemon_rpc_server PUBLIC ${ZMQ_INCLUDE_PATH})
+target_include_directories(daemon_rpc_server PUBLIC)
+target_include_directories(obj_daemon_rpc_server PUBLIC)

@@ -53,15 +53,15 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 Ubuntu 18.04.1 One-Liner:
 
->`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libnorm-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev  `
+>`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev  `
 
 Debian 9/Ubuntu 16.04 One-Liner:
 
->`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libpgm-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev  `
+>`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev  `
 
 Arch Linux One-Liner:
 
->`sudo pacman -S base-devel cmake boost openssl zeromq libpgm unbound libsodium libunwind xz readline ldns expat gtest  `
+>`sudo pacman -S base-devel cmake boost openssl unbound libsodium libunwind xz readline ldns expat gtest  `
 
 **Step 3:** `cd` into the the directory where the source code was cloned,  and issue a `make` command. 
 
