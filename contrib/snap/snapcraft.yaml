@@ -2,9 +2,11 @@ name: blur
 version: 0.1.9.5
 summary: "Blur Network: The private cryptocurrency (https://blur.cash)"
 description: |
-    BLUR is a private & untraceable cryptocurrency based on the cryptonote protocol.
-    The Blur Network consists of individuals mining independently on CPUs, without
-    the need for specialized hardware. Join the Fight for Financial Freedom.  
+    BLUR is a privacy-focused cryptocurrency based on code from Monero. The Blur
+    Network focuses on fostering an educational environment within its community,
+    to lower the barriers to entry for those with an interest in cryptocurrency/mining.
+    BLUR can be mined with just a CPU, and does not require specialized hardware.
+    Join the Fight for Financial Freedom.
 grade: stable
 confinement: strict
 
