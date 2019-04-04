@@ -28,10 +28,29 @@
 // 
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
+#include <unistd.h>
 #include <cstdio>
 
 #ifdef __GLIBC__
 #include <gnu/libc-version.h>
+#endif
+
+#ifdef __GLIBC__
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/resource.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
+#include <ctype.h>
+#include <string>
+#endif
+
+//tools::is_hdd
+#ifdef __GLIBC__
+  #include <sstream>
+  #include <sys/sysmacros.h>
+  #include <fstream>
 #endif
 
 #include "unbound.h"
@@ -181,6 +200,73 @@ namespace tools
       boost::filesystem::remove(filename(), ec);
     }
     catch (...) {}
+  }
+
+  file_locker::file_locker(const std::string &filename)
+  {
+#ifdef WIN32
+    m_fd = INVALID_HANDLE_VALUE;
+    std::wstring filename_wide;
+    try
+    {
+      filename_wide = string_tools::utf8_to_utf16(filename);
+    }
+    catch (const std::exception &e)
+    {
+      MERROR("Failed to convert path \"" << filename << "\" to UTF-16: " << e.what());
+      return;
+    }
+    m_fd = CreateFileW(filename_wide.c_str(), GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (m_fd != INVALID_HANDLE_VALUE)
+    {
+      OVERLAPPED ov;
+      memset(&ov, 0, sizeof(ov));
+      if (!LockFileEx(m_fd, LOCKFILE_FAIL_IMMEDIATELY | LOCKFILE_EXCLUSIVE_LOCK, 0, 1, 0, &ov))
+      {
+        MERROR("Failed to lock " << filename << ": " << std::error_code(GetLastError(), std::system_category()));
+        CloseHandle(m_fd);
+        m_fd = INVALID_HANDLE_VALUE;
+      }
+    }
+    else
+    {
+      MERROR("Failed to open " << filename << ": " << std::error_code(GetLastError(), std::system_category()));
+    }
+#else
+    m_fd = open(filename.c_str(), O_RDONLY | O_CREAT | O_CLOEXEC, 0666);
+    if (m_fd != -1)
+    {
+      if (flock(m_fd, LOCK_EX | LOCK_NB) == -1)
+      {
+        MERROR("Failed to lock " << filename << ": " << std::strerror(errno));
+        close(m_fd);
+        m_fd = -1;
+      }
+    }
+    else
+    {
+      MERROR("Failed to open " << filename << ": " << std::strerror(errno));
+    }
+#endif
+  }
+  file_locker::~file_locker()
+  {
+    if (locked())
+    {
+#ifdef WIN32
+      CloseHandle(m_fd);
+#else
+      close(m_fd);
+#endif
+    }
+  }
+  bool file_locker::locked() const
+  {
+#ifdef WIN32
+    return m_fd != INVALID_HANDLE_VALUE;
+#else
+    return m_fd != -1;
+#endif
   }
 
 #ifdef WIN32
@@ -527,7 +613,10 @@ std::string get_nix_version_display_string()
   {
     ub_ctx *ctx = ub_ctx_create();
     if (!ctx) return false; // cheat a bit, should not happen unless OOM
-    ub_ctx_zone_add(ctx, "blur", "unbound"); // this calls ub_ctx_finalize first, then errors out with UB_SYNTAX
+    char *monero = strdup("monero"), *unbound = strdup("unbound");
+    ub_ctx_zone_add(ctx, monero, unbound); // this calls ub_ctx_finalize first, then errors out with UB_SYNTAX
+    free(unbound);
+    free(monero);
     // if no threads, bails out early with UB_NOERROR, otherwise fails with UB_AFTERFINAL id already finalized
     bool with_threads = ub_ctx_async(ctx, 1) != 0; // UB_AFTERFINAL is not defined in public headers, check any error
     ub_ctx_delete(ctx);
@@ -727,4 +816,32 @@ std::string get_nix_version_display_string()
     }
     return newval;
   }
+  
+#ifdef _WIN32
+  std::string input_line_win()
+  {
+    HANDLE hConIn = CreateFileW(L"CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+    DWORD oldMode;
+
+    FlushConsoleInputBuffer(hConIn);
+    GetConsoleMode(hConIn, &oldMode);
+    SetConsoleMode(hConIn, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
+
+    wchar_t buffer[1024];
+    DWORD read;
+
+    ReadConsoleW(hConIn, buffer, sizeof(buffer)/sizeof(wchar_t)-1, &read, nullptr);
+    buffer[read] = 0;
+
+    SetConsoleMode(hConIn, oldMode);
+    CloseHandle(hConIn);
+  
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, NULL, 0, NULL, NULL);
+    std::string buf(size_needed, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &buf[0], size_needed, NULL, NULL);
+    buf.pop_back(); //size_needed includes null that we needed to have space for
+    return buf;
+  }
+#endif
+
 }
