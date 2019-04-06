@@ -77,13 +77,13 @@ Arch Linux One-Liner:
 For statically linked binaries (defaults to the platform configuration of the host compiler):
 >`make release-static`
 
-For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.9.2/contrib/depends">using contrib/depends system from Bitcoin</a>):
+For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.9.5/contrib/depends">using contrib/depends system from Bitcoin</a>):
 
 Follow the link above to setup build environment, then issue the command below
 
 >`make release-static-win64`
 
-*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.9.2/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
+*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.9.5/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
 
 For MacOS portable binaries:
 >`make release-static-mac-x86_64`
@@ -101,11 +101,11 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
->`cd ~/Downloads && tar xvzf blur-v0.1.9.2-linux-x86_64.tar.xz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.9.5-linux-x86_64.tar.xz`
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
->`cd blur-v0.1.9.2-linux_x86_64 && ./blurd`
+>`cd blur-v0.1.9.5-linux_x86_64 && ./blurd`
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
