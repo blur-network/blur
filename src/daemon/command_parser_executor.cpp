@@ -315,7 +315,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
 
   if(args.size() > 2)
   {
-    tools::fail_msg_writer() << "Formatting error.  Please use the format: start_mining <adderss> <thread count>" << std::endl;
+    tools::fail_msg_writer() << "Formatting error.  Please use the format: start_mining <address> <thread count>" << std::endl;
     return true;
   }
 
