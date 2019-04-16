@@ -969,14 +969,14 @@ namespace cryptonote
     {
       std::string miner_address;
       uint64_t    threads_count;
-      bool        do_background_mining;
-      bool        ignore_battery;
+      bool do_background_mining;
+      bool ignore_battery;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(miner_address)
         KV_SERIALIZE(threads_count)
-        KV_SERIALIZE(do_background_mining)        
-        KV_SERIALIZE(ignore_battery)        
+        KV_SERIALIZE(do_background_mining)
+        KV_SERIALIZE(ignore_battery)
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1280,10 +1280,8 @@ namespace cryptonote
   {
     struct request
     {
-      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1307,11 +1305,9 @@ namespace cryptonote
     struct request
     {
       std::string hash;
-      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(hash)
-        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1335,11 +1331,9 @@ namespace cryptonote
     struct request
     {
       uint64_t height;
-      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(height)
-        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1364,12 +1358,10 @@ namespace cryptonote
     {
       std::string hash;
       uint64_t height;
-      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(hash)
         KV_SERIALIZE(height)
-        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
@@ -1746,12 +1738,10 @@ namespace cryptonote
     {
       uint64_t start_height;
       uint64_t end_height;
-      std::string pow_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(start_height)
         KV_SERIALIZE(end_height)
-        KV_SERIALIZE(pow_hash);
       END_KV_SERIALIZE_MAP()
     };
 
