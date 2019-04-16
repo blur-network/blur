@@ -266,7 +266,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
 {
   if(!args.size())
   {
-    std::cout << "Please specify a wallet address to mine for: start_mining <addr> [<threads>]" << std::endl;
+    tools::fail_msg_writer() << "Please specify a wallet address to mine for: start_mining <addr> [<threads>]" << std::endl;
     return true;
   }
 
@@ -274,32 +274,22 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
   cryptonote::network_type nettype = cryptonote::MAINNET;
   if(!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, args.front()))
   {
-    if(!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, args.front()))
+    if(!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, args.front())) // LOGIC SAYS: if the first argument from input isnt an address for mainnet, testnet, or stagenet...
     {
       if(!cryptonote::get_account_address_from_str(info, cryptonote::STAGENET, args.front()))
       {
-        bool dnssec_valid;
-        std::string address_str = tools::dns_utils::get_account_address_as_str_from_url(args.front(), dnssec_valid,
-            [](const std::string &url, const std::vector<std::string> &addresses, bool dnssec_valid){return addresses[0];});
-        if(!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, address_str))
-        {
-          if(!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, address_str))
-          {
-            if(!cryptonote::get_account_address_from_str(info, cryptonote::STAGENET, address_str))
-            {
-              std::cout << "target account address has wrong format" << std::endl;
-              return true;
-            }
-            else
-            {
-              nettype = cryptonote::STAGENET;
-            }
-          }
-          else
-          {
-            nettype = cryptonote::TESTNET;
-          }
-        }
+  //                                                                                                ...then we should start treating this as a URL?
+  //      bool dnssec_valid
+  //      std::string address_str = tools::dns_utils::get_account_address_as_str_from_url(args.front(), dnssec_valid,
+  //          [](const std::string &url, const std::vector<std::string> &addresses, bool dnssec_valid){return addresses[0];});
+  //      if(!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, address_str))
+  //      {
+  //        if(!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, address_str))
+  //        {
+  //          if(!cryptonote::get_account_address_from_str(info, cryptonote::STAGENET, address_str))
+  //          {
+        std::cout << "Target account address has wrong format" << std::endl;
+        return true;
       }
       else
       {
@@ -311,38 +301,31 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
       nettype = cryptonote::TESTNET;
     }
   }
+
   if (info.is_subaddress)
   {
-    tools::fail_msg_writer() << "subaddress for mining reward is not yet supported!" << std::endl;
+    tools::fail_msg_writer() << "Subaddress for mining reward is not yet supported!" << std::endl;
     return true;
   }
-  if(nettype != cryptonote::MAINNET)
-    std::cout << "Mining to a " << (nettype == cryptonote::TESTNET ? "testnet" : "stagenet") << "address, make sure this is intentional!" << std::endl;
+
+  if((nettype != cryptonote::MAINNET) && (nettype == cryptonote::TESTNET || nettype == cryptonote::STAGENET))
+    std::cout << "Mining to a " << (nettype == (cryptonote::TESTNET) ? "testnet" : "stagenet") << "address, make sure this is intentional!" << std::endl;
+
   uint64_t threads_count = 1;
-  bool do_background_mining = false;  
-  bool ignore_battery = false;  
-  if(args.size() > 4)
+
+  if(args.size() > 2)
   {
-    return false;
-  }
-  
-  if(args.size() == 4)
-  {
-    ignore_battery = args[3] == "true";
-  }  
-  
-  if(args.size() >= 3)
-  {
-    do_background_mining = args[2] == "true";
-  }
-  
-  if(args.size() >= 2)
-  {
-    bool ok = epee::string_tools::get_xtype_from_string(threads_count, args[1]);
-    threads_count = (ok && 0 < threads_count) ? threads_count : 1;
+    tools::fail_msg_writer() << "Formatting error.  Please use the format: start_mining <adderss> <thread count>" << std::endl;
+    return true;
   }
 
-  m_executor.start_mining(info.address, threads_count, nettype, do_background_mining, ignore_battery);
+  if (args.size() == 2)
+  {
+    bool ok = epee::string_tools::get_xtype_from_string(threads_count, args[1]);
+    threads_count = (ok && (0 < threads_count)) ? threads_count : 1;
+  }
+
+  m_executor.start_mining(info.address, threads_count, nettype);
 
   return true;
 }

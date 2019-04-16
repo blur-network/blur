@@ -2227,8 +2227,6 @@ namespace tools
     cryptonote::COMMAND_RPC_START_MINING::request daemon_req = AUTO_VAL_INIT(daemon_req); 
     daemon_req.miner_address = m_wallet->get_account().get_public_address_str(m_wallet->nettype());
     daemon_req.threads_count        = req.threads_count;
-    daemon_req.do_background_mining = req.do_background_mining;
-    daemon_req.ignore_battery       = req.ignore_battery;
 
     cryptonote::COMMAND_RPC_START_MINING::response daemon_res;
     bool r = m_wallet->invoke_http_json("/start_mining", daemon_req, daemon_res);
