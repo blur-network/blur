@@ -56,12 +56,12 @@ int main(int argc, char *argv[]) {
     size_t n = 0;
     while (data >> timestamp >> difficulty) {
         size_t begin, end;
-        if (n < DIFFICULTY_WINDOW_V11 + DIFFICULTY_LAG_V11) {
+        if (n < DIFFICULTY_WINDOW + DIFFICULTY_LAG) {
             begin = 0;
-            end = min(n, (size_t) DIFFICULTY_WINDOW_V11);
+            end = min(n, (size_t) DIFFICULTY_WINDOW);
         } else {
-            end = n - DIFFICULTY_LAG_V11;
-            begin = end - DIFFICULTY_WINDOW_V11;
+            end = n - DIFFICULTY_LAG;
+            begin = end - DIFFICULTY_WINDOW;
         }
         uint64_t res = cryptonote::next_difficulty(
             vector<uint64_t>(timestamps.begin() + begin, timestamps.begin() + end),
