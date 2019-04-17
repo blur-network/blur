@@ -47,23 +47,34 @@ Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
 
 **Blur uses the CMake build system and a top-level [Makefile](Makefile) that invokes cmake commands as needed.**
 
+
 **Step 1:** Clone this repository's stable branch:
 
 >`git clone --recursive https://github.com/blur-network/blur.git`
 
+<br>
+
 **Step 2:** Install dependencies:
 
-Ubuntu 18.04.1 One-Liner:
+**Ubuntu 18.04.1 One-Liner:**
 
->`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev  `
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev`
 
-Debian 9/Ubuntu 16.04 One-Liner:
+Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libreadline-dev libldns-dev libexpat1-dev libgtest-dev`
 
->`sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev libgtest-dev  `
+**Debian 9/Ubuntu 16.04 One-Liner:**
 
-Arch Linux One-Liner:
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev`
 
->`sudo pacman -S base-devel cmake boost openssl unbound libsodium libunwind xz readline ldns expat gtest  `
+Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libreadline-dev libldns-dev libexpat1-dev libgtest-dev`
+
+**Arch Linux One-Liner:**
+
+Required:  `sudo pacman -S base-devel cmake boost openssl unbound libsodium `
+
+Optional:  `sudo pacman -S libunwind xz readline ldns expat gtest`
+
+<br>
 
 **Step 3:** `cd` into the the directory where the source code was cloned,  and issue a `make` command. 
 
