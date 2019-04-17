@@ -100,7 +100,10 @@ static const struct {
   {  7, 80000,  0, 1534323374 },
   {  8, 185000, 0, 1540624740 },
   {  9, 211000, 0, 1543147200 },
-  { 10, 342000, 0, 1551395401 } //finalize v10 hardfork block 02/28/2019 @ 11:10pm (UTC)
+  { 10, 342000, 0, 1551395401 }
+//  { 11, 418000, 0, 1555734000 }
+  //      Set hardfork v11 block for 418,000 - height takes precendence over timestamp
+  //      Timestamp set for 04/20/2019 @ 4:20am UTC  (Actual hardfork will occur on/around 4/23)
 
 };
 

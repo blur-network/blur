@@ -1086,6 +1086,7 @@ void wallet2::scan_output(const cryptonote::transaction &tx, const crypto::publi
     }
   }
 
+  THROW_WALLET_EXCEPTION_IF(std::find(outs.begin(), outs.end(), i) != outs.end(), error::wallet_internal_error, "Same output cannot be added twice");
   outs.push_back(i);
   if (tx_scan_info.money_transfered == 0)
   {
