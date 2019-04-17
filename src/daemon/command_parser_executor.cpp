@@ -288,7 +288,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
   //        {
   //          if(!cryptonote::get_account_address_from_str(info, cryptonote::STAGENET, address_str))
   //          {
-        std::cout << "Target account address has wrong format" << std::endl;
+        tools::fail_msg_writer() << "Target account address has wrong format" << std::endl;
         return true;
       }
       else
