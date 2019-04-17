@@ -29,27 +29,6 @@
 # Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 
-# This is broken up into two parts: first we check for miniupnp, compile it if we can't
-# find it, and thereafter we check for libunbound, and compile it if we can't find it.
-# We always compile if we are building statically to reduce static dependency issues...
-# ...except for FreeBSD, because FreeBSD is a special case that doesn't play well with
-# others.
-
-find_package(Miniupnpc REQUIRED)
-
-message(STATUS "Using in-tree miniupnpc")
-
-add_subdirectory(miniupnp/miniupnpc)
-
-set_property(TARGET libminiupnpc-static PROPERTY FOLDER "external")
-if(MSVC)
-  set_property(TARGET libminiupnpc-static APPEND_STRING PROPERTY COMPILE_FLAGS " -wd4244 -wd4267")
-elseif(NOT MSVC)
-  set_property(TARGET libminiupnpc-static APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef -Wno-unused-result -Wno-unused-value")
-endif()
-
-set(UPNP_LIBRARIES "libminiupnpc-static" PARENT_SCOPE)
-
 find_package(Unbound)
 
 if(NOT UNBOUND_INCLUDE_DIR OR STATIC)

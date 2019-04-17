@@ -190,9 +190,8 @@ if(NOT MANUAL_SUBMODULES)
         message(FATAL_ERROR "Submodule '${relative_path}' is not up-to-date. Please update with\ngit submodule update --init \nor run cmake with -DMANUAL_SUBMODULES=1")
       endif()
     endfunction ()
-    
+
     message(STATUS "Checking submodules")
-    check_submodule(external/miniupnp)
     check_submodule(external/unbound)
     check_submodule(external/rapidjson)
   endif()
@@ -261,11 +260,6 @@ else()
 endif()
 message(STATUS "Building for a ${ARCH_WIDTH}-bit system")
 
-# Check if we're on FreeBSD so we can exclude the local miniupnpc (it should be installed from ports instead)
-# CMAKE_SYSTEM_NAME checks are commonly known, but specifically taken from libsdl's CMakeLists
-if(CMAKE_SYSTEM_NAME MATCHES "kFreeBSD.*|FreeBSD")
-  set(FREEBSD TRUE)
-endif()
 
 # Check if we're on DragonFly BSD. See the README.md for build instructions.
 if(CMAKE_SYSTEM_NAME MATCHES "DragonFly.*")

@@ -50,10 +50,6 @@
 #include "storages/levin_abstract_invoke2.h"
 #include "cryptonote_core/cryptonote_core.h"
 
-#include <miniupnp/miniupnpc/miniupnpc.h>
-#include <miniupnp/miniupnpc/upnpcommands.h>
-#include <miniupnp/miniupnpc/upnperrors.h>
-
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "net.p2p"
 
@@ -76,7 +72,6 @@ namespace nodetool
     command_line::add_arg(desc, arg_p2p_add_exclusive_node);
     command_line::add_arg(desc, arg_p2p_seed_node);
     command_line::add_arg(desc, arg_p2p_hide_my_port);
-    command_line::add_arg(desc, arg_no_igd);
     command_line::add_arg(desc, arg_out_peers);
     command_line::add_arg(desc, arg_in_peers);
     command_line::add_arg(desc, arg_tos_flag);
@@ -275,7 +270,6 @@ namespace nodetool
     m_port = command_line::get_arg(vm, arg_p2p_bind_port);
     m_external_port = command_line::get_arg(vm, arg_p2p_external_port);
     m_allow_local_ip = command_line::get_arg(vm, arg_p2p_allow_local_ip);
-    m_no_igd = command_line::get_arg(vm, arg_no_igd);
     m_offline = command_line::get_arg(vm, cryptonote::arg_offline);
 
     if (command_line::has_arg(vm, arg_p2p_add_peer))
@@ -475,10 +469,6 @@ namespace nodetool
     if(m_external_port)
       MDEBUG("External port defined as " << m_external_port);
 
-    // add UPnP port mapping
-    if(!m_no_igd)
-      add_upnp_port_mapping(m_listening_port);
-
     return res;
   }
   //-----------------------------------------------------------------------------------
@@ -554,9 +544,6 @@ namespace nodetool
     kill();
     m_peerlist.deinit();
     m_net_server.deinit_server();
-    // remove UPnP port mapping
-    if(!m_no_igd)
-      delete_upnp_port_mapping(m_listening_port);
     return store_config();
   }
   //-----------------------------------------------------------------------------------
@@ -1812,92 +1799,4 @@ namespace nodetool
     return true;
   }
 
-  template<class t_payload_net_handler>
-  void node_server<t_payload_net_handler>::add_upnp_port_mapping(uint32_t port)
-  {
-    MDEBUG("Attempting to add IGD port mapping.");
-    int result;
-#if MINIUPNPC_API_VERSION > 13
-    // default according to miniupnpc.h
-    unsigned char ttl = 2;
-    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
-#else
-    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
-#endif
-    UPNPUrls urls;
-    IGDdatas igdData;
-    char lanAddress[64];
-    result = UPNP_GetValidIGD(deviceList, &urls, &igdData, lanAddress, sizeof lanAddress);
-    freeUPNPDevlist(deviceList);
-    if (result != 0) {
-      if (result == 1) {
-        std::ostringstream portString;
-        portString << port;
-
-        // Delete the port mapping before we create it, just in case we have dangling port mapping from the daemon not being shut down correctly
-        UPNP_DeletePortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), "TCP", 0);
-
-        int portMappingResult;
-        portMappingResult = UPNP_AddPortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), portString.str().c_str(), lanAddress, CRYPTONOTE_NAME, "TCP", 0, "0");
-        if (portMappingResult != 0) {
-          LOG_ERROR("UPNP_AddPortMapping failed, error: " << strupnperror(portMappingResult));
-        } else {
-          MLOG_GREEN(el::Level::Info, "Added IGD port mapping.");
-        }
-      } else if (result == 2) {
-        MWARNING("IGD was found but reported as not connected.");
-      } else if (result == 3) {
-        MWARNING("UPnP device was found but not recognized as IGD.");
-      } else {
-        MWARNING("UPNP_GetValidIGD returned an unknown result code.");
-      }
-
-      FreeUPNPUrls(&urls);
-    } else {
-      MINFO("No IGD was found.");
-    }
-  }
-
-  template<class t_payload_net_handler>
-  void node_server<t_payload_net_handler>::delete_upnp_port_mapping(uint32_t port)
-  {
-    MDEBUG("Attempting to delete IGD port mapping.");
-    int result;
-#if MINIUPNPC_API_VERSION > 13
-    // default according to miniupnpc.h
-    unsigned char ttl = 2;
-    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
-#else
-    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
-#endif
-    UPNPUrls urls;
-    IGDdatas igdData;
-    char lanAddress[64];
-    result = UPNP_GetValidIGD(deviceList, &urls, &igdData, lanAddress, sizeof lanAddress);
-    freeUPNPDevlist(deviceList);
-    if (result != 0) {
-      if (result == 1) {
-        std::ostringstream portString;
-        portString << port;
-
-        int portMappingResult;
-        portMappingResult = UPNP_DeletePortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), "TCP", 0);
-        if (portMappingResult != 0) {
-          LOG_ERROR("UPNP_DeletePortMapping failed, error: " << strupnperror(portMappingResult));
-        } else {
-          MLOG_GREEN(el::Level::Info, "Deleted IGD port mapping.");
-        }
-      } else if (result == 2) {
-        MWARNING("IGD was found but reported as not connected.");
-      } else if (result == 3) {
-        MWARNING("UPnP device was found but not recognized as IGD.");
-      } else {
-        MWARNING("UPNP_GetValidIGD returned an unknown result code.");
-      }
-
-      FreeUPNPUrls(&urls);
-    } else {
-      MINFO("No IGD was found.");
-    }
-  }
 }
