@@ -156,7 +156,6 @@ namespace cryptonote
     bool sweep_all(const std::vector<std::string> &args);
     bool sweep_below(const std::vector<std::string> &args);
     bool sweep_single(const std::vector<std::string> &args);
-    bool donate(const std::vector<std::string> &args);
     bool sign_transfer(const std::vector<std::string> &args);
     bool submit_transfer(const std::vector<std::string> &args);
     bool account(const std::vector<std::string> &args = std::vector<std::string>());

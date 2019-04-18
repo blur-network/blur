@@ -108,14 +108,6 @@ typedef cryptonote::simple_wallet sw;
     m_auto_refresh_enabled.store(auto_refresh_enabled, std::memory_order_relaxed); \
   })
 
-#define LONG_PAYMENT_ID_SUPPORT_CHECK() \
-  do { \
-    if (!m_long_payment_id_support) { \
-      fail_msg_writer() << tr("Long payment IDs are obsolete. Use --long-payment-id-support if you really must use one, and warn the recipient they are using an obsolete feature that will disappear in the future."); \
-      return true; \
-    } \
-  } while(0)
-
 enum TransferType {
   Transfer,
   TransferLocked,
@@ -726,7 +718,9 @@ bool simple_wallet::change_password(const std::vector<std::string> &args)
 
 bool simple_wallet::payment_id(const std::vector<std::string> &args/* = std::vector<std::string>()*/)
 {
-  LONG_PAYMENT_ID_SUPPORT_CHECK();
+  if (!m_long_payment_id_support) {
+    fail_msg_writer() << tr("Long payment IDs are obsolete. Use --long-payment-id-support if you really must use one, and warn the recipient they are using an obsolete feature that will disappear in the future.");
+    return true; }
 
   crypto::hash payment_id;
   if (args.size() > 0)
@@ -1700,7 +1694,9 @@ bool simple_wallet::set_refresh_type(const std::vector<std::string> &args/* = st
 
 bool simple_wallet::set_confirm_missing_payment_id(const std::vector<std::string> &args/* = std::vector<std::string>()*/)
 {
-  LONG_PAYMENT_ID_SUPPORT_CHECK();
+  if (!m_long_payment_id_support) {
+  fail_msg_writer() << tr("Long payment IDs are obsolete. Use --long-payment-id-support if you really must use one, and warn the recipient they are using an obsolete feature that will disappear in the future.");
+  return true; }
 
   const auto pwd_container = get_and_verify_password();
   if (pwd_container)
@@ -2009,10 +2005,6 @@ simple_wallet::simple_wallet()
                            boost::bind(&simple_wallet::sweep_single, this, _1),
                            tr("sweep_single [<priority>] <key_image> <address> [<payment_id>]"),
                            tr("Send a single output of the given key image to an address without change."));
-  m_cmd_binder.set_handler("donate",
-                           boost::bind(&simple_wallet::donate, this, _1),
-                           tr("donate [index=<N1>[,<N2>,...]] [<priority>] <amount> [<payment_id>]"),
-                           tr("Donate <amount> to the development team ."));
   m_cmd_binder.set_handler("sign_transfer",
                            boost::bind(&simple_wallet::sign_transfer, this, _1),
                            tr("sign_transfer <file>"),
@@ -5047,44 +5039,6 @@ bool simple_wallet::sweep_below(const std::vector<std::string> &args_)
   return sweep_main(below, std::vector<std::string>(++args_.begin(), args_.end()));
 }
 //----------------------------------------------------------------------------------------------------
-bool simple_wallet::donate(const std::vector<std::string> &args_)
-{
-  if(m_wallet->nettype() != cryptonote::MAINNET)
-  {
-    fail_msg_writer() << tr("donations are not enabled on the testnet or on the stagenet");
-    return true;
-  }
-
-  std::vector<std::string> local_args = args_;
-  if(local_args.empty() || local_args.size() > 4)
-  {
-     fail_msg_writer() << tr("usage: donate [index=<N1>[,<N2>,...]] [<priority>] <amount> [<payment_id>]");
-     return true;
-  }
-  std::string amount_str;
-  std::string payment_id_str;
-  // get payment id and pop
-  crypto::hash payment_id;
-  crypto::hash8 payment_id8;
-  if (tools::wallet2::parse_long_payment_id (local_args.back(), payment_id ) ||
-      tools::wallet2::parse_short_payment_id(local_args.back(), payment_id8))
-  {
-    payment_id_str = local_args.back();
-    local_args.pop_back();
-  }
-  // get amount and pop
-  amount_str = local_args.back();
-  local_args.pop_back();
-  // push back address, amount, payment id
-  local_args.push_back(BLUR_DONATION_ADDR);
-  local_args.push_back(amount_str);
-  if (!payment_id_str.empty())
-    local_args.push_back(payment_id_str);
-  message_writer() << (boost::format(tr("Donating %s BLUR to The BLUR Project (www.blur.cash / %s ).")) % amount_str % BLUR_DONATION_ADDR).str(); 
-  transfer(local_args);
-  return true;
-}
-//----------------------------------------------------------------------------------------------------
 bool simple_wallet::accept_loaded_tx(const std::function<size_t()> get_num_txes, const std::function<const tools::wallet2::tx_construction_data&(size_t)> &get_tx, const std::string &extra_message)
 {
   // gather info to ask the user
@@ -6610,7 +6564,9 @@ bool simple_wallet::address_book(const std::vector<std::string> &args/* = std::v
     {
       if (tools::wallet2::parse_long_payment_id(args[3], payment_id))
       {
-        LONG_PAYMENT_ID_SUPPORT_CHECK();
+        if (!m_long_payment_id_support) {
+          fail_msg_writer() << tr("Long payment IDs are obsolete. Use --long-payment-id-support if you really must use one, and warn the recipient they are using an obsolete feature that will disappear in the future.");
+          return true; }
         description_start += 2;
       }
       else if (tools::wallet2::parse_short_payment_id(args[3], info.payment_id))
