@@ -34,7 +34,7 @@
 
 #define MONERO_DEFAULT_LOG_CATEGORY "default"
 #define MAX_LOG_FILE_SIZE 104850000 // 100 MB - 7600 bytes
-#define MAX_LOG_FILES 50
+#define MAX_LOG_FILES 1
 
 #define MCFATAL(cat,x) CLOG(FATAL,cat) << x
 #define MCERROR(cat,x) CLOG(ERROR,cat) << x
@@ -46,12 +46,12 @@
 #define MCLOG_FILE(level,cat,x) ELPP_WRITE_LOG(el::base::Writer, level, el::base::DispatchAction::FileOnlyLog, cat) << x
 
 #define MCLOG_COLOR(level,cat,color,x) MCLOG(level,cat,"\033[1;" color "m" << x << "\033[0m")
-#define MCLOG_RED(level,cat,x) MCLOG_COLOR(level,cat,"31",x)
-#define MCLOG_GREEN(level,cat,x) MCLOG_COLOR(level,cat,"32",x)
-#define MCLOG_YELLOW(level,cat,x) MCLOG_COLOR(level,cat,"33",x)
-#define MCLOG_BLUE(level,cat,x) MCLOG_COLOR(level,cat,"34",x)
-#define MCLOG_MAGENTA(level,cat,x) MCLOG_COLOR(level,cat,"35",x)
-#define MCLOG_CYAN(level,cat,x) MCLOG_COLOR(level,cat,"36",x)
+#define MCLOG_RED(level,cat,x) MCLOG_COLOR(level,cat,"1;31",x)
+#define MCLOG_GREEN(level,cat,x) MCLOG_COLOR(level,cat,"1;92",x)
+#define MCLOG_YELLOW(level,cat,x) MCLOG_COLOR(level,cat,"1;36",x)
+#define MCLOG_BLUE(level,cat,x) MCLOG_COLOR(level,cat,"1;93",x)
+#define MCLOG_MAGENTA(level,cat,x) MCLOG_COLOR(level,cat,"1;95",x)
+#define MCLOG_CYAN(level,cat,x) MCLOG_COLOR(level,cat,"1;91",x)
 
 #define MLOG_RED(level,x) MCLOG_RED(level,MONERO_DEFAULT_LOG_CATEGORY,x)
 #define MLOG_GREEN(level,x) MCLOG_GREEN(level,MONERO_DEFAULT_LOG_CATEGORY,x)
