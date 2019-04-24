@@ -274,7 +274,7 @@ bool WalletManagerImpl::isMining() const
     return mres.active;
 }
 
-bool WalletManagerImpl::startMining(const std::string &address, uint32_t threads, bool background_mining, bool ignore_battery)
+bool WalletManagerImpl::startMining(const std::string &address, uint32_t *threads)
 {
     cryptonote::COMMAND_RPC_START_MINING::request mreq;
     cryptonote::COMMAND_RPC_START_MINING::response mres;
@@ -299,12 +299,11 @@ bool WalletManagerImpl::stopMining()
     return mres.status == CORE_RPC_STATUS_OK;
 }
 
-std::string WalletManagerImpl::resolveOpenAlias(const std::string &address, bool &dnssec_valid) const
+std::string WalletManagerImpl::resolveOpenAlias(const std::string &address) const
 {
-    std::vector<std::string> addresses = tools::dns_utils::addresses_from_url(address, dnssec_valid);
-    if (addresses.empty())
+    std::string addresses = get_address_from_str(address);
+    if (!addresses)
         return "";
-    return addresses.front();
 }
 
 ///////////////////// WalletManagerFactory implementation //////////////////////

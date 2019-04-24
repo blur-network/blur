@@ -76,9 +76,9 @@ public:
     double miningHashRate() const;
     uint64_t blockTarget() const;
     bool isMining() const;
-    bool startMining(const std::string &address, uint32_t threads = 1, bool background_mining = false, bool ignore_battery = true);
+    bool startMining(const std::string &address, uint32_t *threads);
     bool stopMining();
-    std::string resolveOpenAlias(const std::string &address, bool &dnssec_valid) const;
+    std::string resolveOpenAlias(const std::string &address) const;
 
 private:
     WalletManagerImpl() {}
