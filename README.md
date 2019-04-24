@@ -12,7 +12,10 @@ The Blur Network is an experimental project based upon the premise that privacy 
 The Blur Network employs a custom algorithm for mining, called CryptoNight-Dynamic.  The algorithm adjusts approximately once every five seconds, with a goal of maintaining CPU advantages over specialized mining hardware.  Making use of a Unix timestamp, the current block height, and the previous block’s hash,  CryptoNight-Dynamic varies iterations in the CryptoNight algorithm. Employing a timestamp in the calculation serves the purpose of dynamic iterations on an intra-block basis, while height and the previous block’s hash create variation on an inter-block basis.  The iterations necessary to mine each next block are directly dependent upon the result of the block before it. 
 
 ## Contents:
-- <a href="https://github.com/blur-network/blur#compile-linux">Compiling from Source</a> </br>
+- <a href="https://github.com/blur-network/blur#compile-source">Compiling from Source</a> </br>
+   - <a href="https://github.com/blur-network/blur#packages">Dependency Packages & Dynamic Linking</a> </br>
+   - <a href="https://github.com/blur-network/blur#build-deps">Dependencies from Source & Static Linking</a> </br>
+   - <a href="https://github.com/blur-network/blur#building">Building with packages on Host OS</a> </br>
 - <a href="https://github.com/blur-network/blur#mining-windows">Mining on Linux/Mac</a> </br>
 - <a href="https://github.com/blur-network/blur#mining-windows">Mining on Windows</a></br>
 - <a href="https://github.com/blur-network/blur#sync-issues">Fixing Synchronization Issues</a> </br></br>
@@ -43,30 +46,30 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
 
 
-<h1 id="compile-linux">Compiling from Source on Linux</h1>
+<h1 id="compile-source">Compiling from Source</h1>
 
 **Blur uses the CMake build system and a top-level [Makefile](Makefile) that invokes cmake commands as needed.**
 
 
-**Step 1:** Clone this repository's stable branch:
+
+<h3>Step 1: Clone this repository's stable branch:</h3>
 
 >`git clone --recursive https://github.com/blur-network/blur.git`
 
-<br>
 
-**Step 2:** Install dependencies:
 
-**Ubuntu 18.04.2:**
+<h3 id="packages">Step 2a: Install dependencies (If you wish to link the binaries dynamically)</h3>
 
-Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev`
 
-Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libreadline-dev libldns-dev libexpat1-dev libgtest-dev`
+**If you wish to instead compile statically, scroll to step 2(b)**
 
-**Debian 9:**
+
+Ubuntu/Debian:
 
 Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev`
 
 Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libreadline-dev libldns-dev libexpat1-dev libgtest-dev`
+
 
 **Arch Linux:**
 
@@ -74,20 +77,26 @@ Required:  `sudo pacman -S base-devel cmake boost openssl unbound libsodium `
 
 Optional:  `sudo pacman -S libunwind xz readline ldns expat gtest`
 
-<br>
 
-**Step 3:** `cd` into the the directory where the source code was cloned,  and issue a `make` command. 
+
+<h3 id="build-deps">Step 2(b): Build dependencies, and link statically, all in one go</h3>
+
+To compile for Linux (distro-agnostic): `make release-cross-linux-x86_64`
+
+To compile for Windows(mingw64): `make release-cross-winx64`
+
+The `Makefile` entries run by the above commands will build dependencies for `x86_64-gnu-linux` and `x86_64-w64-mingw32` hosts, respectively. If you would like to compile for a different type of host platform, `cd` into the `contrib/depends` directory, and build with `make HOST=xxx-yyy-zzz` where xxx-yyy-zzz is a <a href="https://wiki.osdev.org/Target_Triplet">standard host triplet</a>.
+
+
+
+<h3 id="building">Step 3: For dynamic linking, or MacOS</h3>
 
 >`cd ~/blur && make release-all`
-
-    *Optional*: If your machine has several cores and enough memory, enable
-    parallel build by running `make -j<number of threads>` instead of `make`. For
-    this to be worthwhile, the machine should have one core and about 2GB of RAM
-    available per thread.
 
 *There are multiple platforms and configurations for which you can compile.  A non-exhaustive list can be found below:*
 
 For statically linked binaries (defaults to the platform configuration of the host compiler):
+
 >`make release-static`
 
 For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.9.5/contrib/depends">using contrib/depends system from Bitcoin</a>):
@@ -96,17 +105,16 @@ Follow the link above to setup build environment, then issue the command below
 
 >`make release-static-win64`
 
-*It is probably much easier to <a href="https://github.com/blur-network/blur/tree/v0.1.9.5/contrib/depends">use the depends system</a> for a cross-compile on Windows Susbsytem Linux than getting MSYS2 to actually work properly*
-
 For MacOS portable binaries:
+
 >`make release-static-mac-x86_64`
 
-For Linux portable binaries:
->`make release-static-linux-x86_64`
+*Note that we do not officially support builds for 32-bit architecture, arm architecture, or the freebsd linux distribution currently. However, there are options within the [Makefile](Makefile) for these configurations.  These entries may require significant modifications to source files, in order to work properly.*
 
-*Note that we do not officially support builds for 32-bit architecture, arm architecture, or the freebsd linux distribution currently. However, there are options within the [Makefile](Makefile) for these configurations.  These configurations (and source files) will need modified (considerably), in order for the resulting binaries to work.  Even if they build, it is unlikely that the network will not identify your node as malicious, upon running a daemon with incorrect code.*
+
 
 <h1 id="mining-linux">Mining on Linux</h1>
+
 
 Compile from source, or download the <a href="https://github.com/blur-network/blur/releases"> latest binary release from the Releases page</a>.  
 
@@ -114,15 +122,21 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
+
 >`cd ~/Downloads && tar xvzf blur-v0.1.9.5-linux-x86_64.tar.xz`
+
 
 Navigate into the directory you just unzipped from the archive, and start the daemon.
 
+
 >`cd blur-v0.1.9.5-linux_x86_64 && ./blurd`
+
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
 
+
 >`./blur-wallet-cli`
+
 
 Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
 
@@ -136,7 +150,11 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
+**You can also start mining, without opening a wallet, by launching the daemon with:** `./blurd --start-mining <address> --mining-threads <num. threads>` (omit the brackets)
+
+
 <h1 id="mining-windows"> Mining on Windows </h1>
+
 
 Download the <a href="https://github.com/blur-network/blur/releases">latest release from our Releases page</a>.
 
@@ -158,7 +176,12 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
+**You can also start mining, without opening a wallet, by launching the daemon with:** `blurd.exe --start-mining <address> --mining-threads <num. threads>` (omit the brackets)
+
+
+
 <h1 id="sync-issues">How to Fix Synchronizing Issues</h1>
+
 
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
