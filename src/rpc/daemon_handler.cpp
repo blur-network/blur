@@ -449,7 +449,7 @@ namespace rpc
     boost::thread::attributes attrs;
     attrs.set_stack_size(THREAD_STACK_SIZE);
 
-    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count), attrs, req.do_background_mining, req.ignore_battery))
+    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count), attrs))
     {
       res.error_details = "Failed, mining not started";
       LOG_PRINT_L0(res.error_details);
@@ -521,8 +521,7 @@ namespace rpc
   {
     const cryptonote::miner& lMiner = m_core.get_miner();
     res.active = lMiner.is_mining();
-    res.is_background_mining_enabled = lMiner.get_is_background_mining_enabled();
-    
+
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
       res.threads_count = lMiner.get_threads_count();
@@ -686,18 +685,6 @@ namespace rpc
   }
 
   void DaemonHandler::handle(const StopDaemon::Request& req, StopDaemon::Response& res)
-  {
-    res.status = Message::STATUS_FAILED;
-    res.error_details = "RPC method not yet implemented.";
-  }
-
-  void DaemonHandler::handle(const StartSaveGraph::Request& req, StartSaveGraph::Response& res)
-  {
-    res.status = Message::STATUS_FAILED;
-    res.error_details = "RPC method not yet implemented.";
-  }
-
-  void DaemonHandler::handle(const StopSaveGraph::Request& req, StopSaveGraph::Response& res)
   {
     res.status = Message::STATUS_FAILED;
     res.error_details = "RPC method not yet implemented.";
