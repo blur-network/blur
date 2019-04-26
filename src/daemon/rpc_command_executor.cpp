@@ -487,15 +487,15 @@ bool t_rpc_command_executor::print_connections() {
     }
   }
 
-  tools::msg_writer() << std::setw(30) << std::left << "Remote Host"
-      << std::setw(10) << "In/Out"
+  tools::msg_writer() << std::setw(25) << std::left << "Remote Host"
+      << std::setw(7) << "In/Out"
       << std::setw(20) << "Peer id"
-      << std::setw(10) << "Support Flags"
-      << std::setw(30) << "Recv/Sent (inactive,sec)"
-      << std::setw(25) << "State"
-      << std::setw(20) << "Livetime(sec)"
+      << std::setw(15) << "Support Flags"
+      << std::setw(25) << "Recv/Sent (inactive,sec)"
+      << std::setw(15) << "State"
+      << std::setw(15) << "Livetime(sec)"
       << std::setw(12) << "Down (kB/s)"
-      << std::setw(14) << "Down(now)"
+      << std::setw(10) << "Down(now)"
       << std::setw(10) << "Up (kB/s)"
       << std::setw(13) << "Up(now)"
       << std::endl;
@@ -505,15 +505,15 @@ bool t_rpc_command_executor::print_connections() {
     std::string address = info.ip + ":" + info.port;
     std::string in_out = info.incoming ? "INC " : "OUT ";
     tools::msg_writer()
-     << std::setw(30) << std::left << address
-     << std::setw(10) << std::left << in_out
+     << std::setw(25) << std::left << address
+     << std::setw(7) << std::left << in_out
      << std::setw(20) << epee::string_tools::pad_string(info.peer_id, 16, '0', true)
-     << std::setw(10) << info.support_flags
-     << std::setw(30) << std::to_string(info.recv_count) + "("  + std::to_string(info.recv_idle_time) + ")/" + std::to_string(info.send_count) + "(" + std::to_string(info.send_idle_time) + ")"
-     << std::setw(25) << info.state
-     << std::setw(20) << info.live_time
+     << std::setw(15) << info.support_flags
+     << std::setw(25) << std::to_string(info.recv_count) + "("  + std::to_string(info.recv_idle_time) + ")/" + std::to_string(info.send_count) + "(" + std::to_string(info.send_idle_time) + ")"
+     << std::setw(15) << info.state
+     << std::setw(15) << info.live_time
      << std::setw(12) << info.avg_download
-     << std::setw(14) << info.current_download
+     << std::setw(10) << info.current_download
      << std::setw(10) << info.avg_upload
      << std::setw(13) << info.current_upload;
 
