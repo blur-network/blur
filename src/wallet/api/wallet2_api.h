@@ -977,14 +977,13 @@ struct WalletManager
     virtual bool isMining() const = 0;
 
     //! starts mining with the set number of threads
-    virtual bool startMining(const std::string &address, uint32_t *threads) = 0;
+    virtual bool startMining(const std::string &address, uint32_t threads) = 0;
 
     //! stops mining
     virtual bool stopMining() = 0;
 
     //! resolves an OpenAlias address to a monero address
-    virtual std::string resolveOpenAlias(const std::string &address) const = 0;
-
+    virtual std::string resolveOpenAlias(const std::string &address, const NetworkType nettype) const = 0;
 };
 
 

@@ -274,15 +274,13 @@ bool WalletManagerImpl::isMining() const
     return mres.active;
 }
 
-bool WalletManagerImpl::startMining(const std::string &address, uint32_t *threads)
+bool WalletManagerImpl::startMining(const std::string &address, uint32_t threads)
 {
     cryptonote::COMMAND_RPC_START_MINING::request mreq;
     cryptonote::COMMAND_RPC_START_MINING::response mres;
 
     mreq.miner_address = address;
     mreq.threads_count = threads;
-    mreq.ignore_battery = ignore_battery;
-    mreq.do_background_mining = background_mining;
 
     if (!connect_and_invoke(m_daemonAddress, "/start_mining", mreq, mres))
       return false;
@@ -299,13 +297,15 @@ bool WalletManagerImpl::stopMining()
     return mres.status == CORE_RPC_STATUS_OK;
 }
 
-std::string WalletManagerImpl::resolveOpenAlias(const std::string &address) const
+std::string WalletManagerImpl::resolveOpenAlias(const std::string &address, const NetworkType nettype) const
 {
-    std::string addresses = get_address_from_str(address);
-    if (!addresses)
-        return "";
+    cryptonote::address_parse_info info;
+    cryptonote::network_type m_nettype = (nettype == MAINNET) ? (cryptonote::MAINNET) : (cryptonote::TESTNET);
+    bool m_address = cryptonote::get_account_address_from_str(info, m_nettype, address);
+    if (!m_address)
+      return "";
+    return address;
 }
-
 ///////////////////// WalletManagerFactory implementation //////////////////////
 WalletManager *WalletManagerFactory::getWalletManager()
 {

@@ -3600,7 +3600,7 @@ bool simple_wallet::start_mining(const std::vector<std::string>& args)
   if(arg_size >= 1)
   {
     uint16_t num = 1;
-    ok = string_tools::get_xtype_from_string(num, args[1]);
+    ok = string_tools::get_xtype_from_string(num, args[0]);
     ok = ok && (1 <= num && num <= max_mining_threads_count);
     req.threads_count = num;
   }
