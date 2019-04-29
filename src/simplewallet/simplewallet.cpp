@@ -3480,11 +3480,7 @@ bool simple_wallet::open_wallet(const boost::program_options::variables_map& vm)
     {
       // only suggest removing cache if the password was actually correct
       bool password_is_correct = false;
-      try
-      {
-        password_is_correct = m_wallet->verify_password(password);
-      }
-      catch (...) { } // guard against I/O errors
+      password_is_correct = m_wallet->verify_password(password);
       if (password_is_correct)
         fail_msg_writer() << boost::format(tr("You may want to remove the file \"%s\" and try again")) % m_wallet_file;
     }
@@ -3604,7 +3600,7 @@ bool simple_wallet::start_mining(const std::vector<std::string>& args)
   if(arg_size >= 1)
   {
     uint16_t num = 1;
-    ok = string_tools::get_xtype_from_string(num, args[0]);
+    ok = string_tools::get_xtype_from_string(num, args[1]);
     ok = ok && (1 <= num && num <= max_mining_threads_count);
     req.threads_count = num;
   }
@@ -3729,13 +3725,6 @@ void simple_wallet::on_money_received(uint64_t height, const crypto::hash &txid,
     std::vector<tx_extra_field> tx_extra_fields;
     parse_tx_extra(tx.extra, tx_extra_fields); // failure ok
     tx_extra_nonce extra_nonce;
-    if (find_tx_extra_field_by_type(tx_extra_fields, extra_nonce))
-    {
-      crypto::hash payment_id = crypto::null_hash;
-      if (get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
-        message_writer(console_color_red, false) <<
-          (m_long_payment_id_support ? tr("WARNING: this transaction uses an unencrypted payment ID: consider using subaddresses instead.") : tr("WARNING: this transaction uses an unencrypted payment ID: these are obsolete. Support will be withdrawn in the future. Use subaddresses instead."));
-   }
   }
   if (m_auto_refresh_refreshing)
     m_cmd_binder.print_prompt();
@@ -6739,8 +6728,8 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
     type = tr("Normal");
   message_writer() << tr("Type: ") << type;
   message_writer() << tr("Network type: ") << (
-    m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
-    m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") : tr("Mainnet"));
+    m_wallet->nettype() == (cryptonote::TESTNET)) ? (tr("Testnet")) :
+    (m_wallet->nettype() == cryptonote::STAGENET) ? (tr("Stagenet")) : (tr("Mainnet"));
   return true;
 }
 //----------------------------------------------------------------------------------------------------
@@ -7259,7 +7248,6 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_params, arg_create_address_file);
   command_line::add_arg(desc_params, arg_subaddress_lookahead);
   command_line::add_arg(desc_params, arg_use_english_language_names);
-  command_line::add_arg(desc_params, arg_long_payment_id_support);
 
   po::positional_options_description positional_options;
   positional_options.add(arg_command.name, -1);
@@ -7293,30 +7281,10 @@ int main(int argc, char* argv[])
   }
   else
   {
-    tools::signal_handler::install([&w](int type) {
-      if (tools::password_container::is_prompting.load())
-      {
-        // must be prompting for password so return and let the signal stop prompt
-        return;
-      }
-#ifdef WIN32
-      if (type == CTRL_C_EVENT)
-#else
-      if (type == SIGINT)
-#endif
-      {
-        // if we're pressing ^C when refreshing, just stop refreshing
-        w.interrupt();
-      }
-      else
-      {
-        w.stop();
-      }
-    });
     w.run();
 
     w.deinit();
   }
   return 0;
-  //CATCH_ENTRY_L0("main", 1);
+//  CATCH_ENTRY_L0("main", 1);
 }
