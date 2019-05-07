@@ -66,14 +66,14 @@ Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
 
 Ubuntu/Debian:
 
-Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libsodium-dev`
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev`
 
 Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libreadline-dev libldns-dev libexpat1-dev libgtest-dev`
 
 
 **Arch Linux:**
 
-Required:  `sudo pacman -S base-devel cmake boost openssl unbound libsodium `
+Required:  `sudo pacman -S base-devel cmake boost openssl libsodium `
 
 Optional:  `sudo pacman -S libunwind xz readline ldns expat gtest`
 
@@ -99,7 +99,7 @@ For statically linked binaries (defaults to the platform configuration of the ho
 
 >`make release-static`
 
-For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/v0.1.9.5/contrib/depends">using contrib/depends system from Bitcoin</a>):
+For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/master/contrib/depends">using contrib/depends system from Bitcoin</a>):
 
 Follow the link above to setup build environment, then issue the command below
 
