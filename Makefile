@@ -107,8 +107,9 @@ release-static-linux-i686:
 	cd build/release && cmake -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=release -D BUILD_TAG="linux-x86" ../.. && $(MAKE)
 
 release-cross-linux-x86_64:
+	cd contrib/depends && mkdir x86_64-gnu-linux && ${MAKE} -j4 HOST=x86_64-gnu-linux
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-pc-linux/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
 
 release-cross-gui-linux-x86_64:
 	cd contrib/depends && mkdir x86_64-gnu-linux && ${MAKE} -j4 HOST=x86_64-gnu-linux
