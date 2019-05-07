@@ -40,7 +40,7 @@ void random_scalar(crypto::ec_scalar &res) {
   crypto::random_scalar(res);
 }
 
-void hash_to_scalar(const void *data, std::size_t length, crypto::ec_scalar &res) {
+void hash_to_scalar(const void *data, size_t length, crypto::ec_scalar &res) {
   crypto::hash_to_scalar(data, length, res);
 }
 

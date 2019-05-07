@@ -122,12 +122,12 @@ namespace crypto {
     friend bool generate_key_derivation(const public_key &, const secret_key &, key_derivation &);
     static void derivation_to_scalar(const key_derivation &derivation, size_t output_index, ec_scalar &res);
     friend void derivation_to_scalar(const key_derivation &derivation, size_t output_index, ec_scalar &res);
-    static bool derive_public_key(const key_derivation &, std::size_t, const public_key &, public_key &);
-    friend bool derive_public_key(const key_derivation &, std::size_t, const public_key &, public_key &);
-    static void derive_secret_key(const key_derivation &, std::size_t, const secret_key &, secret_key &);
-    friend void derive_secret_key(const key_derivation &, std::size_t, const secret_key &, secret_key &);
-    static bool derive_subaddress_public_key(const public_key &, const key_derivation &, std::size_t, public_key &);
-    friend bool derive_subaddress_public_key(const public_key &, const key_derivation &, std::size_t, public_key &);
+    static bool derive_public_key(const key_derivation &, size_t, const public_key &, public_key &);
+    friend bool derive_public_key(const key_derivation &, size_t, const public_key &, public_key &);
+    static void derive_secret_key(const key_derivation &, size_t, const secret_key &, secret_key &);
+    friend void derive_secret_key(const key_derivation &, size_t, const secret_key &, secret_key &);
+    static bool derive_subaddress_public_key(const public_key &, const key_derivation &, size_t, public_key &);
+    friend bool derive_subaddress_public_key(const public_key &, const key_derivation &, size_t, public_key &);
     static void generate_signature(const hash &, const public_key &, const secret_key &, signature &);
     friend void generate_signature(const hash &, const public_key &, const secret_key &, signature &);
     static bool check_signature(const hash &, const public_key &, const signature &);
@@ -139,13 +139,13 @@ namespace crypto {
     static void generate_key_image(const public_key &, const secret_key &, key_image &);
     friend void generate_key_image(const public_key &, const secret_key &, key_image &);
     static void generate_ring_signature(const hash &, const key_image &,
-      const public_key *const *, std::size_t, const secret_key &, std::size_t, signature *);
+      const public_key *const *, size_t, const secret_key &, size_t, signature *);
     friend void generate_ring_signature(const hash &, const key_image &,
-      const public_key *const *, std::size_t, const secret_key &, std::size_t, signature *);
+      const public_key *const *, size_t, const secret_key &, size_t, signature *);
     static bool check_ring_signature(const hash &, const key_image &,
-      const public_key *const *, std::size_t, const signature *);
+      const public_key *const *, size_t, const signature *);
     friend bool check_ring_signature(const hash &, const key_image &,
-      const public_key *const *, std::size_t, const signature *);
+      const public_key *const *, size_t, const signature *);
   };
 
   void generate_random_bytes_thread_safe(size_t N, uint8_t *bytes);
@@ -192,18 +192,18 @@ namespace crypto {
   inline bool generate_key_derivation(const public_key &key1, const secret_key &key2, key_derivation &derivation) {
     return crypto_ops::generate_key_derivation(key1, key2, derivation);
   }
-  inline bool derive_public_key(const key_derivation &derivation, std::size_t output_index,
+  inline bool derive_public_key(const key_derivation &derivation, size_t output_index,
     const public_key &base, public_key &derived_key) {
     return crypto_ops::derive_public_key(derivation, output_index, base, derived_key);
   }
   inline void derivation_to_scalar(const key_derivation &derivation, size_t output_index, ec_scalar &res) {
     return crypto_ops::derivation_to_scalar(derivation, output_index, res);
   }
-  inline void derive_secret_key(const key_derivation &derivation, std::size_t output_index,
+  inline void derive_secret_key(const key_derivation &derivation, size_t output_index,
     const secret_key &base, secret_key &derived_key) {
     crypto_ops::derive_secret_key(derivation, output_index, base, derived_key);
   }
-  inline bool derive_subaddress_public_key(const public_key &out_key, const key_derivation &derivation, std::size_t output_index, public_key &result) {
+  inline bool derive_subaddress_public_key(const public_key &out_key, const key_derivation &derivation, size_t output_index, public_key &result) {
     return crypto_ops::derive_subaddress_public_key(out_key, derivation, output_index, result);
   }
 
@@ -237,13 +237,13 @@ namespace crypto {
     crypto_ops::generate_key_image(pub, sec, image);
   }
   inline void generate_ring_signature(const hash &prefix_hash, const key_image &image,
-    const public_key *const *pubs, std::size_t pubs_count,
-    const secret_key &sec, std::size_t sec_index,
+    const public_key *const *pubs, size_t pubs_count,
+    const secret_key &sec, size_t sec_index,
     signature *sig) {
     crypto_ops::generate_ring_signature(prefix_hash, image, pubs, pubs_count, sec, sec_index, sig);
   }
   inline bool check_ring_signature(const hash &prefix_hash, const key_image &image,
-    const public_key *const *pubs, std::size_t pubs_count,
+    const public_key *const *pubs, size_t pubs_count,
     const signature *sig) {
     return crypto_ops::check_ring_signature(prefix_hash, image, pubs, pubs_count, sig);
   }
@@ -252,7 +252,7 @@ namespace crypto {
    */
   inline void generate_ring_signature(const hash &prefix_hash, const key_image &image,
     const std::vector<const public_key *> &pubs,
-    const secret_key &sec, std::size_t sec_index,
+    const secret_key &sec, size_t sec_index,
     signature *sig) {
     generate_ring_signature(prefix_hash, image, pubs.data(), pubs.size(), sec, sec_index, sig);
   }

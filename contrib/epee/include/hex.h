@@ -43,7 +43,7 @@ namespace epee
     static std::string string(const span<const std::uint8_t> src);
 
     //! \return An array containing hex of `src`.
-    template<std::size_t N>
+    template<size_t N>
     static std::array<char, N * 2> array(const std::array<std::uint8_t, N>& src) noexcept
     {
       std::array<char, N * 2> out{{}};

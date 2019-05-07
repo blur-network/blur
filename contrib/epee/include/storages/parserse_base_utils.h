@@ -66,8 +66,6 @@ namespace misc_utils
           res+="\\\""; break;
         case '\\':  //Backslash caracter
           res+="\\\\"; break;
-        case '/':  //Backslash caracter
-          res+="\\/"; break;
         default:
           res.push_back(*it);
         }
@@ -118,8 +116,6 @@ namespace misc_utils
               val.push_back('"');break;
             case '\\':  //Backslash character
               val.push_back('\\');break;
-            case '/':  //Slash character
-              val.push_back('/');break;
             default:
               val.push_back(*it);
               LOG_PRINT_L0("Unknown escape sequence :\"\\" << *it << "\"");

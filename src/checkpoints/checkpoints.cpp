@@ -36,7 +36,6 @@ using namespace epee;
 
 #include "checkpoints.h"
 
-#include "common/dns_utils.h"
 #include "include_base_utils.h"
 #include "string_tools.h"
 #include "storages/portable_storage_template_helper.h" // epee json include

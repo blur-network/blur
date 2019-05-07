@@ -66,7 +66,7 @@ namespace daemon_args
       return val;
     }
   };
-  const command_line::arg_descriptor<std::size_t> arg_max_log_file_size = {
+  const command_line::arg_descriptor<size_t> arg_max_log_file_size = {
     "max-log-file-size"
   , "Specify maximum log file size [B]"
   , MAX_LOG_FILE_SIZE

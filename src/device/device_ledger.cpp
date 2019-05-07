@@ -597,7 +597,7 @@ namespace hw {
     /*                               SUB ADDRESS                               */
     /* ======================================================================= */
 
-    bool device_ledger::derive_subaddress_public_key(const crypto::public_key &pub, const crypto::key_derivation &derivation, const std::size_t output_index, crypto::public_key &derived_pub){
+    bool device_ledger::derive_subaddress_public_key(const crypto::public_key &pub, const crypto::key_derivation &derivation, const size_t output_index, crypto::public_key &derived_pub){
         AUTO_LOCK_CMD();
         #ifdef DEBUG_HWDEVICE
         const crypto::public_key pub_x = pub;
@@ -607,7 +607,7 @@ namespace hw {
         } else {
           derivation_x = hw::ledger::decrypt(derivation);
         }
-        const std::size_t output_index_x = output_index;
+        const size_t output_index_x = output_index;
         crypto::public_key derived_pub_x;
         hw::ledger::log_hexbuffer("derive_subaddress_public_key: [[IN]]  pub       ", pub_x.data, 32);
         hw::ledger::log_hexbuffer("derive_subaddress_public_key: [[IN]]  derivation", derivation_x.data, 32);
@@ -1157,13 +1157,13 @@ namespace hw {
         return true;
     }
 
-    bool device_ledger::derive_secret_key(const crypto::key_derivation &derivation, const std::size_t output_index, const crypto::secret_key &sec, crypto::secret_key &derived_sec) {
+    bool device_ledger::derive_secret_key(const crypto::key_derivation &derivation, const size_t output_index, const crypto::secret_key &sec, crypto::secret_key &derived_sec) {
         AUTO_LOCK_CMD();
         int offset;
 
         #ifdef DEBUG_HWDEVICE
         const crypto::key_derivation derivation_x   = hw::ledger::decrypt(derivation);
-        const std::size_t            output_index_x = output_index;
+        const size_t            output_index_x = output_index;
         const crypto::secret_key     sec_x          = hw::ledger::decrypt(sec);
         crypto::secret_key           derived_sec_x;
         hw::ledger::log_hexbuffer("derive_secret_key: [[IN]]  derivation ", derivation_x.data, 32);
@@ -1212,13 +1212,13 @@ namespace hw {
         return true;
     }
 
-    bool device_ledger::derive_public_key(const crypto::key_derivation &derivation, const std::size_t output_index, const crypto::public_key &pub, crypto::public_key &derived_pub){
+    bool device_ledger::derive_public_key(const crypto::key_derivation &derivation, const size_t output_index, const crypto::public_key &pub, crypto::public_key &derived_pub){
         AUTO_LOCK_CMD();
         int offset;
       
         #ifdef DEBUG_HWDEVICE
         const crypto::key_derivation derivation_x   = hw::ledger::decrypt(derivation);
-        const std::size_t            output_index_x = output_index;
+        const size_t            output_index_x = output_index;
         const crypto::public_key     pub_x        = pub;
         crypto::public_key           derived_pub_x;
         hw::ledger::log_hexbuffer("derive_public_key: [[IN]]  derivation  ", derivation_x.data, 32);

@@ -190,14 +190,14 @@ struct TransactionHistory
  */
 struct AddressBookRow {
 public:
-    AddressBookRow(std::size_t _rowId, const std::string &_address, const std::string &_paymentId, const std::string &_description):
+    AddressBookRow(size_t _rowId, const std::string &_address, const std::string &_paymentId, const std::string &_description):
         m_rowId(_rowId),
         m_address(_address),
         m_paymentId(_paymentId), 
         m_description(_description) {}
  
 private:
-    std::size_t m_rowId;
+    size_t m_rowId;
     std::string m_address;
     std::string m_paymentId;
     std::string m_description;
@@ -206,7 +206,7 @@ public:
     std::string getAddress() const {return m_address;} 
     std::string getDescription() const {return m_description;} 
     std::string getPaymentId() const {return m_paymentId;} 
-    std::size_t getRowId() const {return m_rowId;}
+    size_t getRowId() const {return m_rowId;}
 };
 
 /**
@@ -224,7 +224,7 @@ struct AddressBook
     virtual ~AddressBook() = 0;
     virtual std::vector<AddressBookRow*> getAll() const = 0;
     virtual bool addRow(const std::string &dst_addr , const std::string &payment_id, const std::string &description) = 0;  
-    virtual bool deleteRow(std::size_t rowId) = 0;
+    virtual bool deleteRow(size_t rowId) = 0;
     virtual void refresh() = 0;  
     virtual std::string errorString() const = 0;
     virtual int errorCode() const = 0;
@@ -233,20 +233,20 @@ struct AddressBook
 
 struct SubaddressRow {
 public:
-    SubaddressRow(std::size_t _rowId, const std::string &_address, const std::string &_label):
+    SubaddressRow(size_t _rowId, const std::string &_address, const std::string &_label):
         m_rowId(_rowId),
         m_address(_address),
         m_label(_label) {}
  
 private:
-    std::size_t m_rowId;
+    size_t m_rowId;
     std::string m_address;
     std::string m_label;
 public:
     std::string extra;
     std::string getAddress() const {return m_address;}
     std::string getLabel() const {return m_label;}
-    std::size_t getRowId() const {return m_rowId;}
+    size_t getRowId() const {return m_rowId;}
 };
 
 struct Subaddress
@@ -260,7 +260,7 @@ struct Subaddress
 
 struct SubaddressAccountRow {
 public:
-    SubaddressAccountRow(std::size_t _rowId, const std::string &_address, const std::string &_label, const std::string &_balance, const std::string &_unlockedBalance):
+    SubaddressAccountRow(size_t _rowId, const std::string &_address, const std::string &_label, const std::string &_balance, const std::string &_unlockedBalance):
         m_rowId(_rowId),
         m_address(_address),
         m_label(_label),
@@ -268,7 +268,7 @@ public:
         m_unlockedBalance(_unlockedBalance) {}
 
 private:
-    std::size_t m_rowId;
+    size_t m_rowId;
     std::string m_address;
     std::string m_label;
     std::string m_balance;
@@ -279,7 +279,7 @@ public:
     std::string getLabel() const {return m_label;}
     std::string getBalance() const {return m_balance;}
     std::string getUnlockedBalance() const {return m_unlockedBalance;}
-    std::size_t getRowId() const {return m_rowId;}
+    size_t getRowId() const {return m_rowId;}
 };
 
 struct SubaddressAccount
