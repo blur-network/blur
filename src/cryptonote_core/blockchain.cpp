@@ -101,8 +101,8 @@ static const struct {
   {  8, 185000, 0, 1540624740 },
   {  9, 211000, 0, 1543147200 },
   { 10, 342000, 0, 1551395401 },
-  { 11, 448000, 0, 1557532800 }
-  //      Set hardfork v11 block for 448,000 - height takes precendence over timestamp
+  { 11, 450000, 0, 1557532800 }
+  //      Set hardfork v11 block for 450,000 - height takes precendence over timestamp
   //      But lets make sure we definitely have enough time afterward... if its too early, things stall.
 
 };
