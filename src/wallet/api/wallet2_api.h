@@ -982,8 +982,6 @@ struct WalletManager
     //! stops mining
     virtual bool stopMining() = 0;
 
-    //! resolves an OpenAlias address to a monero address
-    virtual std::string resolveOpenAlias(const std::string &address, const NetworkType nettype) const = 0;
 };
 
 
