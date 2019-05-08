@@ -78,7 +78,6 @@ public:
     bool isMining() const;
     bool startMining(const std::string &address, uint32_t threads);
     bool stopMining();
-    std::string resolveOpenAlias(const std::string &address, const NetworkType nettype) const;
 
 private:
     WalletManagerImpl() {}
