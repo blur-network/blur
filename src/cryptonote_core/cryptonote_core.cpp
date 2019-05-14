@@ -61,7 +61,7 @@ DISABLE_VS_WARNINGS(4355)
 
 #define MERROR_VER(x) MCERROR("verify", x)
 
-#define BAD_SEMANTICS_TXES_MAX_SIZE 100
+//#define BAD_SEMANTICS_TXES_MAX_SIZE 100
 
 namespace cryptonote
 {
@@ -627,19 +627,19 @@ namespace cryptonote
 
     if (keeped_by_block && get_blockchain_storage().is_within_compiled_block_hash_area())
     {
-      MTRACE("Skipping semantics check for tx kept by block in embedded hash area");
+      MTRACE("Asked to skip semantics check for tx kept by block in embedded hash area");
     }
-    else if(!check_tx_semantic(tx, keeped_by_block))
+    if(!check_tx_semantic(tx, keeped_by_block))
     {
       LOG_PRINT_L1("WRONG TRANSACTION BLOB, Failed to check tx " << tx_hash << " semantic, rejected");
       tvc.m_verifivation_failed = true;
       bad_semantics_txes_lock.lock();
       bad_semantics_txes[0].insert(tx_hash);
-      if (bad_semantics_txes[0].size() >= BAD_SEMANTICS_TXES_MAX_SIZE)
-      {
-        std::swap(bad_semantics_txes[0], bad_semantics_txes[1]);
-        bad_semantics_txes[0].clear();
-      }
+//      if (bad_semantics_txes[0].size() >= BAD_SEMANTICS_TXES_MAX_SIZE)
+//      {
+//        std::swap(bad_semantics_txes[0], bad_semantics_txes[1]);
+//        bad_semantics_txes[0].clear();
+//      }
       bad_semantics_txes_lock.unlock();
       return false;
     }
