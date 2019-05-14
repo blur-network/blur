@@ -124,7 +124,7 @@ namespace
   const command_line::arg_descriptor<std::string> arg_generate_from_multisig_keys = {"generate-from-multisig-keys", sw::tr("Generate a master wallet from multisig wallet keys"), ""};
   const auto arg_generate_from_json = wallet_args::arg_generate_from_json();
   const command_line::arg_descriptor<std::string> arg_mnemonic_language = {"mnemonic-language", sw::tr("Language for mnemonic"), ""};
-  const command_line::arg_descriptor<std::string> arg_electrum_seed = {"electrum-seed", sw::tr("(If you are restoring from seed, this is not the option you are looking for!) Specify Electrum seed for wallet recovery/creation"), ""};
+//  const command_line::arg_descriptor<std::string> arg_electrum_seed = {"electrum-seed", sw::tr("(If you are restoring from seed, this is not the option you are looking for!) Specify Electrum seed for wallet recovery/creation"), ""};
   const command_line::arg_descriptor<bool> arg_restore_deterministic_wallet = {"restore-deterministic", sw::tr("Restore wallet from a deterministic (default) mnemonic seed (Do NOT enter seed on command line! Specify this option only, and follow the prompts. Enter your seed one line at a time as input to the terminal, once prompted)."), false};
   const command_line::arg_descriptor<bool> arg_restore_multisig_wallet = {"restore-multisig-wallet", sw::tr("Recover multisig wallet using Electrum-style mnemonic seed"), false};
   const command_line::arg_descriptor<bool> arg_non_deterministic = {"non-deterministic", sw::tr("Generate non-deterministic view and spend keys"), false};
@@ -2517,12 +2517,10 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
               return false;
             if (m_electrum_seed.empty())
             {
-              fail_msg_writer() << tr("specify a recovery parameter with the --electrum-seed=\"multisig seed here\"");
+//              fail_msg_writer() << tr("specify a recovery parameter with the --electrum-seed=\"multisig seed here\"");
               return false;
             }
-        }
-        else
-        {
+        } else {     
           m_electrum_seed = "";
           do
           {
@@ -2532,12 +2530,12 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
               return false;
             if (electrum_seed.empty())
             {
-              fail_msg_writer() << tr("specify a recovery parameter with the --electrum-seed=\"words list here\"");
+//              fail_msg_writer() << tr("specify a recovery parameter with the --electrum-seed=\"words list here\"");
               return false;
             }
             m_electrum_seed += electrum_seed + " ";
           } while (might_be_partial_seed(m_electrum_seed));
-        }
+        } 
       }
 
       if (m_restore_multisig_wallet)
@@ -3052,7 +3050,7 @@ bool simple_wallet::handle_command_line(const boost::program_options::variables_
   m_generate_from_multisig_keys   = command_line::get_arg(vm, arg_generate_from_multisig_keys);
   m_generate_from_json            = command_line::get_arg(vm, arg_generate_from_json);
   m_mnemonic_language             = command_line::get_arg(vm, arg_mnemonic_language);
-  m_electrum_seed                 = command_line::get_arg(vm, arg_electrum_seed);
+//  m_electrum_seed                 = command_line::get_arg(vm, arg_electrum_seed);
   m_restore_deterministic_wallet  = command_line::get_arg(vm, arg_restore_deterministic_wallet);
   m_restore_multisig_wallet       = command_line::get_arg(vm, arg_restore_multisig_wallet);
   m_non_deterministic             = command_line::get_arg(vm, arg_non_deterministic);
@@ -7203,7 +7201,7 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_params, arg_restore_deterministic_wallet );
   command_line::add_arg(desc_params, arg_restore_multisig_wallet );
   command_line::add_arg(desc_params, arg_non_deterministic );
-  command_line::add_arg(desc_params, arg_electrum_seed );
+//  command_line::add_arg(desc_params, arg_electrum_seed );
   command_line::add_arg(desc_params, arg_trusted_daemon);
   command_line::add_arg(desc_params, arg_allow_mismatched_daemon_version);
   command_line::add_arg(desc_params, arg_restore_height);
