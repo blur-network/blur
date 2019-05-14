@@ -34,6 +34,7 @@ set(common_sources
   error.cpp
   expect.cpp
   util.cpp
+  hex_str.cpp
   i18n.cpp
   password.cpp
   perf_timer.cpp
@@ -50,6 +51,7 @@ set(common_private_headers
   common_fwd.h
   error.h
   expect.h
+  hex_str.h
   http_connection.h
   int-util.h
   pod-class.h
