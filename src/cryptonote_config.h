@@ -47,13 +47,13 @@
 #define CURRENT_TRANSACTION_VERSION                     1
 #define CURRENT_BLOCK_MAJOR_VERSION                     1
 #define CURRENT_BLOCK_MINOR_VERSION                     1
-#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              60*60*2
+#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              (60*60*2)
 #define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE             10
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
-#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2           60*5
-#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V6           60*5
+#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2           (60*5)
+#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V6           (60*5)
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2            12
 
 // MONEY_SUPPLY - total number coins to be generated
@@ -116,7 +116,7 @@
 #define P2P_DEFAULT_PEERS_IN_HANDSHAKE                  250
 #define P2P_DEFAULT_CONNECTION_TIMEOUT                  5000       //5 seconds
 #define P2P_DEFAULT_PING_CONNECTION_TIMEOUT             2000       //2 seconds
-#define P2P_DEFAULT_INVOKE_TIMEOUT                      60*2*1000  //2 minutes
+#define P2P_DEFAULT_INVOKE_TIMEOUT                      120000       //2 minutes
 #define P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT            5000       //5 seconds
 #define P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT       70
 #define P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT            2
@@ -132,7 +132,6 @@
 #define P2P_SUPPORT_FLAGS                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS
 
 #define CRYPTONOTE_NAME                         "blurnetwork"
-#define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
 #define P2P_NET_DATA_FILENAME                   "peers_state.bin"
@@ -156,7 +155,6 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 8597; // Ry
   uint16_t const P2P_DEFAULT_PORT = 52541;
   uint16_t const RPC_DEFAULT_PORT = 52542;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 52543;
   boost::uuids::uuid const NETWORK_ID = { {
       0x1E,0x32, 0x11, 0x2F , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x2D
     } }; //
@@ -172,7 +170,6 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 2195; // Rb
     uint16_t const P2P_DEFAULT_PORT = 11111;
     uint16_t const RPC_DEFAULT_PORT = 21111;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 31111;
     boost::uuids::uuid const NETWORK_ID = { {
         0x22 ,0x36, 0xF1, 0x22 , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x16
       } }; // Post-Amnesia Eidetic
@@ -185,7 +182,6 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 134; // Ry
     uint16_t const P2P_DEFAULT_PORT = 31105;
     uint16_t const RPC_DEFAULT_PORT = 31106;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 31107;
     boost::uuids::uuid const NETWORK_ID = { {
         0x22 ,0x36, 0xF1, 0x22 , 0x54, 0x86 , 0x36, 0xFF, 0xAB, 0x51, 0x00, 0x4F, 0x3C, 0x3D, 0xAA, 0x17
       } }; // Lucid Deja-Vu
@@ -211,7 +207,6 @@ namespace cryptonote
     uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX;
     uint16_t const P2P_DEFAULT_PORT;
     uint16_t const RPC_DEFAULT_PORT;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT;
     boost::uuids::uuid const NETWORK_ID;
     std::string const GENESIS_TX;
     uint32_t const GENESIS_NONCE;
@@ -224,7 +219,6 @@ namespace cryptonote
       ::config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
       ::config::P2P_DEFAULT_PORT,
       ::config::RPC_DEFAULT_PORT,
-      ::config::ZMQ_RPC_DEFAULT_PORT,
       ::config::NETWORK_ID,
       ::config::GENESIS_TX,
       ::config::GENESIS_NONCE
@@ -235,7 +229,6 @@ namespace cryptonote
       ::config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
       ::config::testnet::P2P_DEFAULT_PORT,
       ::config::testnet::RPC_DEFAULT_PORT,
-      ::config::testnet::ZMQ_RPC_DEFAULT_PORT,
       ::config::testnet::NETWORK_ID,
     };
     static const config_t stagenet = {
@@ -244,7 +237,6 @@ namespace cryptonote
       ::config::stagenet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
       ::config::stagenet::P2P_DEFAULT_PORT,
       ::config::stagenet::RPC_DEFAULT_PORT,
-      ::config::stagenet::ZMQ_RPC_DEFAULT_PORT,
       ::config::stagenet::NETWORK_ID,
     };
     switch (nettype)
