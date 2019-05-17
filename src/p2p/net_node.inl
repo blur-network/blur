@@ -78,53 +78,15 @@ namespace nodetool
     command_line::add_arg(desc, arg_limit_rate_up);
     command_line::add_arg(desc, arg_limit_rate_down);
     command_line::add_arg(desc, arg_limit_rate);
+    command_line::add_arg(desc, arg_p2p_exclusive_version);
   }
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::init_config()
   {
-    //
+
     TRY_ENTRY();
-    std::string state_file_path = m_config_folder + "/" + P2P_NET_DATA_FILENAME;
-    std::ifstream p2p_data;
-    p2p_data.open( state_file_path , std::ios_base::binary | std::ios_base::in);
-    if(!p2p_data.fail())
-    {
-      try
-      {
-        // first try reading in portable mode
-        boost::archive::portable_binary_iarchive a(p2p_data);
-        a >> *this;
-      }
-      catch (...)
-      {
-        // if failed, try reading in unportable mode
-        boost::filesystem::copy_file(state_file_path, state_file_path + ".unportable", boost::filesystem::copy_option::overwrite_if_exists);
-        p2p_data.close();
-        p2p_data.open( state_file_path , std::ios_base::binary | std::ios_base::in);
-        if(!p2p_data.fail())
-        {
-          try
-          {
-            boost::archive::binary_iarchive a(p2p_data);
-            a >> *this;
-          }
-          catch (const std::exception &e)
-          {
-            MWARNING("Failed to load p2p config file, falling back to default config");
-            m_peerlist = peerlist_manager(); // it was probably half clobbered by the failed load
-            make_default_config();
-          }
-        }
-        else
-        {
-          make_default_config();
-        }
-      }
-    }else
-    {
-      make_default_config();
-    }
+    make_default_config();
 
     // always recreate a new peer id
     make_default_peer_id();
@@ -229,11 +191,11 @@ namespace nodetool
     CRITICAL_REGION_LOCAL(m_host_fails_score_lock);
     uint64_t fails = ++m_host_fails_score[address.host_str()];
     MDEBUG("Host " << address.host_str() << " fail score=" << fails);
-    if(fails > P2P_IP_FAILS_BEFORE_BLOCK)
+    if(fails == P2P_IP_FAILS_BEFORE_BLOCK)
     {
       auto it = m_host_fails_score.find(address.host_str());
       CHECK_AND_ASSERT_MES(it != m_host_fails_score.end(), false, "internal error");
-      it->second = P2P_IP_FAILS_BEFORE_BLOCK/2;
+      (it->second) = (P2P_IP_FAILS_BEFORE_BLOCK);
       block_host(address);
     }
     return true;
@@ -270,6 +232,7 @@ namespace nodetool
     m_port = command_line::get_arg(vm, arg_p2p_bind_port);
     m_external_port = command_line::get_arg(vm, arg_p2p_external_port);
     m_allow_local_ip = command_line::get_arg(vm, arg_p2p_allow_local_ip);
+    m_node_version = command_line::get_arg(vm, arg_p2p_exclusive_version);
     m_offline = command_line::get_arg(vm, cryptonote::arg_offline);
 
     if (command_line::has_arg(vm, arg_p2p_add_peer))
@@ -428,16 +391,16 @@ namespace nodetool
       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
       if (m_exclusive_peers.empty())
       {
-
-    if (full_addrs.size() < MIN_WANTED_SEED_NODES)
-    {
-
-        for (const auto &peer: get_seed_nodes(cryptonote::MAINNET))
-          full_addrs.insert(peer);
-        m_fallback_seed_nodes_added = true;
+        if ((full_addrs.size() < MIN_WANTED_SEED_NODES) && (m_nettype == cryptonote::MAINNET))
+        {
+          std::set<std::string> seed_nodes = get_seed_nodes(cryptonote::MAINNET);
+          for (const auto &peer : seed_nodes)
+            full_addrs.insert(peer);
+          m_fallback_seed_nodes_added = true;
+        }
+      }
     }
-  }
-}
+
     for (const auto& full_addr : full_addrs)
     {
       MDEBUG("Seed node: " << full_addr);
@@ -481,6 +444,9 @@ namespace nodetool
     MINFO("Binding on " << m_bind_ip << ":" << m_port);
     res = m_net_server.init_server(m_port, m_bind_ip);
     CHECK_AND_ASSERT_MES(res, false, "Failed to bind server");
+
+    if(!m_node_version.empty())
+      MINFO("[VERSION BLOCKING] Specified node version: " << m_node_version << " - refusing connections from all other versions.");
 
     m_listening_port = m_net_server.get_binded_port();
     MLOG_GREEN(el::Level::Info, "Net service bound to " << m_bind_ip << ":" << m_listening_port);
@@ -659,6 +625,14 @@ namespace nodetool
           return;
         }
 
+
+       if(!m_node_version.empty()) {
+         if (rsp.node_data.node_version != m_node_version) {
+           LOG_WARNING_CC(context, "COMMAND_HANDSHAKE: Failed, specified version does not agree with peer's node version");
+           return;
+         }
+       }
+
         pi = context.peer_id = rsp.node_data.peer_id;
         m_peerlist.set_peer_just_seen(rsp.node_data.peer_id, context.m_remote_address);
 
@@ -669,8 +643,7 @@ namespace nodetool
           return;
         }
         LOG_DEBUG_CC(context, " COMMAND_HANDSHAKE INVOKED OK");
-      }else
-      {
+      } else {
         LOG_DEBUG_CC(context, " COMMAND_HANDSHAKE(AND CLOSE) INVOKED OK");
       }
     }, P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT);
@@ -736,10 +709,10 @@ namespace nodetool
   {
     //divide by zero workaround
     if(!max_index)
-      return 0;
+      max_index =  1;
 
     size_t x = crypto::rand<size_t>()%(max_index+1);
-    size_t res = (x*x*x)/(max_index*max_index); //parabola \/
+    size_t res = (x*x*x)/((max_index*max_index)); //parabola
     MDEBUG("Random connection index=" << res << "(x="<< x << ", max_index=" << max_index << ")");
     return res;
   }
@@ -806,15 +779,6 @@ namespace nodetool
     return connected;
   }
 
-#define LOG_PRINT_CC_PRIORITY_NODE(priority, con, msg) \
-  do { \
-    if (priority) {\
-      LOG_INFO_CC(con, "[priority]" << msg); \
-    } else {\
-      LOG_INFO_CC(con, msg); \
-    } \
-  } while(0)
-
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address& na, bool just_take_peerlist, uint64_t last_seen_stamp, PeerType peer_type, uint64_t first_seen_stamp)
   {
@@ -836,30 +800,27 @@ namespace nodetool
         "Only IPv4 addresses are supported here");
     const epee::net_utils::ipv4_network_address &ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
 
+    std::string ipstr = epee::string_tools::get_ip_string_from_int32(ipv4.ip());
+
     typename net_server::t_connection_context con = AUTO_VAL_INIT(con);
     bool res = m_net_server.connect(epee::string_tools::get_ip_string_from_int32(ipv4.ip()),
       epee::string_tools::num_to_string_fast(ipv4.port()),
       m_config.m_net_config.connection_timeout,
       con);
 
-    if(!res)
-    {
-      bool is_priority = is_priority_node(na);
-      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Connect failed to " << na.str()
-        /*<< ", try " << try_count*/);
-      //m_peerlist.set_peer_unreachable(pe);
-      return false;
-    }
+    bool is_priority = is_priority_node(na);
 
     peerid_type pi = AUTO_VAL_INIT(pi);
     res = do_handshake_with_peer(pi, con, just_take_peerlist);
 
     if(!res)
     {
-      bool is_priority = is_priority_node(na);
-      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Failed to HANDSHAKE with peer "
-        << na.str()
-        /*<< ", try " << try_count*/);
+        if (is_priority) {
+          LOG_PRINT_L1("[PRIORITY] Failed to handshake with peer " << pi << ".");
+        }
+	else {
+          LOG_PRINT_L1("Failed to handshake with peer " << pi << ".");
+      }
       return false;
     }
 
@@ -901,16 +862,24 @@ namespace nodetool
         "Only IPv4 addresses are supported here");
     const epee::net_utils::ipv4_network_address &ipv4 = na.as<epee::net_utils::ipv4_network_address>();
 
+    std::string ipstr = epee::string_tools::get_ip_string_from_int32(ipv4.ip());
+
     typename net_server::t_connection_context con = AUTO_VAL_INIT(con);
-    bool res = m_net_server.connect(epee::string_tools::get_ip_string_from_int32(ipv4.ip()),
+    bool res = m_net_server.connect(ipstr,
                                     epee::string_tools::num_to_string_fast(ipv4.port()),
                                     m_config.m_net_config.connection_timeout,
                                     con);
 
-    if (!res) {
-      bool is_priority = is_priority_node(na);
+    bool is_priority = is_priority_node(na);
 
-      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Connect failed to " << na.str());
+    if (!res) {
+
+        if (is_priority) {
+          LOG_PRINT_L1("[PRIORITY] Failed to handshake with peer " << ipstr << ".");
+        }
+	else {
+          LOG_PRINT_L1("Failed to handshake with peer " << ipstr << ".");
+        }
 
       return false;
     }
@@ -919,9 +888,13 @@ namespace nodetool
     res = do_handshake_with_peer(pi, con, true);
 
     if (!res) {
-      bool is_priority = is_priority_node(na);
 
-      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Failed to HANDSHAKE with peer " << na.str());
+        if (is_priority) {
+          LOG_PRINT_L1("[PRIORITY] Failed to handshake with peer " << ipstr << ".");
+        }
+	else {
+          LOG_PRINT_L1("Failed to handshake with peer " << ipstr << ".");
+        }
 
       return false;
     }
@@ -932,8 +905,6 @@ namespace nodetool
 
     return true;
   }
-
-#undef LOG_PRINT_CC_PRIORITY_NODE
 
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
@@ -1295,6 +1266,9 @@ namespace nodetool
     else
       node_data.my_port = 0;
     node_data.network_id = m_network_id;
+    if(!m_node_version.empty()) {
+    std::string node_version = MONERO_VERSION;
+    node_data.node_version = node_version; }
     return true;
   }
   //-----------------------------------------------------------------------------------
@@ -1378,7 +1352,7 @@ namespace nodetool
     std::string port = epee::string_tools::num_to_string_fast(node_data.my_port);
     epee::net_utils::network_address address{epee::net_utils::ipv4_network_address(actual_ip, node_data.my_port)};
     peerid_type pr = node_data.peer_id;
-    bool r = m_net_server.connect_async(ip, port, m_config.m_net_config.ping_connection_timeout, [cb, /*context,*/ address, pr, this](
+    bool r = m_net_server.connect_async(ip, port, m_config.m_net_config.ping_connection_timeout, [cb, context, address, pr, this](
       const typename net_server::t_connection_context& ping_context,
       const boost::system::error_code& ec)->bool
     {
