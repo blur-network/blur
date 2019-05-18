@@ -34,7 +34,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
 **Algorithm:** | <center> Cryptonight-Dynamic v2</center>
    **Ports:** | <center> P2P port = 52541 </br>RPC port = 52542</br></center>
-  **Seed Nodes:** | <center><li>Node 1: 45.33.92.232:52541</li><li>Node 2: 45.79.85.65:52541</li><li>Node 3: 212.71.234.44:52541</li>
+  **Seed Nodes:** | <center><li>Node 1: 66.70.189.131:52541</li><li>Node 2: 66.70.188.178:52541</li><li>Node 3: 66.70.189.183:52541</li>
   </center>
 
 ### Donate to help support Blur:
@@ -89,7 +89,7 @@ The `Makefile` entries run by the above commands will build dependencies for `x8
 
 
 
-<h3 id="building">Step 3: For dynamic linking, or MacOS</h3>
+<h3 id="building">Step 3: For dynamic linking</h3>
 
 >`cd ~/blur && make release-all`
 
@@ -123,10 +123,10 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
 
->`cd ~/Downloads && tar xvzf blur-v0.1.9.5-linux-x86_64.tar.xz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.9.5-linux-x86_64.tar.gz`
 
 
-Navigate into the directory you just unzipped from the archive, and start the daemon.
+Navigate into the directory you just extracted from the archive, and start the daemon.
 
 
 >`cd blur-v0.1.9.5-linux_x86_64 && ./blurd`
@@ -138,20 +138,29 @@ Wait for sync to complete, open a new tab or terminal window, and then start the
 >`./blur-wallet-cli`
 
 
-Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
+Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type, as `echo` has been turned off for password entry.
 
 Record the information for your wallet.
 
-Once the wallet is open, type into the wallet CLI: `start_mining [# of threads]` where [# of threads] is the amount of cpu threads you wish to dedicate to mining BLUR. 
+You can mine from your wallet, using the `start_mining <threads>` command -- but using that method directly from the wallet is *NOT* recommended.
 
-You should see the message: `Mining started in daemon`
+**Secure way to mine:** Once you've generated a wallet address, issue the following command to a running daemon:
 
-Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
+`start_mining <address> <# of threads>`
 
-Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
+Example: `start_mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu 4`
 
-**You can also start mining, without opening a wallet, by launching the daemon with:** `./blurd --start-mining <address> --mining-threads <num. threads>` (omit the brackets)
+**Or:** Use the following startup flags when launching the daemon:
 
+`./blurd --start-mining <BLUR address> --mining-threads <num. threads>`
+
+Example: `./blurd --start-mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu --mining-threads 4`
+
+You should see a message for each thread that reads: `Mining started for thread[0]` or something similar. 
+
+To view your hashrate in real-time, use the command `show_hr`.
+
+Whenever you find a block, your daemon will show a bold message with the block # found.  It is normal to experience a slight delay between that message and the balance reflecting in your wallet. 
 
 <h1 id="mining-windows"> Mining on Windows </h1>
 
@@ -166,18 +175,37 @@ You will see a pop-up from your firewall.  Be sure to check the box next to "Pri
 
 Start the wallet by double-clicking the `blur-wallet-cli` file.
 
-Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type.  It is recording your keystrokes, however.
+Follow the prompts to setup a new wallet.  When prompted for the password, please note that the CLI will not show a password or indicate your keystrokes as you type.
 
-Once the wallet is open, type into the wallet CLI: `start_mining [# of threads]` where [# of threads] is the amount of cpu threads you wish to dedicate to mining BLUR. . 
+Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type, as `echo` has been turned off for password entry.
+
+Record the information for your wallet.
+
+You can mine from your wallet, using the `start_mining <threads>` command -- but using that method directly from the wallet is *NOT* recommended.
+
+**Secure way to mine:** Once you've generated a wallet address, issue the following command to a running daemon:
+
+`start_mining <address> <# of threads>`
+
+Example: `start_mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu 4`
+
+**Or:** Use the following startup flags when launching the daemon, from Powershell:
+
+`blurd.exe --start-mining <BLUR address> --mining-threads <num. threads>`
+
+Example: `blurd.exe --start-mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu --mining-threads 4`
+
+You should see a message for each thread that reads: `Mining started for thread[0]` or something similar. 
+
+To view your hashrate in real-time, use the command `show_hr`.
+
+Whenever you find a block, your daemon will show a bold message with the block # found.  It is normal to experience a slight delay between that message and the balance reflecting in your wallet.  
 
 You should see the message: `Mining started in daemon`
 
 Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
 
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
-
-**You can also start mining, without opening a wallet, by launching the daemon with:** `blurd.exe --start-mining <address> --mining-threads <num. threads>` (omit the brackets)
-
 
 
 <h1 id="sync-issues">How to Fix Synchronizing Issues</h1>
@@ -186,10 +214,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-priority-node=45.33.92.232:52541 --add-priority-node=212.71.234.44:52541 --add-priority-node=45.79.85.65:52541 --p2p-bind-port 52541 --rpc-bind-port 52542 --rpc-bind-ip 127.0.0.1`
+`./blurd --add-priority-node=66.70.188.178:52541 --add-priority-node=66.70.189.131:52541 --add-priority-node=66.70.189.183:52541 --p2p-bind-port 52541 --rpc-bind-port 52542 --rpc-bind-ip 127.0.0.1`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-priority-node=45.33.92.232:52541 --add-priority-node=212.71.234.44:52541 --add-priority-node=45.79.85.65:52541 --p2p-bind-port=52541 --rpc-bind-port=52542 --rpc-bind-ip=127.0.0.1`
+`blurd.exe --add-priority-node=66.70.188.178:52541 --add-priority-node=66.70.189.131:52541 --add-priority-node=66.70.189.183:52541 --p2p-bind-port=52541 --rpc-bind-port=52542 --rpc-bind-ip=127.0.0.1`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
