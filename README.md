@@ -85,29 +85,10 @@ To compile for Linux (distro-agnostic): `make release-cross-linux-x86_64`
 
 To compile for Windows(mingw64): `make release-cross-winx64`
 
+To compile for Mac(x86_64): `make release-cross-mac-x86_64`
+
 The `Makefile` entries run by the above commands will build dependencies for `x86_64-gnu-linux` and `x86_64-w64-mingw32` hosts, respectively. If you would like to compile for a different type of host platform, `cd` into the `contrib/depends` directory, and build with `make HOST=xxx-yyy-zzz` where xxx-yyy-zzz is a <a href="https://wiki.osdev.org/Target_Triplet">standard host triplet</a>.
 
-
-
-<h3 id="building">Step 3: For dynamic linking</h3>
-
->`cd ~/blur && make release-all`
-
-*There are multiple platforms and configurations for which you can compile.  A non-exhaustive list can be found below:*
-
-For statically linked binaries (defaults to the platform configuration of the host compiler):
-
->`make release-static`
-
-For Windows portable binaries (Cross-Compiled on Linux <a href="https://github.com/blur-network/blur/tree/master/contrib/depends">using contrib/depends system from Bitcoin</a>):
-
-Follow the link above to setup build environment, then issue the command below
-
->`make release-static-win64`
-
-For MacOS portable binaries:
-
->`make release-static-mac-x86_64`
 
 *Note that we do not officially support builds for 32-bit architecture, arm architecture, or the freebsd linux distribution currently. However, there are options within the [Makefile](Makefile) for these configurations.  These entries may require significant modifications to source files, in order to work properly.*
 
