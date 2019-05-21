@@ -59,7 +59,7 @@ int SignatureFuzzer::init()
     wallet.generate("", "", spendkey, true, false);
 
     cryptonote::address_parse_info info;
-    if (!cryptonote::get_account_address_from_str_or_url(info, cryptonote::TESTNET, "b8gfHK6ZLNPNQhXvjvVLFFQYQa3kUNBoQE47M48jPmyHGzZnPxq1Zvh6oMe6wpCZJ3bpUaPVarBTdHDZrCuphyUw2qEGxkkS7"))
+    if (!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, "b8gfHK6ZLNPNQhXvjvVLFFQYQa3kUNBoQE47M48jPmyHGzZnPxq1Zvh6oMe6wpCZJ3bpUaPVarBTdHDZrCuphyUw2qEGxkkS7"))
     {
       std::cerr << "failed to parse address" << std::endl;
       return 1;
