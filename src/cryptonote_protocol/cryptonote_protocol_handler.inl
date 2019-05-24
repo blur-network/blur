@@ -49,11 +49,11 @@
 
 #define MLOG_P2P_MESSAGE(x) MCINFO("net.p2p.msg", context << x)
 
-#define BLOCK_QUEUE_NBLOCKS_THRESHOLD 10 // chunks of N blocks
-#define BLOCK_QUEUE_SIZE_THRESHOLD (100*1024*1024) // MB
-#define REQUEST_NEXT_SCHEDULED_SPAN_THRESHOLD (5 * 1000000) // microseconds
-#define IDLE_PEER_KICK_TIME (600 * 1000000) // microseconds
-#define PASSIVE_PEER_KICK_TIME (60 * 1000000) // microseconds
+#define BLOCK_QUEUE_NBLOCKS_THRESHOLD 10 /* chunks of N blocks */
+#define BLOCK_QUEUE_SIZE_THRESHOLD (100*1024*1024) /* MB */
+#define REQUEST_NEXT_SCHEDULED_SPAN_THRESHOLD (5 * 1000000) /* microseconds */
+#define IDLE_PEER_KICK_TIME (600 * 1000000) /* microseconds */
+#define PASSIVE_PEER_KICK_TIME (60 * 1000000) /* microseconds */
 
 namespace cryptonote
 {

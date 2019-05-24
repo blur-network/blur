@@ -110,9 +110,9 @@ using namespace cryptonote;
 
 #define MULTISIG_EXPORT_FILE_MAGIC "BLUR multisig export\001"
 
-#define SEGREGATION_FORK_HEIGHT 1564965
-#define TESTNET_SEGREGATION_FORK_HEIGHT 1000000
-#define STAGENET_SEGREGATION_FORK_HEIGHT 1000000
+#define SEGREGATION_FORK_HEIGHT 99999999999
+#define TESTNET_SEGREGATION_FORK_HEIGHT 99999999999
+#define STAGENET_SEGREGATION_FORK_HEIGHT 99999999999
 #define SEGREGATION_FORK_VICINITY 1500 /* blocks */
 
 
@@ -1290,7 +1290,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
               td.m_mask = tx_scan_info[o].mask;
               td.m_rct = true;
             }
-            else if (miner_tx && tx.version == 2)
+            else if (miner_tx && tx.version == 3)
             {
               td.m_mask = rct::identity();
               td.m_rct = true;
@@ -1736,7 +1736,7 @@ void wallet2::pull_blocks(uint64_t start_height, uint64_t &blocks_start_height, 
     if (rpc_version >= MAKE_CORE_RPC_VERSION(1, 7))
     {
       MDEBUG("Daemon is recent enough, asking for pruned blocks");
-      req.prune = true;
+      req.prune = false;
     }
     else
     {
@@ -2250,7 +2250,7 @@ bool wallet2::add_address_book_row(const cryptonote::account_public_address &add
   return false;
 }
 
-bool wallet2::delete_address_book_row(size_t row_id) {
+bool wallet2::delete_address_book_row(std::size_t row_id) {
   if(m_address_book.size() <= row_id)
     return false;
   
@@ -5660,7 +5660,7 @@ bool wallet2::find_and_save_rings(bool force)
   for (size_t slice = 0; slice < txs_hashes.size(); slice += SLICE_SIZE)
   {
     req.decode_as_json = false;
-    req.prune = true;
+    req.prune = false;
     req.txs_hashes.clear();
     size_t ntxes = slice + SLICE_SIZE > txs_hashes.size() ? txs_hashes.size() - slice : SLICE_SIZE;
     for (size_t s = slice; s < slice + ntxes; ++s)
@@ -9555,7 +9555,6 @@ uint64_t wallet2::import_key_images(const std::vector<std::pair<crypto::key_imag
     COMMAND_RPC_GET_TRANSACTIONS::request gettxs_req;
     COMMAND_RPC_GET_TRANSACTIONS::response gettxs_res;
     gettxs_req.decode_as_json = false;
-    gettxs_req.prune = false;
     for (const crypto::hash& spent_txid : spent_txids)
       gettxs_req.txs_hashes.push_back(epee::string_tools::pod_to_hex(spent_txid));
     m_daemon_rpc_mutex.lock();

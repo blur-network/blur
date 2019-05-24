@@ -58,6 +58,13 @@ namespace {
 
 namespace crypto {
 
+  using std::abort;
+  using std::int32_t;
+  using std::int64_t;
+  using std::size_t;
+  using std::uint32_t;
+  using std::uint64_t;
+
   extern "C" {
 #include "crypto-ops.h"
 #include "random.h"
@@ -219,7 +226,7 @@ namespace crypto {
     sc_add(&unwrap(derived_key), &unwrap(base), &scalar);
   }
 
-  bool crypto_ops::derive_subaddress_public_key(const public_key &out_key, const key_derivation &derivation, size_t output_index, public_key &derived_key) {
+  bool crypto_ops::derive_subaddress_public_key(const public_key &out_key, const key_derivation &derivation, std::size_t output_index, public_key &derived_key) {
     ec_scalar scalar;
     ge_p3 point1;
     ge_p3 point2;
