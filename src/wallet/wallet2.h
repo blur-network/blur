@@ -909,7 +909,7 @@ namespace tools
     */
     std::vector<address_book_row> get_address_book() const { return m_address_book; }
     bool add_address_book_row(const cryptonote::account_public_address &address, const crypto::hash &payment_id, const std::string &description, bool is_subaddress);
-    bool delete_address_book_row(size_t row_id);
+    bool delete_address_book_row(std::size_t row_id);
         
     uint64_t get_num_rct_outputs();
     size_t get_num_transfer_details() const { return m_transfers.size(); }

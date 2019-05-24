@@ -120,7 +120,7 @@ namespace hw {
         /*                               SUB ADDRESS                               */
         /* ======================================================================= */
 
-        bool device_default::derive_subaddress_public_key(const crypto::public_key &out_key, const crypto::key_derivation &derivation, const size_t output_index, crypto::public_key &derived_key) {
+        bool device_default::derive_subaddress_public_key(const crypto::public_key &out_key, const crypto::key_derivation &derivation, const std::size_t output_index, crypto::public_key &derived_key) {
             return crypto::derive_subaddress_public_key(out_key, derivation, output_index,derived_key);
         }
 
@@ -246,12 +246,12 @@ namespace hw {
             return true;
         }
 
-        bool device_default::derive_secret_key(const crypto::key_derivation &derivation, const size_t output_index, const crypto::secret_key &base, crypto::secret_key &derived_key){
+        bool device_default::derive_secret_key(const crypto::key_derivation &derivation, const std::size_t output_index, const crypto::secret_key &base, crypto::secret_key &derived_key){
             crypto::derive_secret_key(derivation, output_index, base, derived_key);
             return true;
         }
 
-        bool device_default::derive_public_key(const crypto::key_derivation &derivation, const size_t output_index, const crypto::public_key &base, crypto::public_key &derived_key){
+        bool device_default::derive_public_key(const crypto::key_derivation &derivation, const std::size_t output_index, const crypto::public_key &base, crypto::public_key &derived_key){
             return crypto::derive_public_key(derivation, output_index, base, derived_key);
         }
 

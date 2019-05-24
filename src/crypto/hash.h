@@ -61,25 +61,25 @@ namespace crypto {
     Cryptonight hash functions
   */
 
-  inline void cn_fast_hash(const void *data, size_t length, hash &hash) {
+  inline void cn_fast_hash(const void *data, std::size_t length, hash &hash) {
     cn_fast_hash(data, length, reinterpret_cast<char *>(&hash));
   }
 
-  inline hash cn_fast_hash(const void *data, size_t length) {
+  inline hash cn_fast_hash(const void *data, std::size_t length) {
     hash h;
     cn_fast_hash(data, length, reinterpret_cast<char *>(&h));
     return h;
   }
 
-  inline void cn_slow_hash(const void *data, size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x80000) {
+  inline void cn_slow_hash(const void *data, std::size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x80000) {
     cn_slow_hash(data, length, reinterpret_cast<char *>(&hash), variant, 0/*prehashed*/, iters);
   }
 
-  inline void cn_slow_hash_prehashed(const void *data, size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x80000) {
+  inline void cn_slow_hash_prehashed(const void *data, std::size_t length, hash &hash, int variant = 0, const uint32_t iters = 0x80000) {
     cn_slow_hash(data, length, reinterpret_cast<char *>(&hash), variant, 1/*prehashed*/, iters);
   }
 
-  inline void tree_hash(const hash *hashes, size_t count, hash &root_hash) {
+  inline void tree_hash(const hash *hashes, std::size_t count, hash &root_hash) {
     tree_hash(reinterpret_cast<const char (*)[HASH_SIZE]>(hashes), count, reinterpret_cast<char *>(&root_hash));
   }
 

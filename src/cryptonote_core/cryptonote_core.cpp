@@ -61,7 +61,7 @@ DISABLE_VS_WARNINGS(4355)
 
 #define MERROR_VER(x) MCERROR("verify", x)
 
-//#define BAD_SEMANTICS_TXES_MAX_SIZE 100
+#define BAD_SEMANTICS_TXES_MAX_SIZE 100
 
 namespace cryptonote
 {
@@ -349,7 +349,7 @@ namespace cryptonote
 
     boost::filesystem::path folder(m_config_folder);
     if (m_nettype == FAKECHAIN)
-      folder /= "fake";
+      folder = "fake";
 
     // make sure the data directory exists, and try to lock it
     CHECK_AND_ASSERT_MES (boost::filesystem::exists(folder) || boost::filesystem::create_directories(folder), false,
@@ -629,17 +629,17 @@ namespace cryptonote
     {
       MTRACE("Asked to skip semantics check for tx kept by block in embedded hash area");
     }
-    if(!check_tx_semantic(tx, keeped_by_block))
+    if (!check_tx_semantic(tx, keeped_by_block))
     {
       LOG_PRINT_L1("WRONG TRANSACTION BLOB, Failed to check tx " << tx_hash << " semantic, rejected");
       tvc.m_verifivation_failed = true;
       bad_semantics_txes_lock.lock();
       bad_semantics_txes[0].insert(tx_hash);
-//      if (bad_semantics_txes[0].size() >= BAD_SEMANTICS_TXES_MAX_SIZE)
-//      {
-//        std::swap(bad_semantics_txes[0], bad_semantics_txes[1]);
-//        bad_semantics_txes[0].clear();
-//      }
+      if (bad_semantics_txes[0].size() >= BAD_SEMANTICS_TXES_MAX_SIZE)
+      {
+        std::swap(bad_semantics_txes[0], bad_semantics_txes[1]);
+        bad_semantics_txes[0].clear();
+      }
       bad_semantics_txes_lock.unlock();
       return false;
     }
