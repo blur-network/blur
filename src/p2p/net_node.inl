@@ -398,6 +398,7 @@ namespace nodetool
           full_addrs = get_seed_nodes(cryptonote::MAINNET);
           m_fallback_seed_nodes_added = true;
         }
+        else if (!m_exclusive_peers.empty()) { };
     }
 
     for (const auto& full_addr : full_addrs)
