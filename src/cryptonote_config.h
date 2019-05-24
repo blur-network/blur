@@ -137,7 +137,7 @@
 #define P2P_NET_DATA_FILENAME                   "peers_state.bin"
 #define MINER_CONFIG_FILE_NAME                  "miner_conf.json"
 
-#define THREAD_STACK_SIZE                       0x40000
+#define THREAD_STACK_SIZE                       0x80000
 
 #define PER_KB_FEE_QUANTIZATION_DECIMALS        8
 

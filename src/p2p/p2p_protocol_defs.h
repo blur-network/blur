@@ -331,15 +331,19 @@ namespace nodetool
 
     struct request
     {
+      peerid_type peer_id;
       BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(peer_id)
       END_KV_SERIALIZE_MAP()
     };
 
     struct response
     {
+      peerid_type peer_id;
       uint32_t support_flags;
 
       BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(peer_id)
         KV_SERIALIZE(support_flags)
       END_KV_SERIALIZE_MAP()
     };
