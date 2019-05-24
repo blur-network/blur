@@ -37,6 +37,7 @@
 #include "string_tools.h"
 #include "time_helper.h"
 #include "cryptonote_config.h"
+#include "version.h"
 
 namespace nodetool
 {
@@ -147,18 +148,18 @@ namespace nodetool
 
   struct basic_node_data
   {
-    uuid network_id;                   
+    uuid network_id;
     uint64_t local_time;
     uint32_t my_port;
     peerid_type peer_id;
-    std::string node_version;
+/*    std::string node_version = MONERO_VERSION_FULL; */
 
     BEGIN_KV_SERIALIZE_MAP()
       KV_SERIALIZE_VAL_POD_AS_BLOB(network_id)
       KV_SERIALIZE(peer_id)
       KV_SERIALIZE(local_time)
       KV_SERIALIZE(my_port)
-      KV_SERIALIZE(node_version)
+/*      KV_SERIALIZE(node_version) */
     END_KV_SERIALIZE_MAP()
   };
 
@@ -171,7 +172,7 @@ namespace nodetool
   template<class t_playload_type>
 	struct COMMAND_HANDSHAKE_T
 	{
-		const static int ID = P2P_COMMANDS_POOL_BASE + 1;
+		const static int ID = 1001;
 
     struct request
     {
@@ -195,7 +196,7 @@ namespace nodetool
         KV_SERIALIZE(payload_data)
         if (is_store)
         {
-          // saving: save both, so old and new peers can understand it
+          /* saving: save both, so old and new peers can understand it */
           KV_SERIALIZE(local_peerlist_new)
           std::list<peerlist_entry_base<network_address_old>> local_peerlist;
           for (const auto &p: this_ref.local_peerlist_new)
@@ -213,7 +214,7 @@ namespace nodetool
         }
         else
         {
-          // loading: load old list only if there is no new one
+          /* loading: load old list only if there is no new one */
           if (!epee::serialization::selector<is_store>::serialize(this_ref.local_peerlist_new, stg, hparent_section, "local_peerlist_new"))
           {
             std::list<peerlist_entry_base<network_address_old>> local_peerlist;
@@ -233,7 +234,7 @@ namespace nodetool
   template<class t_playload_type>
   struct COMMAND_TIMED_SYNC_T
   {
-    const static int ID = P2P_COMMANDS_POOL_BASE + 2;
+    const static int ID = 1002;
 
     struct request
     {
@@ -254,7 +255,7 @@ namespace nodetool
         KV_SERIALIZE(payload_data)
         if (is_store)
         {
-          // saving: save both, so old and new peers can understand it
+          /* saving: save both, so old and new peers can understand it */
           KV_SERIALIZE(local_peerlist_new)
           std::list<peerlist_entry_base<network_address_old>> local_peerlist;
           for (const auto &p: this_ref.local_peerlist_new)
@@ -272,7 +273,7 @@ namespace nodetool
         }
         else
         {
-          // loading: load old list only if there is no new one
+          /* loading: load old list only if there is no new one */
           if (!epee::serialization::selector<is_store>::serialize(this_ref.local_peerlist_new, stg, hparent_section, "local_peerlist_new"))
           {
             std::list<peerlist_entry_base<network_address_old>> local_peerlist;
@@ -296,15 +297,16 @@ namespace nodetool
       have accessible connection point. Only other nodes can add peer to peerlist,
       and ONLY in case when peer has accepted connection and answered to ping.
     */
-    const static int ID = P2P_COMMANDS_POOL_BASE + 3;
+    const static int ID = 1003;
 
 #define PING_OK_RESPONSE_STATUS_TEXT "OK"
 
     struct request
     {
-      /*actually we don't need to send any real data*/
+      peerid_type peer_id;
 
       BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(peer_id)
       END_KV_SERIALIZE_MAP()
     };
 
@@ -316,7 +318,7 @@ namespace nodetool
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
         KV_SERIALIZE(peer_id)
-      END_KV_SERIALIZE_MAP()    
+      END_KV_SERIALIZE_MAP()
     };
   };
 
@@ -325,12 +327,12 @@ namespace nodetool
   /************************************************************************/
   struct COMMAND_REQUEST_SUPPORT_FLAGS
   {
-    const static int ID = P2P_COMMANDS_POOL_BASE + 7;
+    const static int ID = 1007;
 
     struct request
     {
       BEGIN_KV_SERIALIZE_MAP()
-      END_KV_SERIALIZE_MAP()    
+      END_KV_SERIALIZE_MAP()
     };
 
     struct response
@@ -339,10 +341,10 @@ namespace nodetool
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(support_flags)
-      END_KV_SERIALIZE_MAP()    
+      END_KV_SERIALIZE_MAP()
     };
   };
-  
+
 
 }
 

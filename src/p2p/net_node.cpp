@@ -61,8 +61,8 @@ namespace nodetool
     const command_line::arg_descriptor<int> arg_tos_flag = {"tos-flag", "set TOS flag", -1};
 
     const command_line::arg_descriptor<int64_t> arg_limit_rate_up = {"limit-rate-up", "set limit-rate-up [kB/s]", 4096};
-    const command_line::arg_descriptor<int64_t> arg_limit_rate_down = {"limit-rate-down", "set limit-rate-down [kB/s]", 4096};
-    const command_line::arg_descriptor<int64_t> arg_limit_rate = {"limit-rate", "set limit-rate [kB/s]", 8192};
+    const command_line::arg_descriptor<int64_t> arg_limit_rate_down = {"limit-rate-down", "set limit-rate-down [kB/s]", 8192};
+    const command_line::arg_descriptor<int64_t> arg_limit_rate = {"limit-rate", "set limit-rate [kB/s]", 12288};
 
-    const command_line::arg_descriptor<std::string> arg_p2p_exclusive_version = {"exclusive-version", "Refuse connections from nodes that are not running the specified daemon version."};
+//    const command_line::arg_descriptor<std::string> arg_p2p_exclusive_version = {"exclusive-version", "Refuse connections from nodes that are not running the specified daemon version.", ""};
 }

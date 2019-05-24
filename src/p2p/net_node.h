@@ -255,7 +255,7 @@ namespace nodetool
     config m_config; // TODO was private, add getters?
     std::atomic<unsigned int> m_current_number_of_out_peers;
     std::atomic<unsigned int> m_current_number_of_in_peers;
-    std::string m_node_version;
+//    std::string m_node_version;
 
   private:
     std::string m_config_folder;
@@ -278,7 +278,7 @@ namespace nodetool
 
     epee::math_helper::once_a_time_seconds<P2P_DEFAULT_HANDSHAKE_INTERVAL> m_peer_handshake_idle_maker_interval;
     epee::math_helper::once_a_time_seconds<1> m_connections_maker_interval;
-    epee::math_helper::once_a_time_seconds<60,false> m_peerlist_store_interval;
+    epee::math_helper::once_a_time_seconds<60*30, false> m_peerlist_store_interval;
     epee::math_helper::once_a_time_seconds<60> m_gray_peerlist_housekeeping_interval;
 
     std::string m_bind_ip;
@@ -305,7 +305,7 @@ namespace nodetool
     cryptonote::network_type m_nettype;
   };
 
-    const int64_t default_limit_up = 2048;    // kB/s
+    const int64_t default_limit_up = 4096;    // kB/s
     const int64_t default_limit_down = 8192;  // kB/s
     extern const command_line::arg_descriptor<std::string> arg_p2p_bind_ip;
     extern const command_line::arg_descriptor<std::string, false, true, 2> arg_p2p_bind_port;
@@ -326,7 +326,7 @@ namespace nodetool
     extern const command_line::arg_descriptor<int64_t> arg_limit_rate_down;
     extern const command_line::arg_descriptor<int64_t> arg_limit_rate;
 
-    extern const command_line::arg_descriptor<std::string> arg_p2p_exclusive_version;
+//    extern const command_line::arg_descriptor<std::string> arg_p2p_exclusive_version;
 
 }
 
