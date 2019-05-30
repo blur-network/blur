@@ -9,6 +9,7 @@ description: |
     Join the Fight for Financial Freedom.
 grade: stable
 confinement: strict
+base: core18
 
 apps:
     blurd:
@@ -35,11 +36,11 @@ parts:
     cmake-build:
         plugin: cmake
         configflags:
-            - -DCMAKE_BUILD_TYPE=Release
-            - -DMANUAL_SUBMODULES=ON
+            - -DCMAKE_BUILD_TYPE=release
+            - -DMANUAL_SUBMODULES=1
             - -DBUILD_TESTS=OFF
             - -DARCH=default
-            - -DSTATIC=ON
+            - -DSTATIC=1
         source: .
         build-packages:
             - gcc
@@ -47,19 +48,21 @@ parts:
             - libboost-all-dev
             - libssl-dev
             - libsodium-dev
+            - git
+            - libreadline7
         stage-packages:
-            - libboost-date-time1.58.0
-            - libboost-serialization1.58.0
-            - libboost-chrono1.58.0
-            - libboost-system1.58.0
-            - libboost-thread1.58.0
-            - libboost-locale1.58.0
-            - libboost-atomic1.58.0
-            - libboost-filesystem1.58.0
-            - libboost-program-options1.58.0
-            - libboost-regex1.58.0
+            - libboost-date-time1.65.1
+            - libboost-serialization1.65.1
+            - libboost-chrono1.65.1
+            - libboost-system1.65.1
+            - libboost-thread1.65.1
+            - libboost-locale1.65.1
+            - libboost-atomic1.65.1
+            - libboost-filesystem1.65.1
+            - libboost-program-options1.65.1
+            - libboost-regex1.65.1
             - libssl-dev
-            - libsodium18
+            - libsodium23
             - libstdc++6
             - libgcc1
         prime:
