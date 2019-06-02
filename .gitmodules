@@ -1,3 +1,7 @@
 [submodule "external/rapidjson"]
 	path = external/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "libhydrogen"]
+	path = external/libhydrogen
+	url = https://github.com/blur-network/libhydrogen.git
+	branch = blur

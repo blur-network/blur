@@ -246,7 +246,7 @@ endif()
 # elseif(CMAKE_SYSTEM_NAME MATCHES ".*BSDI.*")
 #   set(BSDI TRUE)
 
-include_directories(external/rapidjson/include external/easylogging++ src contrib/epee/include external)
+include_directories(external/rapidjson/include external/easylogging++ external/libhydrogen src contrib/epee/include external)
 
 if(APPLE)
   include_directories(SYSTEM /usr/include/malloc)
@@ -397,6 +397,10 @@ add_subdirectory(external)
 # Final setup for easylogging++
 include_directories(${EASYLOGGING_INCLUDE})
 link_directories(${EASYLOGGING_LIBRARY_DIRS})
+
+# Final setup for libhydrogen
+include_directories(${HYDROGEN_INCLUDE})
+include_directories(${HYDROGEN_LIBRARY_DIR})
 
 # Final setup for liblmdb
 include_directories(${LMDB_INCLUDE})
