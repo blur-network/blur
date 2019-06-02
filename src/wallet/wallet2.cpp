@@ -74,7 +74,6 @@ extern "C"
 #include "crypto/keccak.h"
 #include "crypto/crypto-ops.h"
 }
-using namespace std;
 using namespace crypto;
 using namespace cryptonote;
 
@@ -7509,7 +7508,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
     preferred_inputs = pick_preferred_rct_inputs(needed_money + estimated_fee, subaddr_account, subaddr_indices);
     if (!preferred_inputs.empty())
     {
-      string s;
+      std::string s;
       for (auto i: preferred_inputs) s += boost::lexical_cast<std::string>(i) + " (" + print_money(m_transfers[i].amount()) + ") ";
       LOG_PRINT_L1("Found preferred rct inputs for rct tx: " << s);
 
@@ -9095,7 +9094,7 @@ std::string wallet2::get_daemon_address() const
   return m_daemon_address;
 }
 
-uint64_t wallet2::get_daemon_blockchain_height(string &err) const
+uint64_t wallet2::get_daemon_blockchain_height(std::string &err) const
 {
   uint64_t height;
 
@@ -9110,7 +9109,7 @@ uint64_t wallet2::get_daemon_blockchain_height(string &err) const
   return height;
 }
 
-uint64_t wallet2::get_daemon_blockchain_target_height(string &err)
+uint64_t wallet2::get_daemon_blockchain_target_height(std::string &err)
 {
   cryptonote::COMMAND_RPC_GET_INFO::request req_t = AUTO_VAL_INIT(req_t);
   cryptonote::COMMAND_RPC_GET_INFO::response resp_t = AUTO_VAL_INIT(resp_t);
@@ -10302,7 +10301,7 @@ uint64_t wallet2::get_blockchain_height_by_date(uint16_t year, uint8_t month, ui
       oss << "failed to get blocks by heights: ";
       for (auto height : req.heights)
         oss << height << ' ';
-      oss << endl << "reason: ";
+      oss << std::endl << "reason: ";
       if (!r)
         oss << "possibly lost connection to daemon";
       else if (res.status == CORE_RPC_STATUS_BUSY)
