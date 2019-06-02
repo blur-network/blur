@@ -35,24 +35,6 @@
 #include <gnu/libc-version.h>
 #endif
 
-#ifdef __GLIBC__
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/resource.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <string.h>
-#include <ctype.h>
-#include <string>
-#endif
-
-//tools::is_hdd
-#ifdef __GLIBC__
-  #include <sstream>
-  #include <sys/sysmacros.h>
-  #include <fstream>
-#endif
-
 #include "include_base_utils.h"
 #include "file_io_utils.h"
 #include "wipeable_string.h"
@@ -77,6 +59,8 @@ using namespace epee;
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <openssl/sha.h>
+#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
 
 namespace tools
 {
@@ -650,12 +634,8 @@ std::string get_nix_version_display_string()
 }
   void set_strict_default_file_permissions(bool strict)
   {
-#if defined(__MINGW32__) || defined(__MINGW__)
-    // no clue about the odd one out
-#else
     mode_t mode = strict ? 077 : 0;
     umask(mode);
-#endif
   }
 
   namespace
