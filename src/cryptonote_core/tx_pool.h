@@ -74,7 +74,7 @@ namespace cryptonote
   };
 
   //! container for sorting transactions by fee per unit size
-  typedef std::set<const tx_by_fee_and_receive_time_entry, txCompare> sorted_tx_container;
+  typedef std::set<tx_by_fee_and_receive_time_entry, txCompare> sorted_tx_container;
 
   /**
    * @brief Transaction pool, handles transactions which are not part of a block
