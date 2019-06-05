@@ -2,6 +2,9 @@
 # Blur Network 
 Copyright (c) 2018-2019, Blur Network</br>
 
+[![Blur Network Command-Line Tools](https://snapcraft.io/blur/badge.svg)](https://snapcraft.io/blur)
+
+
 *See [LICENSE](License).*<br>
 *See [Code of Conduct](CODE_OF_CONDUCT.md)*<br>
 
@@ -44,7 +47,6 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
 
 Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
-
 
 <h1 id="compile-source">Compiling from Source</h1>
 
