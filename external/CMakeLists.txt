@@ -31,4 +31,4 @@
 
 add_subdirectory(db_drivers)
 add_subdirectory(easylogging++)
-add_subdirectory(libhydrogen)
+#add_subdirectory(libhydrogen)
