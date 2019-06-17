@@ -68,16 +68,16 @@ Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
 
 Ubuntu/Debian:
 
-Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev`
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libreadline-dev`
 
-Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libreadline-dev libldns-dev libexpat1-dev libgtest-dev`
+Optional:  `sudo apt-get install -y libunwind-dev liblzma-dev libldns-dev libexpat1-dev libgtest-dev`
 
 
 **Arch Linux:**
 
-Required:  `sudo pacman -S base-devel cmake boost openssl libsodium `
+Required:  `sudo pacman -S base-devel cmake boost openssl libsodium readline`
 
-Optional:  `sudo pacman -S libunwind xz readline ldns expat gtest`
+Optional:  `sudo pacman -S libunwind xz ldns expat gtest`
 
 
 
