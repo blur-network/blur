@@ -1,8 +1,10 @@
-packages:=boost openssl expat readline libiconv qt
+packages:=boost openssl expat readline libiconv
 native_packages := native_ccache
 
 darwin_native_packages = native_biplist native_ds_store native_mac_alias
 darwin_packages = sodium-darwin
+
+qt_packages=qt
 
 ifeq ($(host_os),linux)
 packages += unwind
