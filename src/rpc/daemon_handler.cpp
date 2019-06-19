@@ -768,7 +768,7 @@ namespace rpc
 
   void DaemonHandler::handle(const GetRPCVersion::Request& req, GetRPCVersion::Response& res)
   {
-    res.version = DAEMON_RPC_VERSION_ZMQ;
+    res.version = CORE_RPC_VERSION;
     res.status = Message::STATUS_OK;
   }
 
