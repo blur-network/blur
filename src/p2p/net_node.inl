@@ -54,7 +54,7 @@
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
-#define MIN_WANTED_SEED_NODES 3
+#define MIN_WANTED_SEED_NODES 12
 
 namespace nodetool
 {
@@ -64,7 +64,7 @@ namespace nodetool
   void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description& desc)
   {
     command_line::add_arg(desc, arg_p2p_bind_ip);
-    command_line::add_arg(desc, arg_p2p_bind_port, false);
+    command_line::add_arg(desc, arg_p2p_bind_port);
     command_line::add_arg(desc, arg_p2p_external_port);
     command_line::add_arg(desc, arg_p2p_allow_local_ip);
     command_line::add_arg(desc, arg_p2p_add_peer);
@@ -393,12 +393,16 @@ namespace nodetool
     else
     {
       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
+      if (m_exclusive_peers.empty())
+      {
         if ((full_addrs.size() < MIN_WANTED_SEED_NODES) && (m_nettype == cryptonote::MAINNET))
         {
-          full_addrs = get_seed_nodes(cryptonote::MAINNET);
+          std::set<std::string> seed_nodes = get_seed_nodes(cryptonote::MAINNET);
+          for (const auto &peer : seed_nodes)
+            full_addrs.insert(peer);
           m_fallback_seed_nodes_added = true;
         }
-        else if (!m_exclusive_peers.empty()) { };
+      }
     }
 
     for (const auto& full_addr : full_addrs)
@@ -781,6 +785,15 @@ namespace nodetool
     return connected;
   }
 
+#define LOG_PRINT_CC_PRIORITY_NODE(priority, con, msg) \
+  do { \
+    if (priority) {\
+      LOG_INFO_CC(con, "[priority]" << msg); \
+    } else {\
+      LOG_INFO_CC(con, msg); \
+    } \
+  } while(0)
+
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address& na, bool just_take_peerlist, uint64_t last_seen_stamp, PeerType peer_type, uint64_t first_seen_stamp)
   {
@@ -808,22 +821,26 @@ namespace nodetool
       m_config.m_net_config.connection_timeout,
       con);
 
-    bool is_priority = is_priority_node(na);
-
     if(!res)
     {
-        if (is_priority) {
-          LOG_PRINT_L1("[PRIORITY] Failed to handshake with peer " << na.str() << ".");
-        }
-	else {
-          LOG_PRINT_L1("Failed to handshake with peer " << na.str() << ".");
-      }
+      bool is_priority = is_priority_node(na);
+      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Connect failed to " << na.str()
+        /*<< ", try " << try_count*/);
+      //m_peerlist.set_peer_unreachable(pe);
+      return false;
     }
 
     peerid_type pi = AUTO_VAL_INIT(pi);
     res = do_handshake_with_peer(pi, con, just_take_peerlist);
 
-
+    if(!res)
+    {
+      bool is_priority = is_priority_node(na);
+      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Failed to HANDSHAKE with peer "
+        << na.str()
+        /*<< ", try " << try_count*/);
+      return false;
+    }
 
     if(just_take_peerlist)
     {
@@ -869,16 +886,10 @@ namespace nodetool
                                     m_config.m_net_config.connection_timeout,
                                     con);
 
-    bool is_priority = is_priority_node(na);
-
     if (!res) {
+      bool is_priority = is_priority_node(na);
 
-        if (is_priority) {
-          LOG_PRINT_L1("[PRIORITY] Failed to handshake with peer " << na.str() << ".");
-        }
-	else {
-          LOG_PRINT_L1("Failed to handshake with peer " << na.str() << ".");
-        }
+      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Connect failed to " << na.str());
 
       return false;
     }
@@ -887,13 +898,9 @@ namespace nodetool
     res = do_handshake_with_peer(pi, con, true);
 
     if (!res) {
+      bool is_priority = is_priority_node(na);
 
-        if (is_priority) {
-          LOG_PRINT_L1("[PRIORITY] Failed to handshake with peer " << na.str() << ".");
-        }
-	else {
-          LOG_PRINT_L1("Failed to handshake with peer " << na.str() << ".");
-        }
+      LOG_PRINT_CC_PRIORITY_NODE(is_priority, con, "Failed to HANDSHAKE with peer " << na.str());
 
       return false;
     }
@@ -904,6 +911,8 @@ namespace nodetool
 
     return true;
   }
+
+#undef LOG_PRINT_CC_PRIORITY_NODE
 
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
