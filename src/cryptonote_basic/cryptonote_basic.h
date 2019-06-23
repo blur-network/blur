@@ -160,7 +160,7 @@ namespace cryptonote
   public:
     // tx information
     size_t   version;
-    uint64_t unlock_time;  //number of block (or time), used as a limitation like: spend this tx not early then block/time
+    uint64_t unlock_time;  //number of block (timestamp unlocking has been removed)
 
     std::vector<txin_v> vin;
     std::vector<tx_out> vout;

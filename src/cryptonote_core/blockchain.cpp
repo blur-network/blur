@@ -2926,15 +2926,6 @@ bool Blockchain::is_tx_spendtime_unlocked(uint64_t unlock_time) const
     else
       return false;
   }
-  else
-  {
-    //interpret as time
-    uint64_t current_time = static_cast<uint64_t>(time(NULL));
-    if(current_time + CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1 >= unlock_time)
-      return true;
-    else
-      return false;
-  }
   return false;
 }
 //------------------------------------------------------------------
@@ -3823,7 +3814,6 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
   while (!(stop_batch = m_db->batch_start(blocks_entry.size(), bytes))) {
     m_blockchain_lock.unlock();
     m_tx_pool.unlock();
-    epee::misc_utils::sleep_no_w(1000);
     m_tx_pool.lock();
     m_blockchain_lock.lock();
   }

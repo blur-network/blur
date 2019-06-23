@@ -3814,7 +3814,7 @@ bool simple_wallet::show_balance_unlocked(bool detailed)
   const std::pair<std::map<std::string, std::string>, std::vector<std::string>>& account_tags = m_wallet->get_account_tags();
   const std::string tag = account_tags.second[m_current_subaddress_account];
   success_msg_writer() << tr("Tag: ") << (tag.empty() ? std::string{tr("(No tag assigned)")} : tag);
-  
+
   uint64_t total_balance = 0, total_unlocked_balance = 0;
   for (uint32_t account_index = 0; account_index < m_wallet->get_num_subaddress_accounts(); ++account_index)
   {
@@ -3823,7 +3823,7 @@ bool simple_wallet::show_balance_unlocked(bool detailed)
     total_balance += m_wallet->balance(account_index);
     total_unlocked_balance += m_wallet->unlocked_balance(account_index);
   }
-  
+
   if(total_balance != m_wallet->balance(m_current_subaddress_account))
   {
     success_msg_writer() << tr("Account #") << m_current_subaddress_account << tr(" balance: ") << print_money(m_wallet->balance(m_current_subaddress_account)) << ", "
@@ -5681,8 +5681,6 @@ bool simple_wallet::check_reserve_proof(const std::vector<std::string> &args)
 static std::string get_human_readable_timestamp(uint64_t ts)
 {
   char buffer[64];
-  if (ts < 1234567890)
-    return "<unknown>";
   time_t tt = ts;
   struct tm tm;
 #ifdef WIN32
@@ -5691,25 +5689,9 @@ static std::string get_human_readable_timestamp(uint64_t ts)
   gmtime_r(&tt, &tm);
 #endif
   uint64_t now = time(NULL);
-  uint64_t diff = ts > now ? ts - now : now - ts;
+  uint64_t diff = ts > now ? (ts - now) : (now - ts);
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
   return std::string(buffer);
-}
-//----------------------------------------------------------------------------------------------------
-static std::string get_human_readable_timespan(std::chrono::seconds seconds)
-{
-  uint64_t ts = seconds.count();
-  if (ts < 60)
-    return std::to_string(ts) + tr(" seconds");
-  if (ts < 3600)
-    return std::to_string((uint64_t)(ts / 60)) + tr(" minutes");
-  if (ts < 3600 * 24)
-    return std::to_string((uint64_t)(ts / 3600)) + tr(" hours");
-  if (ts < 3600 * 24 * 30.5)
-    return std::to_string((uint64_t)(ts / (3600 * 24))) + tr(" days");
-  if (ts < 3600 * 24 * 365.25)
-    return std::to_string((uint64_t)(ts / (3600 * 24 * 365.25))) + tr(" months");
-  return tr("a long time");
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::show_transfers(const std::vector<std::string> &args_)
@@ -5730,7 +5712,7 @@ bool simple_wallet::show_transfers(const std::vector<std::string> &args_)
   }
 
   LOCK_IDLE_SCOPE();
-  
+
   // optional in/out selector
   if (local_args.size() > 0) {
     if (local_args[0] == "in" || local_args[0] == "incoming") {
@@ -7018,23 +7000,11 @@ bool simple_wallet::show_transfer(const std::vector<std::string> &args)
       success_msg_writer() << "Timestamp: " << get_human_readable_timestamp(pd.m_timestamp);
       success_msg_writer() << "Amount: " << print_money(pd.m_amount);
       success_msg_writer() << "Payment ID: " << payment_id;
-      if (pd.m_unlock_time < CRYPTONOTE_MAX_BLOCK_NUMBER)
-      {
-        uint64_t bh = std::max(pd.m_unlock_time, pd.m_block_height + CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE);
-        if (bh >= last_block_height)
-          success_msg_writer() << "Locked: " << (bh - last_block_height) << " blocks to unlock";
-        else
-          success_msg_writer() << std::to_string(last_block_height - bh) << " confirmations";
-      }
+      uint64_t bh = std::max(pd.m_unlock_time, pd.m_block_height + CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE);
+      if (bh >= last_block_height)
+        success_msg_writer() << "Locked: " << (bh - last_block_height) << " blocks to unlock";
       else
-      {
-        uint64_t current_time = static_cast<uint64_t>(time(NULL));
-        uint64_t threshold = current_time + CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1;
-        if (threshold >= pd.m_unlock_time)
-          success_msg_writer() << "unlocked for " << get_human_readable_timespan(std::chrono::seconds(threshold - pd.m_unlock_time));
-        else
-          success_msg_writer() << "locked for " << get_human_readable_timespan(std::chrono::seconds(pd.m_unlock_time - threshold));
-      }
+        success_msg_writer() << std::to_string(last_block_height - bh) << " confirmations";
       success_msg_writer() << "Address index: " << pd.m_subaddr_index.minor;
       success_msg_writer() << "Note: " << m_wallet->get_tx_note(txid);
       return true;

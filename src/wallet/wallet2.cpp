@@ -4318,22 +4318,13 @@ bool wallet2::is_tx_spendtime_unlocked(uint64_t unlock_time, uint64_t block_heig
   if(unlock_time < CRYPTONOTE_MAX_BLOCK_NUMBER)
   {
     //interpret as block index
-    if(m_local_bc_height-1 + CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS >= unlock_time)
-      return true;
-    else
-      return false;
-  }else
-  {
-    //interpret as time
-    uint64_t current_time = static_cast<uint64_t>(time(NULL));
-    // XXX: this needs to be fast, so we'd need to get the starting heights
-    // from the daemon to be correct once voting kicks in
-    uint64_t leeway = CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1;
-    if(current_time + leeway >= unlock_time)
+    if(m_local_bc_height >= unlock_time)
       return true;
     else
       return false;
   }
+  else
+    return false;
   return false;
 }
 //----------------------------------------------------------------------------------------------------
