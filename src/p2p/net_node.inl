@@ -724,51 +724,6 @@ namespace nodetool
   }
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
-  bool node_server<t_payload_net_handler>::is_peer_used(const peerlist_entry& peer)
-  {
-
-    if(m_config.m_peer_id == peer.id)
-      return true;//dont make connections to ourself
-
-    bool used = false;
-    m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
-    {
-      if(cntxt.peer_id == peer.id || (!cntxt.m_is_income && peer.adr == cntxt.m_remote_address))
-      {
-        used = true;
-        return false;//stop enumerating
-      }
-      return true;
-    });
-
-    return used;
-  }
-  //-----------------------------------------------------------------------------------
-  template<class t_payload_net_handler>
-  bool node_server<t_payload_net_handler>::is_peer_used(const anchor_peerlist_entry& peer)
-  {
-    if(m_config.m_peer_id == peer.id) {
-        return true;//dont make connections to ourself
-    }
-
-    bool used = false;
-
-    m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
-    {
-      if(cntxt.peer_id == peer.id || (!cntxt.m_is_income && peer.adr == cntxt.m_remote_address))
-      {
-        used = true;
-
-        return false;//stop enumerating
-      }
-
-      return true;
-    });
-
-    return used;
-  }
-  //-----------------------------------------------------------------------------------
-  template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::is_addr_connected(const epee::net_utils::network_address& peer)
   {
     bool connected = false;
@@ -858,14 +813,6 @@ namespace nodetool
     m_peerlist.append_with_peer_white(pe_local);
     //update last seen and push it to peerlist manager
 
-    anchor_peerlist_entry ape = AUTO_VAL_INIT(ape);
-    ape.adr = na;
-    ape.id = pi;
-    ape.first_seen = first_seen_stamp ? first_seen_stamp : time(nullptr);
-
-    m_peerlist.append_with_peer_anchor(ape);
-
-    LOG_DEBUG_CC(con, "CONNECTION HANDSHAKED OK.");
     return true;
   }
 
@@ -930,40 +877,6 @@ namespace nodetool
   }
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
-  bool node_server<t_payload_net_handler>::make_new_connection_from_anchor_peerlist(const std::vector<anchor_peerlist_entry>& anchor_peerlist)
-  {
-    for (const auto& pe: anchor_peerlist) {
-      _note("Considering connecting (out) to peer: " << peerid_type(pe.id) << " " << pe.adr.str());
-
-      if(is_peer_used(pe)) {
-        _note("Peer is used");
-        continue;
-      }
-
-      if(!is_remote_host_allowed(pe.adr)) {
-        continue;
-      }
-
-      if(is_addr_recently_failed(pe.adr)) {
-        continue;
-      }
-
-      MDEBUG("Selected peer: " << peerid_to_string(pe.id) << " " << pe.adr.str()
-                               << "[peer_type=" << anchor
-                               << "] first_seen: " << epee::misc_utils::get_time_interval_string(time(NULL) - pe.first_seen));
-
-      if(!try_to_connect_and_handshake_with_new_peer(pe.adr, false, 0, anchor, pe.first_seen)) {
-        _note("Handshake failed");
-        continue;
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-  //-----------------------------------------------------------------------------------
-  template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::make_new_connection_from_peerlist(bool use_white_list)
   {
     size_t local_peers_count = use_white_list ? m_peerlist.get_white_peers_count():m_peerlist.get_gray_peers_count();
@@ -1007,11 +920,6 @@ namespace nodetool
       ++try_count;
 
       _note("Considering connecting (out) to peer: " << peerid_to_string(pe.id) << " " << pe.adr.str());
-
-      if(is_peer_used(pe)) {
-        _note("Peer is used");
-        continue;
-      }
 
       if(!is_remote_host_allowed(pe.adr))
         continue;
@@ -1103,10 +1011,7 @@ namespace nodetool
     {
       if(conn_count < expected_white_connections)
       {
-        //start from anchor list
-        if(!make_expected_connections_count(anchor, P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT))
-          return false;
-        //then do white list
+        //start from white list
         if(!make_expected_connections_count(white, expected_white_connections))
           return false;
         //then do grey list
@@ -1139,22 +1044,12 @@ namespace nodetool
     if (m_offline)
       return true;
 
-    std::vector<anchor_peerlist_entry> apl;
-
-    if (peer_type == anchor) {
-      m_peerlist.get_and_empty_anchor_peerlist(apl);
-    }
-
     size_t conn_count = get_outgoing_connections_count();
     //add new connections from white peers
     while(conn_count < expected_connections)
     {
       if(m_net_server.is_stop_signal_sent())
         return false;
-
-      if (peer_type == anchor && !make_new_connection_from_anchor_peerlist(apl)) {
-        break;
-      }
 
       if (peer_type == white && !make_new_connection_from_peerlist(true)) {
         break;
@@ -1377,7 +1272,7 @@ namespace nodetool
       auto cb_ = cb;*/
 
       // GCC 5.1.0 gives error with second use of uint64_t (peerid_type) variable.
-      peerid_type pr_ = pr;
+
 
       bool inv_call_res = epee::net_utils::async_invoke_remote_command2<COMMAND_PING::response>(ping_context.m_connection_id, COMMAND_PING::ID, req, m_net_server.get_config_object(),
         [=](int code, const COMMAND_PING::response& rsp, p2p_connection_context& context)
@@ -1388,12 +1283,7 @@ namespace nodetool
           return;
         }
 
-        if(rsp.status != PING_OK_RESPONSE_STATUS_TEXT || pr != rsp.peer_id)
-        {
-          LOG_WARNING_CC(ping_context, "back ping invoke wrong response \"" << rsp.status << "\" from" << address.str() << ", hsh_peer_id=" << pr_ << ", rsp.peer_id=" << rsp.peer_id);
-          m_net_server.get_config_object().close(ping_context.m_connection_id);
-          return;
-        }
+        peerid_type pr_ = rsp.peer_id;
         m_net_server.get_config_object().close(ping_context.m_connection_id);
         cb();
       });
@@ -1425,11 +1315,11 @@ namespace nodetool
       m_net_server.get_config_object(),
       [=](int code, const typename COMMAND_REQUEST_SUPPORT_FLAGS::response& rsp, p2p_connection_context& context_)
       {
-//        if(code < 0)
-//        {
-//          LOG_WARNING_CC(context_, "COMMAND_REQUEST_SUPPORT_FLAGS invoke failed. (" << code <<  ", " << epee::levin::get_err_descr(code) << ")");
-//          return;
-//       }
+        if(code < 0)
+        {
+          LOG_WARNING_CC(context_, "COMMAND_REQUEST_SUPPORT_FLAGS invoke failed. (" << code <<  ", " << epee::levin::get_err_descr(code) << ")");
+          return;
+       }
 
         f(context_, rsp.support_flags);
       },
@@ -1554,7 +1444,7 @@ namespace nodetool
   int node_server<t_payload_net_handler>::handle_ping(int command, COMMAND_PING::request& arg, COMMAND_PING::response& rsp, p2p_connection_context& context)
   {
     LOG_DEBUG_CC(context, "COMMAND_PING");
-    rsp.status = PING_OK_RESPONSE_STATUS_TEXT;
+    rsp.status = "OK";
     rsp.peer_id = m_config.m_peer_id;
     return 1;
   }
@@ -1605,8 +1495,6 @@ namespace nodetool
     if (!m_net_server.is_stop_signal_sent() && !context.m_is_income) {
       epee::net_utils::network_address na = AUTO_VAL_INIT(na);
       na = context.m_remote_address;
-
-      m_peerlist.remove_from_peer_anchor(na);
     }
 
     m_payload_handler.on_connection_close(context);

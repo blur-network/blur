@@ -299,14 +299,10 @@ namespace nodetool
     */
     const static int ID = 1003;
 
-#define PING_OK_RESPONSE_STATUS_TEXT "OK"
-
     struct request
     {
-      peerid_type peer_id;
 
       BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE(peer_id)
       END_KV_SERIALIZE_MAP()
     };
 
@@ -331,9 +327,7 @@ namespace nodetool
 
     struct request
     {
-      peerid_type peer_id;
       BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE(peer_id)
       END_KV_SERIALIZE_MAP()
     };
 
