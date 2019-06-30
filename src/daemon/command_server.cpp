@@ -103,7 +103,7 @@ t_command_server::t_command_server(
   m_command_lookup.set_handler(
       "start_mining"
     , std::bind(&t_command_parser_executor::start_mining, &m_parser, p::_1)
-    , "start_mining <addr> [<threads>] [do_background_mining] [ignore_battery]"
+    , "start_mining <addr> [<threads>]"
     , "Start mining for specified address. Defaults to 1 thread and no background mining."
     );
   m_command_lookup.set_handler(
@@ -313,7 +313,7 @@ bool t_command_server::help(const std::vector<std::string>& args)
 std::string t_command_server::get_commands_str()
 {
   std::stringstream ss;
-  ss << "BLUR '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << std::endl;
+  ss << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << std::endl;
   ss << "Commands: " << std::endl;
   std::string usage = m_command_lookup.get_usage();
   boost::replace_all(usage, "\n", "\n  ");
