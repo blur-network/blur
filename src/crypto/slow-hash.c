@@ -715,6 +715,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
         hash_extra_blake, hash_extra_groestl, hash_extra_jh, hash_extra_skein
     };
 
+
     // this isn't supposed to happen, but guard against it for now.
     if(hp_state == NULL)
         slow_hash_allocate_state();
@@ -772,7 +773,8 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     // the useAes test is only performed once, not every iteration.
     if(useAes)
     {
-        for(i = 0; i < (iters >> 1); i++)
+        uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
+        for(i = 0; i < iters_var; i++)
         {
             pre_aes();
             _c = _mm_aesenc_si128(_c, _a);
@@ -781,7 +783,8 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     }
     else
     {
-        for(i = 0; i < (iters >> 1); i++)
+        uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
+        for(i = 0; i < iters_var; i++)
         {
             pre_aes();
             aesb_single_round((uint8_t *) &_c, (uint8_t *) &_c, (uint8_t *) &_a);
@@ -828,7 +831,6 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     hash_permutation(&state.hs);
     extra_hashes[state.hs.b[0] & 3](&state, 200, hash);
 }
-
 #elif !defined NO_AES && (defined(__arm__) || defined(__aarch64__))
 void slow_hash_allocate_state(void)
 {
@@ -1124,7 +1126,8 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     _b = vld1q_u8((const uint8_t *)b);
     _b1 = vld1q_u8(((const uint8_t *)b) + AES_BLOCK_SIZE);
 
-    for(i = 0; i < (iters >> 1); i++)
+    uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
+    for(i = 0; i < iters_var; i++)
     {
         pre_aes();
         _c = vaeseq_u8(_c, zero);
@@ -1331,7 +1334,8 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     U64(b)[0] = U64(&state.k[16])[0] ^ U64(&state.k[48])[0];
     U64(b)[1] = U64(&state.k[16])[1] ^ U64(&state.k[48])[1];
 
-    for(i = 0; i < (iters >> 1); i++)
+    uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
+    for(i = 0; i < iters_var; i++)
     {
       #define MASK ((uint32_t)(((MEMORY / AES_BLOCK_SIZE) - 1) << 4))
       #define state_index(x) ((*(uint32_t *) x) & MASK)
