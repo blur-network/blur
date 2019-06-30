@@ -27,6 +27,12 @@ find_path(Readline_ROOT_DIR
     NO_DEFAULT_PATH
 )
 
+find_path(Termcap_ROOT_DIR
+    NAMES include/curses.h
+    PATHS /usr/local/ /usr/ /opt/local/ /usr/local/opt/ncurses/
+    NO_DEFAULT_PATH
+)
+
 find_path(Readline_INCLUDE_DIR
     NAMES readline/readline.h
     PATHS ${Readline_ROOT_DIR}/include
@@ -41,6 +47,8 @@ find_library(Readline_LIBRARY
 
 find_library(Termcap_LIBRARY
   NAMES tinfo termcap ncursesw ncurses cursesw curses
+  PATHS ${Termcap_ROOT_DIR}/lib
+  NO_DEFAULT_PATH
 )
 
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY)
