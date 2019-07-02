@@ -4,14 +4,17 @@ native_packages := native_ccache
 darwin_native_packages = native_biplist native_ds_store native_mac_alias
 darwin_packages = sodium-darwin
 
-qt_packages=qt
+qt_packages = qt
 
 ifeq ($(host_os),linux)
 packages += unwind
 packages += sodium
+packages += icu4c
+packages += qt
 endif
 ifeq ($(host_os),mingw32)
 packages += icu4c
+packages += qt
 packages += sodium
 endif
 
