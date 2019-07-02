@@ -648,6 +648,54 @@ struct Wallet
      *                          after object returned
      */
 
+
+    /**
+     * @brief multisig - returns current state of multisig wallet creation process
+     * @return MultisigState struct
+     */
+    virtual MultisigState multisig() const = 0;
+    /**
+     * @brief getMultisigInfo
+     * @return serialized and signed multisig info string
+     */
+    virtual std::string getMultisigInfo() const = 0;
+    /**
+     * @brief makeMultisig - switches wallet in multisig state. The one and only creation phase for N / N wallets
+     * @param info - vector of multisig infos from other participants obtained with getMulitisInfo call
+     * @param threshold - number of required signers to make valid transaction. Must be equal to number of participants (N) or N - 1
+     * @return in case of N / N wallets returns empty string since no more key exchanges needed. For N - 1 / N wallets returns base58 encoded extra multisig info
+     */
+    virtual std::string makeMultisig(const std::vector<std::string>& info, uint32_t threshold) = 0;
+    /**
+     * @brief exchange_multisig_keys - provides additional key exchange round for arbitrary multisig schemes (like N-1/N, M/N)
+     * @param info - base58 encoded key derivations returned by makeMultisig or exchangeMultisigKeys function call
+     * @return new info string if more rounds required or an empty string if wallet creation is done
+     */
+    virtual std::string exchangeMultisigKeys(const std::vector<std::string> &info) = 0;
+    /**
+     * @brief finalizeMultisig - finalizes N - 1 / N multisig wallets creation
+     * @param extraMultisigInfo - wallet participants' extra multisig info obtained with makeMultisig call
+     * @return true if success
+     */
+    virtual bool finalizeMultisig(const std::vector<std::string>& extraMultisigInfo) = 0;
+    /**
+     * @brief exportMultisigImages - exports transfers' key images
+     * @param images - output paramter for hex encoded array of images
+     * @return true if success
+     */
+    virtual bool exportMultisigImages(std::string& images) = 0;
+    /**
+     * @brief importMultisigImages - imports other participants' multisig images
+     * @param images - array of hex encoded arrays of images obtained with exportMultisigImages
+     * @return number of imported images
+     */
+    virtual size_t importMultisigImages(const std::vector<std::string>& images) = 0;
+    /**
+     * @brief hasMultisigPartialKeyImages - checks if wallet needs to import multisig key images from other participants
+     * @return true if there are partial key images
+     */
+    virtual bool hasMultisigPartialKeyImages() const = 0;
+
     virtual PendingTransaction * createTransaction(const std::string &dst_addr, const std::string &payment_id,
                                                    optional<uint64_t> amount, uint32_t mixin_count,
                                                    PendingTransaction::Priority = PendingTransaction::Priority_Low,

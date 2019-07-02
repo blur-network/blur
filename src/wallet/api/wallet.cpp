@@ -1103,6 +1103,132 @@ void WalletImpl::setSubaddressLabel(uint32_t accountIndex, uint32_t addressIndex
     }
 }
 
+MultisigState WalletImpl::multisig() const {
+    MultisigState state;
+    state.isMultisig = m_wallet->multisig(&state.isReady, &state.threshold, &state.total);
+    return state;
+}
+string WalletImpl::getMultisigInfo() const {
+    try {
+        clearStatus();
+        return m_wallet->get_multisig_info();
+    } catch (const exception& e) {
+        LOG_ERROR("Error on generating multisig info: ") << e.what();
+        setStatusError(string(tr("Failed to get multisig info: ")) + e.what());
+    }
+    return string();
+}
+string WalletImpl::makeMultisig(const vector<string>& info, uint32_t threshold) {
+    try {
+        clearStatus();
+        if (m_wallet->multisig()) {
+            throw runtime_error("Wallet is already multisig");
+        }
+        return m_wallet->make_multisig(epee::wipeable_string(m_password), info, threshold);
+    } catch (const exception& e) {
+        LOG_ERROR("Error on making multisig wallet: ") << e.what();
+        setStatusError(string(tr("Failed to make multisig: ")) + e.what());
+    }
+    return string();
+}
+
+std::string WalletImpl::exchangeMultisigKeys(const std::vector<std::string> &info) {
+    try {
+        clearStatus();
+        checkMultisigWalletNotReady(m_wallet);
+
+        return m_wallet->exchange_multisig_keys(epee::wipeable_string(m_password), info);
+    } catch (const exception& e) {
+        LOG_ERROR("Error on exchanging multisig keys: ") << e.what();
+        setStatusError(string(tr("Failed to make multisig: ")) + e.what());
+    }
+
+    return string();
+}
+
+bool WalletImpl::finalizeMultisig(const vector<string>& extraMultisigInfo) {
+    try {
+        clearStatus();
+       checkMultisigWalletNotReady(m_wallet);
+        if (m_wallet->finalize_multisig(epee::wipeable_string(m_password), extraMultisigInfo)) {
+            return true;
+        }
+        setStatusError(tr("Failed to finalize multisig wallet creation"));
+    } catch (const exception& e) {
+        LOG_ERROR("Error on finalizing multisig wallet creation: ") << e.what();
+        setStatusError(string(tr("Failed to finalize multisig wallet creation: ")) + e.what());
+    }
+    return false;
+}
+bool WalletImpl::exportMultisigImages(string& images) {
+    try {
+        clearStatus();
+        checkMultisigWalletReady(m_wallet);
+        auto blob = m_wallet->export_multisig();
+        images = epee::string_tools::buff_to_hex_nodelimer(blob);
+        return true;
+    } catch (const exception& e) {
+        LOG_ERROR("Error on exporting multisig images: ") << e.what();
+        setStatusError(string(tr("Failed to export multisig images: ")) + e.what());
+    }
+    return false;
+}
+size_t WalletImpl::importMultisigImages(const vector<string>& images) {
+    try {
+        clearStatus();
+        checkMultisigWalletReady(m_wallet);
+        std::vector<std::string> blobs;
+        blobs.reserve(images.size());
+        for (const auto& image: images) {
+            std::string blob;
+            if (!epee::string_tools::parse_hexstr_to_binbuff(image, blob)) {
+                LOG_ERROR("Failed to parse imported multisig images");
+                setStatusError(tr("Failed to parse imported multisig images"));
+                return 0;
+            }
+            blobs.emplace_back(std::move(blob));
+        }
+        return m_wallet->import_multisig(blobs);
+    } catch (const exception& e) {
+        LOG_ERROR("Error on importing multisig images: ") << e.what();
+        setStatusError(string(tr("Failed to import multisig images: ")) + e.what());
+    }
+    return 0;
+}
+bool WalletImpl::hasMultisigPartialKeyImages() const {
+    try {
+        clearStatus();
+        checkMultisigWalletReady(m_wallet);
+        return m_wallet->has_multisig_partial_key_images();
+    } catch (const exception& e) {
+        LOG_ERROR("Error on checking for partial multisig key images: ") << e.what();
+        setStatusError(string(tr("Failed to check for partial multisig key images: ")) + e.what());
+    }
+    return false;
+}
+PendingTransaction* WalletImpl::restoreMultisigTransaction(const string& signData) {
+    try {
+        clearStatus();
+        checkMultisigWalletReady(m_wallet);
+        string binary;
+        if (!epee::string_tools::parse_hexstr_to_binbuff(signData, binary)) {
+            throw runtime_error("Failed to deserialize multisig transaction");
+        }
+        tools::wallet2::multisig_tx_set txSet;
+        if (!m_wallet->load_multisig_tx(binary, txSet, {})) {
+          throw runtime_error("couldn't parse multisig transaction data");
+        }
+        auto ptx = new PendingTransactionImpl(*this);
+        ptx->m_pending_tx = txSet.m_ptx;
+        ptx->m_signers = txSet.m_signers;
+        return ptx;
+    } catch (exception& e) {
+        LOG_ERROR("Error on restoring multisig transaction: ") << e.what();
+        setStatusError(string(tr("Failed to restore multisig transaction: ")) + e.what());
+    }
+    return nullptr;
+}
+
 // TODO:
 // 1 - properly handle payment id (add another menthod with explicit 'payment_id' param)
 // 2 - check / design how "Transaction" can be single interface
