@@ -114,6 +114,8 @@ using namespace cryptonote;
 #define STAGENET_SEGREGATION_FORK_HEIGHT 99999999999
 #define SEGREGATION_FORK_VICINITY 1500 /* blocks */
 
+static const std::string MULTISIG_SIGNATURE_MAGIC = "SigMultisigPkV1";
+static const std::string MULTISIG_EXTRA_INFO_MAGIC = "MultisigxV1";
 
 namespace
 {
@@ -123,6 +125,42 @@ namespace
     // .blur/shared-ringdb is the default path
     dir /= "shared-ringdb";
     return dir.string();
+  }
+
+  std::string pack_multisignature_keys(const std::string& prefix, const std::vector<crypto::public_key>& keys, const crypto::secret_key& signer_secret_key)
+  {
+    std::string data;
+    crypto::public_key signer;
+    CHECK_AND_ASSERT_THROW_MES(crypto::secret_key_to_public_key(signer_secret_key, signer), "Failed to derive public spend key");
+    data += std::string((const char *)&signer, sizeof(crypto::public_key));
+
+    for (const auto &key: keys)
+    {
+      data += std::string((const char *)&key, sizeof(crypto::public_key));
+    }
+
+    data.resize(data.size() + sizeof(crypto::signature));
+
+    crypto::hash hash;
+    crypto::cn_fast_hash(data.data(), data.size() - sizeof(crypto::signature), hash);
+    crypto::signature &signature = *(crypto::signature*)&data[data.size() - sizeof(crypto::signature)];
+    crypto::generate_signature(hash, signer, signer_secret_key, signature);
+
+    return MULTISIG_EXTRA_INFO_MAGIC + tools::base58::encode(data);
+  }
+
+  std::vector<crypto::public_key> secret_keys_to_public_keys(const std::vector<crypto::secret_key>& keys)
+  {
+    std::vector<crypto::public_key> public_keys;
+    public_keys.reserve(keys.size());
+
+    std::transform(keys.begin(), keys.end(), std::back_inserter(public_keys), [] (const crypto::secret_key& k) -> crypto::public_key {
+      crypto::public_key p;
+      CHECK_AND_ASSERT_THROW_MES(crypto::secret_key_to_public_key(k, p), "Failed to derive public spend key");
+      return p;
+    });
+
+    return public_keys;
   }
 }
 
@@ -641,6 +679,7 @@ wallet2::wallet2(network_type nettype, bool restricted):
   m_run(true),
   m_callback(0),
   m_nettype(nettype),
+  m_multisig_rounds_passed(0),
   m_always_confirm_transfers(true),
   m_print_ring_members(false),
   m_store_tx_info(true),
@@ -2584,6 +2623,7 @@ bool wallet2::store_keys(const std::string& keys_file_name, const epee::wipeable
 {
   std::string account_data;
   std::string multisig_signers;
+  std::string multisig_derivations;
   cryptonote::account_base account = m_account;
 
   if (watch_only)
@@ -2624,6 +2664,14 @@ bool wallet2::store_keys(const std::string& keys_file_name, const epee::wipeable
     CHECK_AND_ASSERT_MES(r, false, "failed to serialize wallet multisig signers");
     value.SetString(multisig_signers.c_str(), multisig_signers.length());
     json.AddMember("multisig_signers", value, json.GetAllocator());
+
+    r = ::serialization::dump_binary(m_multisig_derivations, multisig_derivations);
+    CHECK_AND_ASSERT_MES(r, false, "failed to serialize wallet multisig derivations");
+    value.SetString(multisig_derivations.c_str(), multisig_derivations.length());
+    json.AddMember("multisig_derivations", value, json.GetAllocator());
+
+    value2.SetUint(m_multisig_rounds_passed);
+    json.AddMember("multisig_rounds_passed", value2, json.GetAllocator());
   }
 
   value2.SetInt(m_always_confirm_transfers ? 1 :0);
@@ -2747,6 +2795,8 @@ bool wallet2::load_keys(const std::string& keys_file_name, const epee::wipeable_
     m_multisig = false;
     m_multisig_threshold = 0;
     m_multisig_signers.clear();
+    m_multisig_rounds_passed = 0;
+    m_multisig_derivations.clear();
     m_always_confirm_transfers = false;
     m_print_ring_members = false;
     m_default_mixin = 0;
@@ -2799,6 +2849,8 @@ bool wallet2::load_keys(const std::string& keys_file_name, const epee::wipeable_
     m_multisig = field_multisig;
     GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, multisig_threshold, unsigned int, Uint, m_multisig, 0);
     m_multisig_threshold = field_multisig_threshold;
+    GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, multisig_rounds_passed, unsigned int, Uint, false, 0);
+    m_multisig_rounds_passed = field_multisig_rounds_passed;
     if (m_multisig)
     {
       if (!json.HasMember("multisig_signers"))
@@ -2818,6 +2870,24 @@ bool wallet2::load_keys(const std::string& keys_file_name, const epee::wipeable_
       {
         LOG_ERROR("Field multisig_signers found in JSON, but failed to parse");
         return false;
+      }
+
+      //previous version of multisig does not have this field
+      if (json.HasMember("multisig_derivations"))
+      {
+        if (!json["multisig_derivations"].IsString())
+        {
+          LOG_ERROR("Field multisig_derivations found in JSON, but not String");
+          return false;
+        }
+        const char *field_multisig_derivations = json["multisig_derivations"].GetString();
+        std::string multisig_derivations = std::string(field_multisig_derivations, field_multisig_derivations + json["multisig_derivations"].GetStringLength());
+        r = ::serialization::parse_binary(multisig_derivations, m_multisig_derivations);
+        if (!r)
+        {
+          LOG_ERROR("Field multisig_derivations found in JSON, but failed to parse");
+          return false;
+        }
       }
     }
     GET_FIELD_FROM_JSON_RETURN_ON_ERROR(json, always_confirm_transfers, int, Int, false, true);
@@ -3326,62 +3396,86 @@ std::string wallet2::make_multisig(const epee::wipeable_string &password,
   CHECK_AND_ASSERT_THROW_MES(!view_keys.empty(), "empty view keys");
   CHECK_AND_ASSERT_THROW_MES(view_keys.size() == spend_keys.size(), "Mismatched view/spend key sizes");
   CHECK_AND_ASSERT_THROW_MES(threshold > 1 && threshold <= spend_keys.size() + 1, "Invalid threshold");
-  CHECK_AND_ASSERT_THROW_MES(threshold == spend_keys.size() || threshold == spend_keys.size() + 1, "Unsupported threshold case");
 
   std::string extra_multisig_info;
-  crypto::hash hash;
-
-  clear();
-
-  MINFO("Creating spend key...");
   std::vector<crypto::secret_key> multisig_keys;
-  rct::key spend_pkey, spend_skey;
+  rct::key spend_pkey = rct::identity();
+  rct::key spend_skey;
+  std::vector<crypto::public_key> multisig_signers;
+
+
   if (threshold == spend_keys.size() + 1)
   {
+    // In N / N case we only need to do one round and calculate secret multisig keys and new secret spend key
+    MINFO("Creating spend key...");
+
+    // Calculates all multisig keys and spend key
     cryptonote::generate_multisig_N_N(get_account().get_keys(), spend_keys, multisig_keys, spend_skey, spend_pkey);
-  }
-  else if (threshold == spend_keys.size())
-  {
-    cryptonote::generate_multisig_N1_N(get_account().get_keys(), spend_keys, multisig_keys, spend_skey, spend_pkey);
 
-    // We need an extra step, so we package all the composite public keys
-    // we know about, and make a signed string out of them
-    std::string data;
-    crypto::public_key signer;
-    CHECK_AND_ASSERT_THROW_MES(crypto::secret_key_to_public_key(rct::rct2sk(spend_skey), signer), "Failed to derive public spend key");
-    data += std::string((const char *)&signer, sizeof(crypto::public_key));
-
-    for (const auto &msk: multisig_keys)
-    {
-      rct::key pmsk = rct::scalarmultBase(rct::sk2rct(msk));
-      data += std::string((const char *)&pmsk, sizeof(crypto::public_key));
-    }
-
-    data.resize(data.size() + sizeof(crypto::signature));
-    crypto::cn_fast_hash(data.data(), data.size() - sizeof(signature), hash);
-    crypto::signature &signature = *(crypto::signature*)&data[data.size() - sizeof(crypto::signature)];
-    crypto::generate_signature(hash, signer, rct::rct2sk(spend_skey), signature);
-
-    extra_multisig_info = std::string("MultisigxV1") + tools::base58::encode(data);
+    // Our signer key is b * G, where b is secret spend key.
+    multisig_signers = spend_keys;
+    multisig_signers.push_back(get_multisig_signer_public_key(get_account().get_keys().m_spend_secret_key));
   }
   else
   {
-    CHECK_AND_ASSERT_THROW_MES(false, "Unsupported threshold case");
+    // We just got public spend keys of all participants and deriving multisig keys (set of Mi = b * Bi).
+    // note that derivations are public keys as DH exchange suppose it to be
+    auto derivations = cryptonote::generate_multisig_derivations(get_account().get_keys(), spend_keys);
+
+    spend_pkey = rct::identity();
+    multisig_signers = std::vector<crypto::public_key>(spend_keys.size() + 1, crypto::null_pkey);
+
+    if (threshold == spend_keys.size())
+    {
+      // N - 1 / N case
+
+      // We need an extra step, so we package all the composite public keys
+      // we know about, and make a signed string out of them
+      MINFO("Creating spend key...");
+
+      // Calculating set of our secret multisig keys as follows: mi = H(Mi),
+      // where mi - secret multisig key, Mi - others' participants public multisig key
+      multisig_keys = cryptonote::calculate_multisig_keys(derivations);
+
+      // calculating current participant's spend secret key as sum of all secret multisig keys for current participant.
+      // IMPORTANT: participant's secret spend key is not an entire wallet's secret spend!
+      //            Entire wallet's secret spend is sum of all unique secret multisig keys
+      //            among all of participants and is not held by anyone!
+      spend_skey = rct::sk2rct(cryptonote::calculate_multisig_signer_key(multisig_keys));
+
+      // Preparing data for the last round to calculate common public spend key. The data contains public multisig keys.
+      extra_multisig_info = pack_multisignature_keys(MULTISIG_EXTRA_INFO_MAGIC, secret_keys_to_public_keys(multisig_keys), rct::rct2sk(spend_skey));
+    }
+    else
+    {
+      // M / N case
+      MINFO("Preparing keys for next exchange round...");
+
+      // Preparing data for middle round - packing new public multisig keys to exchage with others.
+      extra_multisig_info = pack_multisignature_keys(MULTISIG_EXTRA_INFO_MAGIC, derivations, m_account.get_keys().m_spend_secret_key);
+      spend_skey = rct::sk2rct(m_account.get_keys().m_spend_secret_key);
+
+      // Need to store middle keys to be able to proceed in case of wallet shutdown.
+      m_multisig_derivations = derivations;
+    }
   }
 
-  // the multisig view key is shared by all, make one all can derive
+  clear();
   MINFO("Creating view key...");
   crypto::secret_key view_skey = cryptonote::generate_multisig_view_secret_key(get_account().get_keys().m_view_secret_key, view_keys);
 
   MINFO("Creating multisig address...");
   CHECK_AND_ASSERT_THROW_MES(m_account.make_multisig(view_skey, rct::rct2sk(spend_skey), rct::rct2pk(spend_pkey), multisig_keys),
       "Failed to create multisig wallet due to bad keys");
+  memwipe(&spend_skey, sizeof(rct::key));
 
   m_account_public_address = m_account.get_keys().m_account_address;
   m_watch_only = false;
   m_multisig = true;
   m_multisig_threshold = threshold;
   m_key_on_device = false;
+  m_multisig_signers = multisig_signers;
+  ++m_multisig_rounds_passed;
 
   if (threshold == spend_keys.size() + 1)
   {
@@ -3416,13 +3510,134 @@ std::string wallet2::make_multisig(const epee::wipeable_string &password,
   return extra_multisig_info;
 }
 
-std::string wallet2::make_multisig(const epee::wipeable_string &password,
-  const std::vector<std::string> &info,
-  uint32_t threshold)
+std::string wallet2::exchange_multisig_keys(const epee::wipeable_string &password,
+  const std::vector<std::string> &info)
+{
+  THROW_WALLET_EXCEPTION_IF(info.empty(),
+    error::wallet_internal_error, "Empty multisig info");
+
+  if (info[0].substr(0, MULTISIG_EXTRA_INFO_MAGIC.size()) != MULTISIG_EXTRA_INFO_MAGIC)
+  {
+    THROW_WALLET_EXCEPTION_IF(false,
+      error::wallet_internal_error, "Unsupported info string");
+  }
+
+  std::vector<crypto::public_key> signers;
+  std::unordered_set<crypto::public_key> pkeys;
+
+  THROW_WALLET_EXCEPTION_IF(!unpack_extra_multisig_info(info, signers, pkeys),
+    error::wallet_internal_error, "Bad extra multisig info");
+
+  return exchange_multisig_keys(password, pkeys, signers);
+}
+
+std::string wallet2::exchange_multisig_keys(const epee::wipeable_string &password,
+  std::unordered_set<crypto::public_key> derivations,
+  std::vector<crypto::public_key> signers)
+{
+  CHECK_AND_ASSERT_THROW_MES(!derivations.empty(), "empty pkeys");
+  CHECK_AND_ASSERT_THROW_MES(!signers.empty(), "empty signers");
+
+  bool ready = false;
+  CHECK_AND_ASSERT_THROW_MES(multisig(&ready), "The wallet is not multisig");
+  CHECK_AND_ASSERT_THROW_MES(!ready, "Multisig wallet creation process has already been finished");
+
+  if (m_multisig_rounds_passed == multisig_rounds_required(m_multisig_signers.size(), m_multisig_threshold) - 1)
+  {
+    // the last round is passed and we have to calculate spend public key
+    // add ours if not included
+    crypto::public_key local_signer = get_multisig_signer_public_key();
+
+    if (std::find(signers.begin(), signers.end(), local_signer) == signers.end())
+    {
+        signers.push_back(local_signer);
+        for (const auto &msk: get_account().get_multisig_keys())
+        {
+            derivations.insert(rct::rct2pk(rct::scalarmultBase(rct::sk2rct(msk))));
+        }
+    }
+
+    CHECK_AND_ASSERT_THROW_MES(signers.size() == m_multisig_signers.size(), "Bad signers size");
+
+    // Summing all of unique public multisig keys to calculate common public spend key
+    crypto::public_key spend_public_key = cryptonote::generate_multisig_M_N_spend_public_key(std::vector<crypto::public_key>(derivations.begin(), derivations.end()));
+    m_account_public_address.m_spend_public_key = spend_public_key;
+    m_account.finalize_multisig(spend_public_key);
+
+    m_multisig_signers = signers;
+    std::sort(m_multisig_signers.begin(), m_multisig_signers.end(), [](const crypto::public_key &e0, const crypto::public_key &e1){ return memcmp(&e0, &e1, sizeof(e0)); });
+
+    ++m_multisig_rounds_passed;
+    m_multisig_derivations.clear();
+
+  if (!m_wallet_file.empty())
+  {
+    bool r = store_keys(m_keys_file, password, false);
+    THROW_WALLET_EXCEPTION_IF(!r, error::file_save_error, m_keys_file);
+
+    if (boost::filesystem::exists(m_wallet_file + ".address.txt"))
+    {
+      r = file_io_utils::save_string_to_file(m_wallet_file + ".address.txt", m_account.get_public_address_str(m_nettype));
+      if(!r) MERROR("String with address text not saved");
+    }
+  }
+
+    m_subaddresses.clear();
+    m_subaddress_labels.clear();
+    add_subaddress_account(tr("Primary account"));
+
+    if (!m_wallet_file.empty())
+      store();
+
+    return {};
+  }
+
+  // Below are either middle or secret spend key establishment rounds
+
+  for (const auto& key: m_multisig_derivations)
+    derivations.erase(key);
+
+  // Deriving multisig keys (set of Mi = b * Bi) according to DH from other participants' multisig keys.
+  auto new_derivations = cryptonote::generate_multisig_derivations(get_account().get_keys(), std::vector<crypto::public_key>(derivations.begin(), derivations.end()));
+
+  std::string extra_multisig_info;
+  if (m_multisig_rounds_passed == multisig_rounds_required(m_multisig_signers.size(), m_multisig_threshold) - 2) // next round is last
+  {
+    // Next round is last therefore we are performing secret spend establishment round as described above.
+    MINFO("Creating spend key...");
+
+    // Calculating our secret multisig keys by hashing our public multisig keys.
+    auto multisig_keys = cryptonote::calculate_multisig_keys(std::vector<crypto::public_key>(new_derivations.begin(), new_derivations.end()));
+    // And summing it to get personal secret spend key
+    crypto::secret_key spend_skey = cryptonote::calculate_multisig_signer_key(multisig_keys);
+
+    m_account.make_multisig(m_account.get_keys().m_view_secret_key, spend_skey, rct::rct2pk(rct::identity()), multisig_keys);
+
+    // Packing public multisig keys to exchange with others and calculate common public spend key in the last round
+    extra_multisig_info = pack_multisignature_keys(MULTISIG_EXTRA_INFO_MAGIC, secret_keys_to_public_keys(multisig_keys), spend_skey);
+  }
+  else
+  {
+    // This is just middle round
+    MINFO("Preparing keys for next exchange round...");
+    extra_multisig_info = pack_multisignature_keys(MULTISIG_EXTRA_INFO_MAGIC, new_derivations, m_account.get_keys().m_spend_secret_key);
+    m_multisig_derivations = new_derivations;
+  }
+
+  ++m_multisig_rounds_passed;
+
+  if (!m_wallet_file.empty())
+    store();
+  return extra_multisig_info;
+}
+
+void wallet2::unpack_multisig_info(const std::vector<std::string>& info,
+  std::vector<crypto::public_key> &public_keys,
+  std::vector<crypto::secret_key> &secret_keys) const
 {
   // parse all multisig info
-  std::vector<crypto::secret_key> secret_keys(info.size());
-  std::vector<crypto::public_key> public_keys(info.size());
+  public_keys.resize(info.size());
+  secret_keys.resize(info.size());
   for (size_t i = 0; i < info.size(); ++i)
   {
     THROW_WALLET_EXCEPTION_IF(!verify_multisig_info(info[i], secret_keys[i], public_keys[i]),
@@ -3466,71 +3681,51 @@ std::string wallet2::make_multisig(const epee::wipeable_string &password,
           "Found local spend public key, but not local view secret key - something very weird");
     }
   }
+}
 
+std::string wallet2::make_multisig(const epee::wipeable_string &password,
+  const std::vector<std::string> &info,
+  uint32_t threshold)
+{
+  std::vector<crypto::secret_key> secret_keys(info.size());
+  std::vector<crypto::public_key> public_keys(info.size());
+  unpack_multisig_info(info, public_keys, secret_keys);
   return make_multisig(password, secret_keys, public_keys, threshold);
 }
 
 bool wallet2::finalize_multisig(const epee::wipeable_string &password, std::unordered_set<crypto::public_key> pkeys, std::vector<crypto::public_key> signers)
 {
-  CHECK_AND_ASSERT_THROW_MES(!pkeys.empty(), "empty pkeys");
+  exchange_multisig_keys(password, pkeys, signers);
+  return true;
+}
 
-  // add ours if not included
-  crypto::public_key local_signer;
-  CHECK_AND_ASSERT_THROW_MES(crypto::secret_key_to_public_key(get_account().get_keys().m_spend_secret_key, local_signer),
-      "Failed to derive public spend key");
-  if (std::find(signers.begin(), signers.end(), local_signer) == signers.end())
+bool wallet2::unpack_extra_multisig_info(const std::vector<std::string>& info,
+  std::vector<crypto::public_key> &signers,
+  std::unordered_set<crypto::public_key> &pkeys) const
+{
+  // parse all multisig info
+  signers.resize(info.size(), crypto::null_pkey);
+  for (size_t i = 0; i < info.size(); ++i)
   {
-    signers.push_back(local_signer);
-    for (const auto &msk: get_account().get_multisig_keys())
-    {
-      pkeys.insert(rct::rct2pk(rct::scalarmultBase(rct::sk2rct(msk))));
-    }
+      if (!verify_extra_multisig_info(info[i], pkeys, signers[i]))
+      {
+          return false;
+      }
   }
-
-  CHECK_AND_ASSERT_THROW_MES(signers.size() == m_multisig_signers.size(), "Bad signers size");
-
-  crypto::public_key spend_public_key = cryptonote::generate_multisig_N1_N_spend_public_key(std::vector<crypto::public_key>(pkeys.begin(), pkeys.end()));
-  m_account_public_address.m_spend_public_key = spend_public_key;
-  m_account.finalize_multisig(spend_public_key);
-
-  m_multisig_signers = signers;
-  std::sort(m_multisig_signers.begin(), m_multisig_signers.end(), [](const crypto::public_key &e0, const crypto::public_key &e1){ return memcmp(&e0, &e1, sizeof(e0)); });
-
-  if (!m_wallet_file.empty())
-  {
-    bool r = store_keys(m_keys_file, password, false);
-    THROW_WALLET_EXCEPTION_IF(!r, error::file_save_error, m_keys_file);
-
-    if (boost::filesystem::exists(m_wallet_file + ".address.txt"))
-    {
-      r = file_io_utils::save_string_to_file(m_wallet_file + ".address.txt", m_account.get_public_address_str(m_nettype));
-      if(!r) MERROR("String with address text not saved");
-    }
-  }
-
-  m_subaddresses.clear();
-  m_subaddress_labels.clear();
-  add_subaddress_account(tr("Primary account"));
-
-  if (!m_wallet_file.empty())
-    store();
 
   return true;
 }
 
 bool wallet2::finalize_multisig(const epee::wipeable_string &password, const std::vector<std::string> &info)
 {
-  // parse all multisig info
   std::unordered_set<crypto::public_key> public_keys;
-  std::vector<crypto::public_key> signers(info.size(), crypto::null_pkey);
-  for (size_t i = 0; i < info.size(); ++i)
+  std::vector<crypto::public_key> signers;
+  if (!unpack_extra_multisig_info(info, signers, public_keys))
   {
-    if (!verify_extra_multisig_info(info[i], public_keys, signers[i]))
-    {
-      MERROR("Bad multisig info");
-      return false;
-    }
+    MERROR("Bad multisig info");
+    return false;
   }
+
   return finalize_multisig(password, public_keys, signers);
 }
 
@@ -3593,14 +3788,13 @@ bool wallet2::verify_multisig_info(const std::string &data, crypto::secret_key &
 
 bool wallet2::verify_extra_multisig_info(const std::string &data, std::unordered_set<crypto::public_key> &pkeys, crypto::public_key &signer)
 {
-  const size_t header_len = strlen("MultisigxV1");
-  if (data.size() < header_len || data.substr(0, header_len) != "MultisigxV1")
+  if (data.size() < MULTISIG_EXTRA_INFO_MAGIC.size() || data.substr(0, MULTISIG_EXTRA_INFO_MAGIC.size()) != MULTISIG_EXTRA_INFO_MAGIC)
   {
     MERROR("Multisig info header check error");
     return false;
   }
   std::string decoded;
-  if (!tools::base58::decode(data.substr(header_len), decoded))
+  if (!tools::base58::decode(data.substr(MULTISIG_EXTRA_INFO_MAGIC.size()), decoded))
   {
     MERROR("Multisig info decoding error");
     return false;
