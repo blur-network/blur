@@ -557,14 +557,14 @@ namespace hw {
         return true;
     }
 
-    bool  device_ledger::generate_chacha_key(const cryptonote::account_keys &keys, crypto::chacha_key &key) {
+    bool  device_ledger::generate_chacha_key(const cryptonote::account_keys &keys, crypto::chacha_key &key, uint64_t kdf_rounds) {
         AUTO_LOCK_CMD();
         int offset;
 
         #ifdef DEBUG_HWDEVICE
         crypto::chacha_key key_x;
         cryptonote::account_keys keys_x = hw::ledger::decrypt(keys); 
-        this->controle_device->generate_chacha_key(keys_x, key_x);
+        this->controle_device->generate_chacha_key(keys_x, key_x, kdf_rounds);
         #endif
 
         reset_buffer();
@@ -584,7 +584,7 @@ namespace hw {
 
         char prekey[200];
         memmove(prekey, &this->buffer_recv[0], 200);
-        crypto::generate_chacha_key_prehashed(&prekey[0], sizeof(prekey), key);
+        crypto::generate_chacha_key_prehashed(&prekey[0], sizeof(prekey), key, kdf_rounds);
 
         #ifdef DEBUG_HWDEVICE
         hw::ledger::check32("generate_chacha_key_prehashed", "key", (char*)key_x.data(), (char*)key.data());

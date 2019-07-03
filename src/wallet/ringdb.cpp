@@ -31,6 +31,7 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/filesystem.hpp>
 #include "misc_log_ex.h"
+#include "common/util.h"
 #include "misc_language.h"
 #include "wallet_errors.h"
 #include "ringdb.h"

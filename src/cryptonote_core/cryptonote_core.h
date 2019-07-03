@@ -917,40 +917,40 @@ namespace cryptonote
       */
      bool check_disk_space();
 
-     bool m_test_drop_download = true; //!< whether or not to drop incoming blocks (for testing)
+     bool m_test_drop_download = true; // whether or not to drop incoming blocks (for testing)
 
-     uint64_t m_test_drop_download_height = 0; //!< height under which to drop incoming blocks, if doing so
+     uint64_t m_test_drop_download_height = 0; // height under which to drop incoming blocks, if doing so
 
-     tx_memory_pool m_mempool; //!< transaction pool instance
-     Blockchain m_blockchain_storage; //!< Blockchain instance
+     tx_memory_pool m_mempool; // transaction pool instance
+     Blockchain m_blockchain_storage; // Blockchain instance
 
-     i_cryptonote_protocol* m_pprotocol; //!< cryptonote protocol instance
+     i_cryptonote_protocol* m_pprotocol; // cryptonote protocol instance
 
-     epee::critical_section m_incoming_tx_lock; //!< incoming transaction lock
+     epee::critical_section m_incoming_tx_lock; // incoming transaction lock
 
      //m_miner and m_miner_addres are probably temporary here
-     miner m_miner; //!< miner instance
-     account_public_address m_miner_address; //!< address to mine to (for miner instance)
+     miner m_miner; // miner instance
+     account_public_address m_miner_address; // address to mine to (for miner instance)
 
-     std::string m_config_folder; //!< folder to look in for configs and other files
+     std::string m_config_folder; // folder to look in for configs and other files
 
-     cryptonote_protocol_stub m_protocol_stub; //!< cryptonote protocol stub instance
+     cryptonote_protocol_stub m_protocol_stub; // cryptonote protocol stub instance
 
-     epee::math_helper::once_a_time_seconds<60*60*12, false> m_store_blockchain_interval; //!< interval for manual storing of Blockchain, if enabled
-     epee::math_helper::once_a_time_seconds<60*60*2, true> m_fork_moaner; //!< interval for checking HardFork status
-     epee::math_helper::once_a_time_seconds<60*2, false> m_txpool_auto_relayer; //!< interval for checking re-relaying txpool transactions
-     epee::math_helper::once_a_time_seconds<60*10, true> m_check_disk_space_interval; //!< interval for checking for disk space
+     epee::math_helper::once_a_time_seconds<60*2> m_store_blockchain_interval; // interval for manual storing of Blockchain, if enabled
+     epee::math_helper::once_a_time_seconds<60*2> m_fork_moaner; // interval for checking HardFork status
+     epee::math_helper::once_a_time_seconds<30> m_txpool_auto_relayer; // interval for checking re-relaying txpool transactions
+     epee::math_helper::once_a_time_seconds<60*10> m_check_disk_space_interval; // interval for checking for disk space
 
-     std::atomic<bool> m_starter_message_showed; //!< has the "daemon will sync now" message been shown?
+     std::atomic<bool> m_starter_message_showed; // has the "daemon will sync now" message been shown?
 
-     uint64_t m_target_blockchain_height; //!< blockchain height target
+     uint64_t m_target_blockchain_height; // blockchain height target
 
-     network_type m_nettype; //!< which network are we on?
+     network_type m_nettype; // which network are we on?
 
-     std::string m_checkpoints_path; //!< path to json checkpoints file
-     time_t m_last_json_checkpoints_update; //!< time when json checkpoints were last updated
+     std::string m_checkpoints_path; // path to json checkpoints file
+     time_t m_last_json_checkpoints_update; // time when json checkpoints were last updated
 
-     std::atomic_flag m_checkpoints_updating; //!< set if checkpoints are currently updating to avoid multiple threads attempting to update at once
+     std::atomic_flag m_checkpoints_updating; // set if checkpoints are currently updating to avoid multiple threads attempting to update at once
 
      size_t block_sync_size;
 

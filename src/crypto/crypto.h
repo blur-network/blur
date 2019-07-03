@@ -39,7 +39,6 @@
 #include <vector>
 
 #include "common/pod-class.h"
-#include "common/util.h"
 #include "memwipe.h"
 #include "mlocker.h"
 #include "generic-ops.h"
