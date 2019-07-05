@@ -1089,9 +1089,6 @@ BlockchainLMDB::~BlockchainLMDB()
 BlockchainLMDB::BlockchainLMDB(bool batch_transactions): BlockchainDB()
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
-  // initialize folder to something "safe" just in case
-  // someone accidentally misuses this class...
-  m_folder = "thishsouldnotexistbecauseitisgibberish";
 
   m_batch_transactions = batch_transactions;
   m_write_txn = nullptr;
@@ -1100,7 +1097,7 @@ BlockchainLMDB::BlockchainLMDB(bool batch_transactions): BlockchainDB()
   m_cum_size = 0;
   m_cum_count = 0;
 
-  m_hardfork = nullptr;
+  m_hardfork = 0;
 }
 
 void BlockchainLMDB::open(const std::string& filename, const int db_flags)
@@ -3190,7 +3187,7 @@ void BlockchainLMDB::drop_hard_fork_info()
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   check_open();
 
-  TXN_PREFIX(0);
+  TXN_BLOCK_PREFIX(0);
 
   auto result = mdb_drop(*txn_ptr, m_hf_starting_heights, 1);
   if (result)
@@ -3225,6 +3222,11 @@ uint8_t BlockchainLMDB::get_hard_fork_version(uint64_t height) const
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   check_open();
+
+  if (height == 0) {
+    const uint8_t ret = 1;
+    return ret;
+  }
 
   TXN_PREFIX_RDONLY();
   RCURSOR(hf_versions);

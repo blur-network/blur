@@ -177,12 +177,27 @@ void BlockchainDB::add_transaction(const crypto::hash& blk_hash, const transacti
       cryptonote::tx_out vout = tx.vout[i];
       rct::key commitment = rct::zeroCommit(vout.amount);
       vout.amount = 0;
-      amount_output_indices.push_back(add_output(tx_hash, vout, i, tx.unlock_time,
-        &commitment));
+      bool unlock_too_soon = tx.unlock_time < (height()  + CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW);
+      if (unlock_too_soon)
+      {
+        MERROR("Miner_tx unlock time cannot be less than block height + 25!"); 
+      }
+      else
+      {
+        amount_output_indices.push_back(add_output(tx_hash, vout, i, tx.unlock_time, &commitment));
+      }
     }
     else
     {
-      amount_output_indices.push_back(add_output(tx_hash, tx.vout[i], i, tx.unlock_time, &tx.rct_signatures.outPk[i].mask));
+      bool unlock_too_soon = tx.unlock_time < (height() + CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE);
+      if (unlock_too_soon)
+      {
+        MERROR("Transfers cannot have an unlock time less than block_height + 10!");
+      }
+      else
+      {
+        amount_output_indices.push_back(add_output(tx_hash, tx.vout[i], i, tx.unlock_time, &tx.rct_signatures.outPk[i].mask));
+      }
     }
   }
   add_tx_amount_output_indices(tx_id, amount_output_indices);
