@@ -3226,12 +3226,17 @@ uint8_t BlockchainLMDB::get_hard_fork_version(uint64_t height) const
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   check_open();
 
+  if ( height == 0 ) {
+    const uint8_t version = 1;
+    return version; }
+
   TXN_PREFIX_RDONLY();
   RCURSOR(hf_versions);
 
   MDB_val_copy<uint64_t> val_key(height);
   MDB_val val_ret;
   auto result = mdb_cursor_get(m_cur_hf_versions, &val_key, &val_ret, MDB_SET);
+
   if (result == MDB_NOTFOUND || result)
     throw0(DB_ERROR(lmdb_error("Error attempting to retrieve a hard fork version at height " + boost::lexical_cast<std::string>(height) + " from the db: ", result).c_str()));
 
