@@ -8,25 +8,17 @@ define $(package)_set_vars
   $(package)_build_opts=CFLAGS="$($(package)_cflags) $($(package)_cppflags) -DU_USING_ICU_NAMESPACE=0 -DU_STATIC_IMPLEMENTATION -DU_COMBINED_IMPLEMENTATION -fPIC -DENABLE_STATIC=YES -DPGKDATA_MODE=static"
 endef
 
-ifeq($(host_os),linux)
 define $(package)_config_cmds
-  mkdir build &&\
-  cd build &&\
+  mkdir builda &&\
+  mkdir buildb &&\
+  cd builda &&\
   sh ../source/runConfigureICU Linux &&\
   make &&\
+  cd ../buildb &&\
+  sh ../source/runConfigureICU MinGW --enable-static=yes --disable-shared --disable-layout --disable-layoutex --disable-tests --disable-samples --prefix=$(host_prefix) --with-cross-build=`pwd`/../builda &&\
   $(MAKE) $($(package)_build_opts)
 endef
-endif
 
-ifeq($(host_os),mingw32)
-define $(package)_config_cmds
-  mkdir build &&\
-  cd ../build &&\
-  sh ../source/runConfigureICU MinGW --enable-static=yes --disable-shared --disable-layout --disable-layoutex --disable-tests --disable-samples --prefix=$(host_prefix) /../build &&\
-  make &&\
-  $(MAKE) $($(package)_build_opts)
-endef
-endif
 
 #define $(package)_build_cmds
 #  cd source &&\
