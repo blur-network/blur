@@ -369,13 +369,11 @@ namespace cryptonote
     return r;
   }
   //---------------------------------------------------------------
-  bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields)
+ bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields)
   {
     tx_extra_fields.clear();
-
     if(tx_extra.empty())
       return true;
-
     std::string extra_str(reinterpret_cast<const char*>(tx_extra.data()), tx_extra.size());
     std::istringstream iss(extra_str);
     binary_archive<false> ar(iss);
@@ -918,6 +916,11 @@ namespace cryptonote
       if (b.major_version <= 7)
       {
         cn_iters += ((height + 1) & 0x3FF);
+      }
+      else if (b.major_version == 8)
+      {
+        cn_iters += ((height + 1) & 0x3FF);
+        cn_iters >>= 1;
       }
       else if (b.major_version == 8)
       {
