@@ -95,7 +95,7 @@ public:
     bool store(const std::string &path);
     std::string filename() const;
     std::string keysFilename() const;
-    bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "", bool use_ssl = false, bool lightWallet = false);
+    bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "", bool use_ssl = false);
     bool connectToDaemon();
     ConnectionStatus connected() const;
     void setTrustedDaemon(bool arg);
@@ -162,8 +162,6 @@ public:
     virtual void pauseRefresh();
     virtual bool parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error);
     virtual std::string getDefaultDataDir() const;
-    virtual bool lightWalletLogin(bool &isNewWallet) const;
-    virtual bool lightWalletImportWalletRequest(std::string &payment_id, uint64_t &fee, bool &new_request, bool &request_fulfilled, std::string &payment_address, std::string &status);
     virtual bool blackballOutputs(const std::vector<std::string> &pubkeys, bool add);
     virtual bool unblackballOutput(const std::string &pubkey);
     virtual bool getRing(const std::string &key_image, std::vector<uint64_t> &ring) const;

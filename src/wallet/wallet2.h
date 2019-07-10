@@ -142,9 +142,8 @@ namespace tools
 
     enum RefreshType {
       RefreshFull,
-      RefreshOptimizeCoinbase,
       RefreshNoCoinbase,
-      RefreshDefault = RefreshOptimizeCoinbase,
+      RefreshDefault = RefreshFull,
     };
 
     static const char* tr(const char* str);
@@ -604,14 +603,6 @@ namespace tools
     bool get_seed(std::string& electrum_words, const epee::wipeable_string &passphrase = epee::wipeable_string()) const;
 
     /*!
-    * \brief Checks if light wallet. A light wallet sends view key to a server where the blockchain is scanned.
-    */
-    bool light_wallet() const { return m_light_wallet; }
-    void set_light_wallet(bool light_wallet) { m_light_wallet = light_wallet; }
-    uint64_t get_light_wallet_scanned_block_height() const { return m_light_wallet_scanned_block_height; }
-    uint64_t get_light_wallet_blockchain_height() const { return m_light_wallet_blockchain_height; }
-
-    /*!
      * \brief Gets the seed language
      */
     const std::string &get_seed_language() const;
@@ -1001,24 +992,6 @@ namespace tools
     uint64_t adjust_mixin(uint64_t mixin) const;
     uint32_t adjust_priority(uint32_t priority);
 
-    // Light wallet specific functions
-    // fetch unspent outs from lw node and store in m_transfers
-    void light_wallet_get_unspent_outs();
-    // fetch txs and store in m_payments
-    void light_wallet_get_address_txs();
-    // get_address_info
-    bool light_wallet_get_address_info(cryptonote::COMMAND_RPC_GET_ADDRESS_INFO::response &response);
-    // Login. new_address is true if address hasn't been used on lw node before.
-    bool light_wallet_login(bool &new_address);
-    // Send an import request to lw node. returns info about import fee, address and payment_id
-    bool light_wallet_import_wallet_request(cryptonote::COMMAND_RPC_IMPORT_WALLET_REQUEST::response &response);
-    // get random outputs from light wallet server
-    void light_wallet_get_outs(std::vector<std::vector<get_outs_entry>> &outs, const std::vector<size_t> &selected_transfers, size_t fake_outputs_count);
-    // Parse rct string
-    bool light_wallet_parse_rct_str(const std::string& rct_string, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key& decrypted_mask, rct::key& rct_commit, bool decrypt) const;
-    // check if key image is ours
-    bool light_wallet_key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index);
-
     /*
      * "attributes" are a mechanism to store an arbitrary number of string values
      * on the level of the wallet as a whole, identified by keys. Their introduction,
@@ -1212,17 +1185,6 @@ namespace tools
     std::unordered_set<crypto::hash> m_scanned_pool_txs[2];
     size_t m_subaddress_lookahead_major, m_subaddress_lookahead_minor;
 
-    // Light wallet
-    bool m_light_wallet; /* sends view key to daemon for scanning */
-    uint64_t m_light_wallet_scanned_block_height;
-    uint64_t m_light_wallet_blockchain_height;
-    uint64_t m_light_wallet_per_kb_fee = DYNAMIC_FEE_PER_KB_BASE_FEE;
-    bool m_light_wallet_connected;
-    uint64_t m_light_wallet_balance;
-    uint64_t m_light_wallet_unlocked_balance;
-    // Light wallet info needed to populate m_payment requires 2 separate api calls (get_address_txs and get_unspent_outs)
-    // We save the info from the first call in m_light_wallet_address_txs for easier lookup.
-    std::unordered_map<crypto::hash, address_tx> m_light_wallet_address_txs;
     // store calculated key image for faster lookup
     std::unordered_map<crypto::public_key, std::map<uint64_t, crypto::key_image> > m_key_image_cache;
 
@@ -1853,7 +1815,7 @@ namespace tools
       return true;
     });
     THROW_WALLET_EXCEPTION_IF(!all_are_txin_to_key, error::unexpected_txin_type, tx);
-    
+
     bool dust_sent_elsewhere = (dust_policy.addr_for_dust.m_view_public_key != change_dts.addr.m_view_public_key
                                 || dust_policy.addr_for_dust.m_spend_public_key != change_dts.addr.m_spend_public_key);      
 
