@@ -772,8 +772,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     // the useAes test is only performed once, not every iteration.
     if(useAes)
     {
-        uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
-        for(i = 0; i < iters_var; i++)
+        for(i = 0; i < iters; i++)
         {
             pre_aes();
             _c = _mm_aesenc_si128(_c, _a);
@@ -782,8 +781,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     }
     else
     {
-        uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
-        for(i = 0; i < iters_var; i++)
+        for(i = 0; i < iters; i++)
         {
             pre_aes();
             aesb_single_round((uint8_t *) &_c, (uint8_t *) &_c, (uint8_t *) &_a);
@@ -1127,8 +1125,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     _b1 = vld1q_u8(((const uint8_t *)b) + AES_BLOCK_SIZE);
 
 
-    uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
-    for(i = 0; i < iters_var; i++)
+    for(i = 0; i < iters; i++)
     {
         pre_aes();
         _c = vaeseq_u8(_c, zero);
@@ -1335,8 +1332,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     U64(b)[0] = U64(&state.k[16])[0] ^ U64(&state.k[48])[0];
     U64(b)[1] = U64(&state.k[16])[1] ^ U64(&state.k[48])[1];
 
-    uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
-    for(i = 0; i < iters_var; i++)
+    for(i = 0; i < iters; i++)
     {
       #define MASK ((uint32_t)(((MEMORY / AES_BLOCK_SIZE) - 1) << 4))
       #define state_index(x) ((*(uint32_t *) x) & MASK)
@@ -1523,8 +1519,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     b[i] = state.k[AES_BLOCK_SIZE + i] ^ state.k[AES_BLOCK_SIZE * 3 + i];
   }
 
-    uint32_t iters_var = variant > 1 ? (iters >> 1) : iters;
-    for(i = 0; i < iters_var; i++) {
+    for(i = 0; i < iters; i++) {
     /* Dependency chain: address -> read value ------+
      * written value <-+ hard function (AES or MUL) <+
      * next address  <-+

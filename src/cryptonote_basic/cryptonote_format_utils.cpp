@@ -132,7 +132,7 @@ namespace cryptonote
   //---------------------------------------------------------------
   bool expand_transaction_1(transaction &tx, bool base_only)
   {
-    if (tx.version >= 2 && !is_coinbase(tx))
+    if (tx.version >= 1 && !is_coinbase(tx))
     {
       rct::rctSig &rv = tx.rct_signatures;
       if (rv.outPk.size() != tx.vout.size())
@@ -380,19 +380,10 @@ namespace cryptonote
     std::istringstream iss(extra_str);
     binary_archive<false> ar(iss);
 
-    bool eof = false;
-    while (!eof)
-    {
       tx_extra_field field;
       bool r = ::do_serialize(ar, field);
-      CHECK_AND_NO_ASSERT_MES_L1(r, false, "failed to deserialize extra field. extra = " << string_tools::buff_to_hex_nodelimer(std::string(reinterpret_cast<const char*>(tx_extra.data()), tx_extra.size())));
+      CHECK_AND_ASSERT_MES(r, false, "failed to deserialize extra field. extra = " << string_tools::buff_to_hex_nodelimer(std::string(reinterpret_cast<const char*>(tx_extra.data()), tx_extra.size())));
       tx_extra_fields.push_back(field);
-
-      std::ios_base::iostate state = iss.rdstate();
-      eof = (EOF == iss.peek());
-      iss.clear(state);
-    }
-    CHECK_AND_NO_ASSERT_MES_L1(::serialization::check_stream_state(ar), false, "failed to deserialize extra field. extra = " << string_tools::buff_to_hex_nodelimer(std::string(reinterpret_cast<const char*>(tx_extra.data()), tx_extra.size())));
 
     return true;
   }
@@ -640,8 +631,6 @@ namespace cryptonote
   {
     std::string res = string_tools::pod_to_hex(h);
     CHECK_AND_ASSERT_MES(res.size() == 64, res, "wrong hash256 with string_tools::pod_to_hex conversion");
-    auto erased_pos = res.erase(8, 48);
-    res.insert(8, "....");
     return res;
   }
   //---------------------------------------------------------------
@@ -847,9 +836,7 @@ namespace cryptonote
   {
     if (t.is_hash_valid())
     {
-#ifdef ENABLE_HASH_CASH_INTEGRITY_CHECK
       CHECK_AND_ASSERT_THROW_MES(!calculate_transaction_hash(t, res, blob_size) || t.hash == res, "tx hash cash integrity failure");
-#endif
       res = t.hash;
       if (blob_size)
       {
@@ -901,9 +888,7 @@ namespace cryptonote
   {
     if (b.is_hash_valid())
     {
-#ifdef ENABLE_HASH_CASH_INTEGRITY_CHECK
       CHECK_AND_ASSERT_THROW_MES(!calculate_block_hash(b, res) || b.hash == res, "block hash cash integrity failure");
-#endif
       res = b.hash;
       ++block_hashes_cached_count;
       return true;
@@ -930,14 +915,20 @@ namespace cryptonote
     const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
     int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
 
-      if (b.major_version <= 8)
+      if (b.major_version <= 7)
       {
         cn_iters += ((height + 1) & 0x3FF);
+      }
+      else if (b.major_version == 8)
+      {
+        cn_iters += ((height + 1) & 0x3FF);
+        cn_iters >>= 1;
       }
       else if (b.major_version == 9)
       {
         const uint64_t stamp = b.timestamp;
         cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
+        cn_iters >>= 1;
       }
       else if (b.major_version >= 10)
       {
@@ -959,6 +950,8 @@ namespace cryptonote
           cn_iters += ((( stamp & (id_num - 1)) + height) & 0x7FFF);  }
         else if (!two) {
           cn_iters += (((stamp % id_num) + height) & 0x7FFF);  }
+
+        cn_iters >>= 1;
 
         LOG_PRINT_L2("\nIterations : "<< cn_iters);
 
