@@ -925,17 +925,16 @@ namespace cryptonote
       if (b.major_version <= 7)
       {
         cn_iters += ((height + 1) & 0x3FF);
+        cn_iters <<= 1;
       }
       else if (b.major_version == 8)
       {
         cn_iters += ((height + 1) & 0x3FF);
-        cn_iters >>= 1;
       }
       else if (b.major_version == 9)
       {
         const uint64_t stamp = b.timestamp;
         cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
-        cn_iters >>= 1;
       }
       else if (b.major_version >= 10)
       {
@@ -957,8 +956,6 @@ namespace cryptonote
           cn_iters += ((( stamp & (id_num - 1)) + height) & 0x7FFF);  }
         else if (!two) {
           cn_iters += (((stamp % id_num) + height) & 0x7FFF);  }
-
-        cn_iters >>= 1;
 
         LOG_PRINT_L2("\nIterations : "<< cn_iters);
 
