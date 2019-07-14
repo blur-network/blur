@@ -646,7 +646,7 @@ wallet2::wallet2(network_type nettype, bool restricted):
   m_store_tx_info(true),
   m_default_mixin(0),
   m_default_priority(0),
-  m_refresh_type(RefreshDefault),
+  m_refresh_type(RefreshFull),
   m_auto_refresh(true),
   m_refresh_from_block_height(0),
   m_explicit_refresh_from_block_height(true),

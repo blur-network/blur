@@ -142,8 +142,8 @@ namespace tools
 
     enum RefreshType {
       RefreshFull,
-      RefreshNoCoinbase,
       RefreshDefault = RefreshFull,
+      RefreshNoCoinbase
     };
 
     static const char* tr(const char* str);
