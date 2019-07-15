@@ -6687,8 +6687,8 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
     type = tr("Normal");
   message_writer() << tr("Type: ") << type;
   message_writer() << tr("Network type: ") << (
-    m_wallet->nettype() == (cryptonote::TESTNET)) ? (tr("Testnet")) :
-    (m_wallet->nettype() == cryptonote::STAGENET) ? (tr("Stagenet")) : (tr("Mainnet"));
+    m_wallet->nettype() == (cryptonote::TESTNET) ? tr("Testnet") :
+    (m_wallet->nettype() == cryptonote::STAGENET) ? tr("Stagenet") : tr("Mainnet"));
   return true;
 }
 //----------------------------------------------------------------------------------------------------
