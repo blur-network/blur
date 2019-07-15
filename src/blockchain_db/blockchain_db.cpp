@@ -192,7 +192,7 @@ void BlockchainDB::add_transaction(const crypto::hash& blk_hash, const transacti
       bool unlock_too_soon = tx.unlock_time < (height() + CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE);
       if (unlock_too_soon)
       {
-        MERROR("Transfers cannot have an unlock time less than block_height + 10!");
+        MERROR("Transfers seen with unlock time less than 10. Txid: " + epee::string_tools::pod_to_hex(get_transaction_hash(tx)));
       }
       else
       {
