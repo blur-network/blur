@@ -61,8 +61,6 @@ DISABLE_VS_WARNINGS(4355)
 
 #define MERROR_VER(x) MCERROR("verify", x)
 
-#define BAD_SEMANTICS_TXES_MAX_SIZE 100
-
 namespace cryptonote
 {
   const command_line::arg_descriptor<bool, false> arg_testnet_on  = {
@@ -635,11 +633,6 @@ namespace cryptonote
       tvc.m_verifivation_failed = true;
       bad_semantics_txes_lock.lock();
       bad_semantics_txes[0].insert(tx_hash);
-      if (bad_semantics_txes[0].size() >= BAD_SEMANTICS_TXES_MAX_SIZE)
-      {
-        std::swap(bad_semantics_txes[0], bad_semantics_txes[1]);
-        bad_semantics_txes[0].clear();
-      }
       bad_semantics_txes_lock.unlock();
       return false;
     }
