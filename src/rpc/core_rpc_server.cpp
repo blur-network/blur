@@ -37,6 +37,7 @@ using namespace epee;
 #include "common/command_line.h"
 #include "common/util.h"
 #include "common/perf_timer.h"
+#include "common/hex_str.h"
 #include "cryptonote_basic/cryptonote_format_utils.h"
 #include "cryptonote_basic/account.h"
 #include "cryptonote_basic/cryptonote_basic_impl.h"
@@ -66,7 +67,6 @@ namespace
 
 namespace cryptonote
 {
-
   //-----------------------------------------------------------------------------------
   void core_rpc_server::init_options(boost::program_options::options_description& desc)
   {
@@ -702,26 +702,26 @@ namespace cryptonote
       return ok;
 
     std::vector<crypto::hash> vh;
-    
+
     for (size_t i = 0; i < req.heights.size(); i++)
     {
       block blk;
       bool orphan = false;
       crypto::hash block_hash = m_core.get_block_id_by_height(req.heights[i]);
       bool have_block = m_core.get_block_by_hash(block_hash, blk, &orphan);
-    
+
       for(auto& btxs: blk.tx_hashes)
         vh.push_back(btxs);
     }
-    
+
     std::list<crypto::hash> missed_txs;
     std::list<transaction> txs;
     bool r = m_core.get_transactions(vh, txs, missed_txs);
-    
+
     std::list<std::string> tx_hashes;
     for(auto& tx: txs)
       tx_hashes.push_back(string_tools::pod_to_hex(get_transaction_hash(tx)));
-    
+
     if(!r)
     {
       res.status = "Failed";
@@ -1146,7 +1146,7 @@ namespace cryptonote
       return r;
 
     m_core.get_pool_transactions_and_spent_keys_info(res.transactions, res.spent_key_images, !request_has_rpc_origin || !m_restricted);
-    
+
     if (req.json_only)
     {
       for(auto& tx: res.transactions)
@@ -1177,7 +1177,7 @@ namespace cryptonote
     bool r;
     if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_BLOCKS_JSON>(invoke_http_mode::JON, "/get_blocks_json", req, res, r))
       return r;
-    
+
     for (size_t i = 0; i < req.heights.size(); i++)
     {
       if(m_core.get_current_blockchain_height() <= req.heights[i])
@@ -1185,7 +1185,7 @@ namespace cryptonote
         LOG_ERROR("Requested block at height " << req.heights[i] << " which is greater than top block height " << m_core.get_current_blockchain_height() - 1);
         continue;
       }
-      
+
       block blk;
       bool orphan = false;
       crypto::hash block_hash = m_core.get_block_id_by_height(req.heights[i]);
@@ -1193,7 +1193,7 @@ namespace cryptonote
       {
         LOG_ERROR("Block with hash " << block_hash << " not found in database");
       }
-    
+
       res.blocks.push_back(obj_to_json_str(blk));
     }
     res.status = CORE_RPC_STATUS_OK;
@@ -1386,7 +1386,7 @@ namespace cryptonote
       error_resp.message = "Wrong block blob";
       return false;
     }
-    
+
     // Fixing of high orphan issue for most pools
     // Thanks Boolberry!
     block b = AUTO_VAL_INIT(b);
@@ -1784,7 +1784,7 @@ namespace cryptonote
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
     }
-	res.version = MONERO_VERSION;
+    res.version = MONERO_VERSION;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -1858,6 +1858,67 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_merkle_root(const COMMAND_RPC_GET_MERKLE_ROOT::request& req, COMMAND_RPC_GET_MERKLE_ROOT::response& res, epee::json_rpc::error& error_resp)
+  {
+      bool tx_filled = req.tx_hashes.size() > 0;
+      bool blk_filled = req.block_hash.size() > 0;
+      bool both_filled = tx_filled && blk_filled;
+
+      if (!tx_filled && !blk_filled) {
+        error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+        error_resp.message = "Error: No transaction(s) or block hash given for root computation";
+        return false;
+      } else if (both_filled) {
+        error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+        error_resp.message = "Error: Too many parameters.  Please use only one of tx_hashes or block_hash.";
+        return false;
+      }
+
+     std::vector<crypto::hash> tx_hashes;
+     cryptonote::blobdata tmp_hash;
+     crypto::hash tree_hash = crypto::null_hash;
+     cryptonote::block b;
+
+     if (tx_filled)
+     {
+       for (const auto& hash : req.tx_hashes)
+       {
+         if (!epee::string_tools::parse_hexstr_to_binbuff(hash,tmp_hash))
+         {
+           error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+           error_resp.message = "Error: Cannot parse tx_hash from hexstr";
+           return false;
+         }
+         tx_hashes.push_back(*reinterpret_cast<const crypto::hash*>(tmp_hash.data()));
+       }
+       const std::vector<crypto::hash> const_txs = tx_hashes;
+       tree_hash = get_tx_tree_hash(const_txs);
+     }
+
+     if (blk_filled)
+     {
+       if(!epee::string_tools::parse_hexstr_to_binbuff(req.block_hash,tmp_hash))
+       {
+         error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+         error_resp.message = "Error: Cannot parse blk_hash from hexstr";
+         return false;
+       }
+
+       const crypto::hash* b_hash = reinterpret_cast<const crypto::hash*>(tmp_hash.data());
+       if (!m_core.get_block_by_hash(*b_hash, b))
+       {
+         error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+         error_resp.message = "Error: Block not found for provided hash";
+         return false;
+       }
+       tree_hash = get_tx_tree_hash(b);
+     }
+
+     std::string tree_hash_s = epee::string_tools::pod_to_hex(tree_hash);
+     res.tree_hash = tree_hash_s;
+     res.status = "OK";
+     return true;
+}
   bool core_rpc_server::on_flush_txpool(const COMMAND_RPC_FLUSH_TRANSACTION_POOL::request& req, COMMAND_RPC_FLUSH_TRANSACTION_POOL::response& res, epee::json_rpc::error& error_resp)
   {
     PERF_TIMER(on_flush_txpool);
