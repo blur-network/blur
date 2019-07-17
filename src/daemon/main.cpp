@@ -43,6 +43,7 @@
 #include "p2p/net_node.h"
 #include "rpc/core_rpc_server.h"
 #include "rpc/rpc_args.h"
+#include "sodium.h"
 #include "daemon/command_line_args.h"
 #include "blockchain_db/db_types.h"
 #include "version.h"
@@ -58,6 +59,11 @@ int main(int argc, char* argv[])
   try {
 
     // TODO parse the debug options like set log level right here at start
+
+    if (sodium_init() < 0)
+    {
+      MWARNING("Libsodium did not initialize properly. Trying again in a few seconds...");
+    }
 
     tools::on_startup();
 
@@ -269,6 +275,11 @@ int main(int argc, char* argv[])
 
     if (!command_line::is_arg_defaulted(vm, daemon_args::arg_max_concurrency))
       tools::set_max_concurrency(command_line::get_arg(vm, daemon_args::arg_max_concurrency));
+
+    if (sodium_init() < 0) {
+      MERROR("Libsodium couldn't initialize. Shutting down...");
+      exit(-1);
+    }
 
     // logging is now set up
     MGINFO("Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")");
