@@ -920,16 +920,19 @@ namespace cryptonote
   {
     blobdata bd = get_block_hashing_blob(b);
     const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
-    int cn_iters = b.major_version >= 6 ? ( b.major_version >= 7 ? 0x40000 : 0x20000 ) : 0x80000;
+    int cn_iters = b.major_version >= 6 ? (b.major_version >= 7 ? 0x40000 :  0x20000) : 0x80000;
 
       if (b.major_version <= 7)
       {
         cn_iters += ((height + 1) & 0x3FF);
         cn_iters <<= 1;
       }
-      else if (b.major_version == 8)
+      else if (b.major_version <= 8)
       {
         cn_iters += ((height + 1) & 0x3FF);
+        if (height < 185856) {
+        cn_iters <<= 1;
+        }
       }
       else if (b.major_version == 9)
       {
