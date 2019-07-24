@@ -169,7 +169,7 @@ namespace nodetool
     for (const auto &c: conns)
       m_net_server.get_config_object().close(c);
 
-    MCLOG_CYAN(el::Level::Info, "global", "Host " << addr.host_str() << " blocked.");
+    MCLOG_CYAN(el::Level::Info, "global", "Host " << addr.host_str() << " blocked due to host being found on block list.");
     return true;
   }
   //-----------------------------------------------------------------------------------
@@ -195,8 +195,10 @@ namespace nodetool
     {
       auto it = m_host_fails_score.find(address.host_str());
       CHECK_AND_ASSERT_MES(it != m_host_fails_score.end(), false, "internal error");
-      if ((it->second) >= 9)
+      if ((it->second) >= 9) {
         block_host(address);
+        MCLOG_CYAN(el::Level::Info, "global", "Host " << address.host_str() << " added to block list. Failed to connect after at least 9 attempts."); 
+      }
     }
     return true;
   }
