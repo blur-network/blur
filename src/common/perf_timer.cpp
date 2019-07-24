@@ -132,12 +132,6 @@ PerformanceTimer::~PerformanceTimer()
 
 LoggingPerformanceTimer::~LoggingPerformanceTimer()
 {
-  pause();
-  performance_timers->pop_back();
-  char s[12];
-  snprintf(s, sizeof(s), "%8llu  ", (unsigned long long)(ticks_to_ns(ticks) / (1000000000 / unit)));
-  size_t size = 0; for (const auto *tmp: *performance_timers) if (!tmp->paused || tmp==this) ++size;
-  MLOG(level, "PERF " << s << std::string(size * 2, ' ') << "  " << name);
   if (performance_timers->empty())
   {
     delete performance_timers;
@@ -149,7 +143,6 @@ void PerformanceTimer::pause()
 {
   if (paused)
     return;
-  ticks = get_tick_count() - ticks;
   paused = true;
 }
 
@@ -157,7 +150,6 @@ void PerformanceTimer::resume()
 {
   if (!paused)
     return;
-  ticks = get_tick_count() - ticks;
   paused = false;
 }
 
