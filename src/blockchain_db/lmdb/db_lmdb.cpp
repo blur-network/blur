@@ -518,105 +518,6 @@ bool BlockchainLMDB::need_resize(uint64_t threshold_size) const
 void BlockchainLMDB::check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes)
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
-  LOG_PRINT_L1("[" << __func__ << "] " << "checking DB size");
-  const uint64_t min_increase_size = 512 * (1 << 20);
-  uint64_t threshold_size = 0;
-  uint64_t increase_size = 0;
-  if (batch_num_blocks > 0)
-  {
-    threshold_size = get_estimated_batch_size(batch_num_blocks, batch_bytes);
-    MDEBUG("calculated batch size: " << threshold_size);
-
-    // The increased DB size could be a multiple of threshold_size, a fixed
-    // size increase (> threshold_size), or other variations.
-    //
-    // Currently we use the greater of threshold size and a minimum size. The
-    // minimum size increase is used to avoid frequent resizes when the batch
-    // size is set to a very small numbers of blocks.
-    increase_size = (threshold_size > min_increase_size) ? threshold_size : min_increase_size;
-    MDEBUG("increase size: " << increase_size);
-  }
-
-  // if threshold_size is 0 (i.e. number of blocks for batch not passed in), it
-  // will fall back to the percent-based threshold check instead of the
-  // size-based check
-  if (need_resize(threshold_size))
-  {
-    MGINFO("[batch] DB resize needed");
-    do_resize(increase_size);
-  }
-}
-
-uint64_t BlockchainLMDB::get_estimated_batch_size(uint64_t batch_num_blocks, uint64_t batch_bytes) const
-{
-  LOG_PRINT_L3("BlockchainLMDB::" << __func__);
-  uint64_t threshold_size = 0;
-
-  // batch size estimate * batch safety factor = final size estimate
-  // Takes into account "reasonable" block size increases in batch.
-  float batch_safety_factor = 1.7f;
-  float batch_fudge_factor = batch_safety_factor * batch_num_blocks;
-  // estimate of stored block expanded from raw block, including denormalization and db overhead.
-  // Note that this probably doesn't grow linearly with block size.
-  float db_expand_factor = 4.5f;
-  uint64_t num_prev_blocks = 500;
-  // For resizing purposes, allow for at least 4k average block size.
-  uint64_t min_block_size = 4 * 1024;
-
-  uint64_t block_stop = 0;
-  uint64_t m_height = height();
-  if (m_height > 1)
-    block_stop = m_height - 1;
-  uint64_t block_start = 0;
-  if (block_stop >= num_prev_blocks)
-    block_start = block_stop - num_prev_blocks + 1;
-  uint32_t num_blocks_used = 0;
-  uint64_t total_block_size = 0;
-  MDEBUG("[" << __func__ << "] " << "m_height: " << m_height << "  block_start: " << block_start << "  block_stop: " << block_stop);
-  size_t avg_block_size = 0;
-  if (batch_bytes)
-  {
-    avg_block_size = batch_bytes / batch_num_blocks;
-    goto estim;
-  }
-  if (m_height == 0)
-  {
-    MDEBUG("No existing blocks to check for average block size");
-  }
-  else if (m_cum_count >= num_prev_blocks)
-  {
-    avg_block_size = m_cum_size / m_cum_count;
-    MDEBUG("average block size across recent " << m_cum_count << " blocks: " << avg_block_size);
-    m_cum_size = 0;
-    m_cum_count = 0;
-  }
-  else
-  {
-    MDB_txn *rtxn;
-    mdb_txn_cursors *rcurs;
-    block_rtxn_start(&rtxn, &rcurs);
-    for (uint64_t block_num = block_start; block_num <= block_stop; ++block_num)
-    {
-      uint32_t block_size = get_block_size(block_num);
-      total_block_size += block_size;
-      // Track number of blocks being totalled here instead of assuming, in case
-      // some blocks were to be skipped for being outliers.
-      ++num_blocks_used;
-    }
-    block_rtxn_stop();
-    avg_block_size = total_block_size / num_blocks_used;
-    MDEBUG("average block size across recent " << num_blocks_used << " blocks: " << avg_block_size);
-  }
-estim:
-  if (avg_block_size < min_block_size)
-    avg_block_size = min_block_size;
-  MDEBUG("estimated average block size for batch: " << avg_block_size);
-
-  // bigger safety margin on smaller block sizes
-  if (batch_fudge_factor < 5000.0)
-    batch_fudge_factor = 5000.0;
-  threshold_size = avg_block_size * db_expand_factor * batch_fudge_factor;
-  return threshold_size;
 }
 
 void BlockchainLMDB::add_block(const block& blk, const size_t& block_size, const difficulty_type& cumulative_difficulty, const uint64_t& coins_generated,
@@ -2886,16 +2787,6 @@ uint64_t BlockchainLMDB::add_block(const block& blk, const size_t& block_size, c
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   check_open();
   uint64_t m_height = height();
-
-  if (m_height % 1000 == 0)
-  {
-    // for batch mode, DB resize check is done at start of batch transaction
-    if (! m_batch_active && need_resize())
-    {
-      LOG_PRINT_L0("LMDB memory map needs to be resized, doing that now.");
-      do_resize();
-    }
-  }
 
   try
   {
