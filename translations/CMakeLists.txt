@@ -48,6 +48,12 @@ else()
   set(LRELEASE ${LRELEASE_PATH}/lrelease)
 endif()
 
+if(LRELEASE_PATH STREQUAL "")
+  find_program(LRELEASE lrelease-qt5)
+else()
+  set(LRELEASE ${LRELEASE_PATH}/lrelease-qt5)
+endif()
+
 if(LRELEASE STREQUAL "LRELEASE-NOTFOUND")
   set(ts_files "")
   message(WARNING "lrelease program not found, translation files not built")
