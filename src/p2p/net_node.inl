@@ -987,13 +987,13 @@ namespace nodetool
         local_peers_count = m_peerlist.get_white_peers_count();
         if (!local_peers_count)
           return false;
-        max_random_index = std::min<uint64_t>(local_peers_count -1, 20);
+        max_random_index = std::min<uint64_t>(local_peers_count, 20);
         random_index = get_random_index_with_fixed_probability(max_random_index);
       } else {
         local_peers_count = m_peerlist.get_gray_peers_count();
         if (!local_peers_count)
           return false;
-        random_index = crypto::rand<size_t>() % local_peers_count;
+        random_index = crypto::rand<size_t>() % (local_peers_count+1);
       }
 
       CHECK_AND_ASSERT_MES(random_index < local_peers_count, false, "random_starter_index < peers_local.size() failed!!");
@@ -1105,22 +1105,22 @@ namespace nodetool
     {
       if(conn_count < expected_white_connections)
       {
-        //start from anchor list
-        if(!make_expected_connections_count(anchor, P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT))
-          return false;
-        //then do white list
+        //start from white list
         if(!make_expected_connections_count(white, expected_white_connections))
+          return false;
+        //then do anchor list
+        if(!make_expected_connections_count(anchor, P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT))
           return false;
         //then do grey list
         if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
           return false;
       }else
       {
-        //start from grey list
-        if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
-          return false;
-        //and then do white list
+        //start from white list
         if(!make_expected_connections_count(white, m_config.m_net_config.max_out_connection_count))
+          return false;
+        //then do grey list
+        if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
           return false;
       }
     }
@@ -1154,11 +1154,11 @@ namespace nodetool
       if(m_net_server.is_stop_signal_sent())
         return false;
 
-      if (peer_type == anchor && !make_new_connection_from_anchor_peerlist(apl)) {
+      if (peer_type == white && !make_new_connection_from_peerlist(true)) {
         break;
       }
 
-      if (peer_type == white && !make_new_connection_from_peerlist(true)) {
+      if (peer_type == anchor && !make_new_connection_from_anchor_peerlist(apl)) {
         break;
       }
 
@@ -1670,7 +1670,7 @@ namespace nodetool
   bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_options::variables_map& vm, int64_t max)
   {
     if(max == -1) {
-      m_config.m_net_config.max_out_connection_count = P2P_DEFAULT_CONNECTIONS_COUNT;
+      m_config.m_net_config.max_out_connection_count = -1;
       return true;
     }
     m_config.m_net_config.max_out_connection_count = max;
