@@ -152,8 +152,9 @@ namespace cryptonote
         MAP_JON_RPC_WE_IF("relay_tx",            on_relay_tx,                   COMMAND_RPC_RELAY_TX, !m_restricted)
         MAP_JON_RPC_WE_IF("sync_info",           on_sync_info,                  COMMAND_RPC_SYNC_INFO, !m_restricted)
         MAP_JON_RPC_WE("get_txpool_backlog",     on_get_txpool_backlog,         COMMAND_RPC_GET_TRANSACTION_POOL_BACKLOG)
-        MAP_JON_RPC_WE("get_output_distribution", on_get_output_distribution, COMMAND_RPC_GET_OUTPUT_DISTRIBUTION)
-        MAP_JON_RPC_WE_IF("get_merkle_root",       on_get_merkle_root,            COMMAND_RPC_GET_MERKLE_ROOT, !m_restricted)
+        MAP_JON_RPC_WE("get_output_distribution",on_get_output_distribution, COMMAND_RPC_GET_OUTPUT_DISTRIBUTION)
+        MAP_JON_RPC_WE_IF("get_merkle_root",     on_get_merkle_root,            COMMAND_RPC_GET_MERKLE_ROOT, !m_restricted)
+        MAP_JON_RPC_WE("base64_encode",          on_base64_encode,            COMMAND_RPC_BASE64_ENCODE)
       END_JSON_RPC_MAP()
     END_URI_MAP2()
 
@@ -215,6 +216,7 @@ namespace cryptonote
     bool on_get_txpool_backlog(const COMMAND_RPC_GET_TRANSACTION_POOL_BACKLOG::request& req, COMMAND_RPC_GET_TRANSACTION_POOL_BACKLOG::response& res, epee::json_rpc::error& error_resp);
     bool on_get_output_distribution(const COMMAND_RPC_GET_OUTPUT_DISTRIBUTION::request& req, COMMAND_RPC_GET_OUTPUT_DISTRIBUTION::response& res, epee::json_rpc::error& error_resp);
     bool on_get_merkle_root(const COMMAND_RPC_GET_MERKLE_ROOT::request& req, COMMAND_RPC_GET_MERKLE_ROOT::response& res, epee::json_rpc::error& error);
+    bool on_base64_encode(const COMMAND_RPC_BASE64_ENCODE::request& req, COMMAND_RPC_BASE64_ENCODE::response& res, epee::json_rpc::error& error);
     //-----------------------
 
 private:

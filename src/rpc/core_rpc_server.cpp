@@ -31,6 +31,7 @@
 
 #include "include_base_utils.h"
 #include "string_tools.h"
+#include "string_coding.h"
 using namespace epee;
 
 #include "core_rpc_server.h"
@@ -1918,7 +1919,31 @@ namespace cryptonote
      res.tree_hash = tree_hash_s;
      res.status = "OK";
      return true;
-}
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_base64_encode(const COMMAND_RPC_BASE64_ENCODE::request& req, COMMAND_RPC_BASE64_ENCODE::response& res, epee::json_rpc::error& error_resp)
+  {
+
+    unsigned char const bytes = req.bytes;
+
+    if (sizeof(bytes) < 1) {
+      res.status = "Minimum length of 1 byte needed to encode to base 64";
+      return false;
+    }
+
+    std::string base_64_string = epee::string_encoding::base64_encode(&bytes, sizeof(bytes));
+    res.base_64_string = base_64_string;
+
+    bool r = base_64_string.empty();
+    if (r) {
+      res.status = "Error encoding to base64 string";
+      return false;
+    }
+
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_flush_txpool(const COMMAND_RPC_FLUSH_TRANSACTION_POOL::request& req, COMMAND_RPC_FLUSH_TRANSACTION_POOL::response& res, epee::json_rpc::error& error_resp)
   {
     PERF_TIMER(on_flush_txpool);

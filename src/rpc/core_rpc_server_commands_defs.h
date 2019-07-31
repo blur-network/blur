@@ -979,6 +979,29 @@ namespace cryptonote
     };
   };
   //-----------------------------------------------
+  struct COMMAND_RPC_BASE64_ENCODE
+  {
+    struct request
+    {
+      unsigned char bytes;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(bytes)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      std::string status;
+      std::string base_64_string;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(base_64_string)
+        KV_SERIALIZE(status)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+  //-----------------------------------------------
   struct COMMAND_RPC_GET_MERKLE_ROOT
   {
     struct request
