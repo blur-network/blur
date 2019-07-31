@@ -131,12 +131,14 @@ inline bool do_serialize(Archive &ar, bool &v)
   return true;
 }
 
-// Never used in the code base
-// #ifndef __GNUC__
-// #ifndef constexpr
-// #define constexpr
-// #endif
-// #endif
+// These were commented out previously as "never used in code base"
+// Similarly to other places in code where this is claimed... not true.
+// used in src/blockchain_db/lmdb/db_lmdb.cpp, as are these templates.
+#ifndef __GNUC__
+#ifndef constexpr
+#define constexpr /*constexpr*/
+#endif
+#endif
 
 /* the following add a trait to a set and define the serialization DSL*/
 
