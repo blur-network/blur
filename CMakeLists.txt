@@ -211,8 +211,6 @@ option(BOOST_IGNORE_SYSTEM_PATHS "Ignore boost system paths for local boost inst
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 enable_testing()
 
-option(BUILD_TESTS "Build tests." OFF)
-
 # Check whether we're on a 32-bit or 64-bit system
 if(CMAKE_SIZEOF_VOID_P EQUAL "8")
   set(DEFAULT_BUILD_64 ON)
@@ -246,7 +244,7 @@ endif()
 # elseif(CMAKE_SYSTEM_NAME MATCHES ".*BSDI.*")
 #   set(BSDI TRUE)
 
-include_directories(external/rapidjson/include external/easylogging++ src contrib/epee/include external)
+include_directories(external/rapidjson/include external/easylogging++ src contrib/epee/include external external/backward)
 
 if(APPLE)
   include_directories(SYSTEM /usr/include/malloc)
@@ -334,13 +332,16 @@ if (APPLE)
   set(LIBUNWIND_LIBRARIES "")
 elseif (DEPENDS AND NOT LINUX)
   set(LIBUNWIND_LIBRARIES "")
-elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT MINGW)
-  set(LIBUNWIND_LIBRARIES "")
 elseif (ARM AND STATIC)
   set(LIBUNWIND_LIBRARIES "")
 else()
-  find_package(Libunwind)
-    set(LIBUNWIND_LIBRARIES "")
+  find_library(UNWIND_LIBRARY unwind)
+  if(UNWIND_LIBRARY)
+    set(UNWIND_LIBRARY ${UNWIND_LIBRARY})
+    message(STATUS "Found UNWIND_LIBRARY located at: ${UNWIND_LIBRARY}.")
+  else()
+    message(FATAL_ERROR "Could not find required unwind library, when building debug type. Please recompile for release build, or install libunwind.")
+  endif()
 endif()
 
 if (UNIX AND NOT APPLE)
@@ -350,6 +351,8 @@ if (UNIX AND NOT APPLE)
   add_c_flag_if_supported(-pthread CMAKE_C_FLAGS)
   add_cxx_flag_if_supported(-pthread CMAKE_CXX_FLAGS)
 endif()
+
+find_package(Backward)
 
 # Handle OpenSSL, used for sha256sum on binary updates and light wallet ssl http
 if (CMAKE_SYSTEM_NAME MATCHES "(SunOS|Solaris)")
@@ -842,6 +845,16 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND ARCH_WIDTH EQUAL "32" AND NOT IOS AN
   if (ATOMIC_FOUND)
     list(APPEND EXTRA_LIBRARIES ${ATOMIC})
   endif()
+endif()
+
+find_library(BFD_LIBRARY bfd)
+if(BFD_LIBRARY)
+  set(BFD_LIBRARY "${BFD_LIBRARY}")
+  message(STATUS "Found BFD_LIBRARY located at ${BFD_LIBRARY}")
+  include_directories(BFD_INCLUDE_DIR /usr/include)
+endif()
+if(NOT BFD_LIBRARY)
+  message(FATAL_ERROR "Could not find required libbfd from binutils package.")
 endif()
 
 find_library(SODIUM_LIBRARY sodium)
