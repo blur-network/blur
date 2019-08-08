@@ -29,7 +29,7 @@ project(backward CXX)
 # * CMAKE_INSTALL_INCLUDEDIR
 include(GNUInstallDirs)
 
-include(../../cmake/BackwardConfig.cmake)
+include(BackwardConfig.cmake)
 
 # check if compiler is nvcc or nvcc_wrapper
 set(COMPILER_IS_NVCC false)
