@@ -58,7 +58,6 @@
 
 namespace nodetool
 {
-  inline bool append_net_address(std::vector<epee::net_utils::network_address> & seed_nodes, std::string const & addr, uint16_t default_port);
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description& desc)
@@ -245,20 +244,8 @@ namespace nodetool
         pe.id = crypto::rand<uint64_t>();
         const uint16_t default_port = cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT;
         bool r = parse_peer_from_string(pe.adr, pr_str, default_port);
-        if (r)
-        {
-          m_command_line_peers.push_back(pe);
-          continue;
-        }
-        std::vector<epee::net_utils::network_address> resolved_addrs;
-        r = append_net_address(resolved_addrs, pr_str, default_port);
-        CHECK_AND_ASSERT_MES(r, false, "Failed to parse or resolve address from string: " << pr_str);
-        for (const epee::net_utils::network_address& addr : resolved_addrs)
-        {
-          pe.id = crypto::rand<uint64_t>();
-          pe.adr = addr;
-          m_command_line_peers.push_back(pe);
-        }
+        CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: " << pr_str);
+        m_command_line_peers.push_back(pe);
       }
     }
 
@@ -309,41 +296,41 @@ namespace nodetool
     return true;
   }
   //-----------------------------------------------------------------------------------
-  inline bool append_net_address(
+  inline void append_net_address(
       std::vector<epee::net_utils::network_address> & seed_nodes
     , std::string const & addr
-    , uint16_t default_port
     )
   {
     using namespace boost::asio;
 
-    std::string host = addr;
-    std::string port = std::to_string(default_port);
     size_t pos = addr.find_last_of(':');
-    if (std::string::npos != pos)
-    {
-      CHECK_AND_ASSERT_MES(addr.length() - 1 != pos && 0 != pos, false, "Failed to parse seed address from string: '" << addr << '\'');
-      host = addr.substr(0, pos);
-      port = addr.substr(pos + 1);
-    }
-    MINFO("Resolving node address: host=" << host << ", port=" << port);
+    CHECK_AND_ASSERT_MES_NO_RET(std::string::npos != pos && addr.length() - 1 != pos && 0 != pos, "Failed to parse seed address from string: '" << addr << '\'');
+    std::string host = addr.substr(0, pos);
+    std::string port = addr.substr(pos + 1);
 
     io_service io_srv;
     ip::tcp::resolver resolver(io_srv);
     ip::tcp::resolver::query query(host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     boost::system::error_code ec;
     ip::tcp::resolver::iterator i = resolver.resolve(query, ec);
-    CHECK_AND_ASSERT_MES(!ec, false, "Failed to resolve host name '" << host << "': " << ec.message() << ':' << ec.value());
+    CHECK_AND_ASSERT_MES_NO_RET(!ec, "Failed to resolve host name '" << host << "': " << ec.message() << ':' << ec.value());
 
     ip::tcp::resolver::iterator iend;
     for (; i != iend; ++i)
     {
       ip::tcp::endpoint endpoint = *i;
+      if (endpoint.address().is_v4())
+      {
         epee::net_utils::network_address na{epee::net_utils::ipv4_network_address{boost::asio::detail::socket_ops::host_to_network_long(endpoint.address().to_v4().to_ulong()), endpoint.port()}};
         seed_nodes.push_back(na);
-        MINFO("Added node: " << na.str());
+        MINFO("Added seed node: " << na.str());
+      }
+      else
+      {
+        MWARNING("IPv6 unsupported, skip '" << host << "' -> " << endpoint.address().to_v6().to_string(ec));
+        throw std::runtime_error("IPv6 unsupported");
+      }
     }
-    return true;
   }
 
   //-----------------------------------------------------------------------------------
@@ -397,11 +384,10 @@ namespace nodetool
       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
       if (m_exclusive_peers.empty())
       {
-        if ((full_addrs.size() < MIN_WANTED_SEED_NODES) && (m_nettype == cryptonote::MAINNET))
+        if ((full_addrs.size() < MIN_WANTED_SEED_NODES))
         {
-          std::set<std::string> seed_nodes = get_seed_nodes(cryptonote::MAINNET);
-          for (const auto &peer : seed_nodes)
-            full_addrs.insert(peer);
+          for (const auto &peer :get_seed_nodes(cryptonote::MAINNET)) {
+            full_addrs.insert(peer); }
           m_fallback_seed_nodes_added = true;
         }
       }
@@ -410,7 +396,7 @@ namespace nodetool
     for (const auto& full_addr : full_addrs)
     {
       MDEBUG("Seed node: " << full_addr);
-      append_net_address(m_seed_nodes, full_addr, cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT);
+      append_net_address(m_seed_nodes, full_addr);
     }
 
     MDEBUG("Number of seed nodes: " << m_seed_nodes.size());
@@ -649,15 +635,14 @@ namespace nodetool
           return;
         }
         LOG_DEBUG_CC(context, " COMMAND_HANDSHAKE INVOKED OK");
+        hsh_result = true;
       } else {
         LOG_DEBUG_CC(context, " COMMAND_HANDSHAKE(AND CLOSE) INVOKED OK");
+        hsh_result = true;
       }
     }, P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT);
 
-    if(r)
-    {
-      ev.wait();
-    }
+    if (r) { ev.wait(); }
 
     if(!hsh_result)
     {
@@ -719,7 +704,7 @@ namespace nodetool
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, max_index);
+    std::uniform_int_distribution<> dis(1, max_index+1);
     size_t x = dis(gen);
     MDEBUG("Random connection index=" << x << "(x="<< x << ", max_index=" << max_index << ")");
     return x;
@@ -987,14 +972,19 @@ namespace nodetool
         local_peers_count = m_peerlist.get_white_peers_count();
         if (!local_peers_count)
           return false;
-        max_random_index = std::min<uint64_t>(local_peers_count, 20);
-        random_index = get_random_index_with_fixed_probability(max_random_index);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(local_peers_count+1, 20);
+        size_t random_index = dis(gen);
       } else {
         local_peers_count = m_peerlist.get_gray_peers_count();
         if (!local_peers_count)
           return false;
-        random_index = crypto::rand<size_t>() % (local_peers_count+1);
-      }
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(1, local_peers_count+1);
+        size_t random_index = dis(gen);
+        }
 
       CHECK_AND_ASSERT_MES(random_index < local_peers_count, false, "random_starter_index < peers_local.size() failed!!");
 
@@ -1059,7 +1049,7 @@ namespace nodetool
             for (const auto &peer: get_seed_nodes(m_nettype))
             {
               MDEBUG("Fallback seed node: " << peer);
-              append_net_address(m_seed_nodes, peer, cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT);
+              append_net_address(m_seed_nodes, peer);
             }
             m_fallback_seed_nodes_added = true;
             if (current_index == m_seed_nodes.size())
@@ -1107,21 +1097,15 @@ namespace nodetool
       {
         //start from white list
         if(!make_expected_connections_count(white, expected_white_connections))
-          return false;
-        //then do anchor list
-        if(!make_expected_connections_count(anchor, P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT))
-          return false;
-        //then do grey list
-        if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
-          return false;
-      }else
-      {
-        //start from white list
-        if(!make_expected_connections_count(white, m_config.m_net_config.max_out_connection_count))
-          return false;
-        //then do grey list
-        if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
-          return false;
+        { //then do anchor list
+          if(!make_expected_connections_count(anchor, P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT))
+          { //then do grey list
+            if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
+            {
+              return false;
+            }
+          }
+        }
       }
     }
 
@@ -1390,9 +1374,9 @@ namespace nodetool
           return;
         }
 
-        if(rsp.status != PING_OK_RESPONSE_STATUS_TEXT || pr != rsp.peer_id)
+        if(rsp.status != PING_OK_RESPONSE_STATUS_TEXT)
         {
-          LOG_WARNING_CC(ping_context, "back ping invoke wrong response \"" << rsp.status << "\" from" << address.str() << ", hsh_peer_id=" << pr_ << ", rsp.peer_id=" << rsp.peer_id);
+          LOG_WARNING_CC(ping_context, "back ping invoke wrong response \"" << rsp.status << "\" from" << address.str() << ", hsh_peer_id=" << pr_);
           m_net_server.get_config_object().close(ping_context.m_connection_id);
           return;
         }
@@ -1557,7 +1541,6 @@ namespace nodetool
   {
     LOG_DEBUG_CC(context, "COMMAND_PING");
     rsp.status = PING_OK_RESPONSE_STATUS_TEXT;
-    rsp.peer_id = m_config.m_peer_id;
     return 1;
   }
   //-----------------------------------------------------------------------------------
@@ -1647,20 +1630,10 @@ namespace nodetool
     for(const std::string& pr_str: perrs)
     {
       epee::net_utils::network_address na = AUTO_VAL_INIT(na);
-      const uint16_t default_port = cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT;
+      const uint16_t default_port = m_nettype == cryptonote::TESTNET ? ::config::testnet::P2P_DEFAULT_PORT : m_nettype == cryptonote::STAGENET ? ::config::stagenet::P2P_DEFAULT_PORT : ::config::P2P_DEFAULT_PORT;
       bool r = parse_peer_from_string(na, pr_str, default_port);
-      if (r)
-      {
-        container.push_back(na);
-        continue;
-      }
-      std::vector<epee::net_utils::network_address> resolved_addrs;
-      r = append_net_address(resolved_addrs, pr_str, default_port);
-      CHECK_AND_ASSERT_MES(r, false, "Failed to parse or resolve address from string: " << pr_str);
-      for (const epee::net_utils::network_address& addr : resolved_addrs)
-      {
-        container.push_back(addr);
-      }
+      CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: " << pr_str);
+      container.push_back(na);
     }
 
     return true;
@@ -1670,7 +1643,7 @@ namespace nodetool
   bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_options::variables_map& vm, int64_t max)
   {
     if(max == -1) {
-      m_config.m_net_config.max_out_connection_count = -1;
+      m_config.m_net_config.max_out_connection_count = 9999;
       return true;
     }
     m_config.m_net_config.max_out_connection_count = max;
