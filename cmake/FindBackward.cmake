@@ -24,6 +24,8 @@
 # OPTIONS
 ###############################################################################
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
 set(STACK_WALKING_UNWIND TRUE CACHE BOOL
 	"Use compiler's unwind API")
 set(STACK_WALKING_BACKTRACE FALSE CACHE BOOL
@@ -200,4 +202,4 @@ if (NOT TARGET Backward::Backward)
 		)
 	endif()
 endif()
-
+endif()

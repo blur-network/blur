@@ -68,26 +68,35 @@ Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
 
 Ubuntu/Debian:
 
-Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev binutils-dev`
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev`
 
-Optional:  `sudo apt-get install -y liblzma-dev libldns-dev libexpat1-dev libgtest-dev libreadline-dev`
+Optional:  `sudo apt-get install -y liblzma-dev libldns-dev libexpat1-dev libgtest-dev libreadline-dev binutils-dev`
+
+Note: `binutils-dev` package required for debug builds
 
 
 **Arch Linux:**
 
-Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind binutils-devel`
+Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind`
 
-Optional:  `sudo pacman -S xz ldns expat gtest readline`
+Optional:  `sudo pacman -S xz ldns expat gtest readline binutils-devel`
 
+Note: `binutils-devel` package required for debug builds
 
 
 <h3 id="build-deps">Step 2(b): Build dependencies, and link statically, all in one go</h3>
+
+For "release" builds:
 
 To compile for Linux (distro-agnostic): `make release-cross-linux-x86_64`
 
 To compile for Windows(mingw64): `make release-cross-winx64`
 
 To compile for Mac(x86_64): `make release-cross-mac-x86_64`
+
+For "debug" builds:
+
+Compile with: `make debug-all` or `make debug-static`
 
 The `Makefile` entries run by the above commands will build dependencies for `x86_64-gnu-linux` and `x86_64-w64-mingw32` hosts, respectively. If you would like to compile for a different type of host platform, `cd` into the `contrib/depends` directory, and build with `make HOST=xxx-yyy-zzz` where xxx-yyy-zzz is a <a href="https://wiki.osdev.org/Target_Triplet">standard host triplet</a>.
 
