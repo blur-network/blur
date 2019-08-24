@@ -76,6 +76,7 @@ set(daemon_private_headers
 monero_private_headers(daemon
   ${daemon_private_headers})
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 monero_add_executable(daemon
   ${daemon_sources}
   ${daemon_headers}
@@ -111,6 +112,39 @@ target_link_libraries(daemon
     ${EXTRA_LIBRARIES}
   PUBLIC
     Backward::Backward)
+else()
+monero_add_executable(daemon
+  ${daemon_sources}
+  ${daemon_headers}
+  ${daemon_private_headers}
+  ${blocksdat})
+
+target_link_libraries(daemon
+  PRIVATE
+    rpc
+    blockchain_db
+    cryptonote_core
+    cncrypto
+    common
+    p2p
+    cryptonote_protocol
+    daemonizer
+    serialization
+    daemon_rpc_server
+    epee
+    ${EPEE_READLINE}
+    version
+    ${Boost_CHRONO_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_PROGRAM_OPTIONS_LIBRARY}
+    ${Boost_REGEX_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${GNU_READLINE_LIBRARY}
+    ${SODIUM_LIBRARY}
+    ${EXTRA_LIBRARIES})
+endif()
+
 set_property(TARGET daemon
   PROPERTY
     OUTPUT_NAME "blurd")

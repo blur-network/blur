@@ -1557,7 +1557,6 @@ namespace nodetool
   {
     LOG_DEBUG_CC(context, "COMMAND_PING");
     rsp.status = PING_OK_RESPONSE_STATUS_TEXT;
-    rsp.peer_id = m_config.m_peer_id;
     return 1;
   }
   //-----------------------------------------------------------------------------------
@@ -1670,7 +1669,7 @@ namespace nodetool
   bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_options::variables_map& vm, int64_t max)
   {
     if(max == -1) {
-      m_config.m_net_config.max_out_connection_count = -1;
+      m_config.m_net_config.max_out_connection_count = 9999;
       return true;
     }
     m_config.m_net_config.max_out_connection_count = max;
