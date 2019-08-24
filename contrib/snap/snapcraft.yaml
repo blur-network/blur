@@ -1,5 +1,5 @@
 name: blur
-version: 0.1.9.6
+version: 0.1.9.8.1
 summary: "Blur Network: The private cryptocurrency (https://blur.cash)"
 description: |
     BLUR is a privacy-focused cryptocurrency based on code from Monero. The Blur
@@ -9,7 +9,6 @@ description: |
     Join the Fight for Financial Freedom.
 grade: stable
 confinement: strict
-base: core18
 
 apps:
     blurd:
@@ -36,11 +35,13 @@ parts:
     cmake-build:
         plugin: cmake
         configflags:
-            - -DCMAKE_BUILD_TYPE=release
-            - -DMANUAL_SUBMODULES=1
+            - -DCMAKE_BUILD_TYPE=Release
+            - -DBUILD_SHARED_LIBS=OFF
+            - -DMANUAL_SUBMODULES=ON
             - -DBUILD_TESTS=OFF
-            - -DARCH=default
-            - -DSTATIC=1
+            - -DARCH="x86_64"
+            - -DSTATIC=ON
+            - -DBUILD_TAG="linux-x86_64"
         source: .
         build-packages:
             - gcc
@@ -49,22 +50,25 @@ parts:
             - libssl-dev
             - libsodium-dev
             - git
-            - libreadline7
+            - libunwind-dev
+            - libreadline-dev
         stage-packages:
-            - libboost-date-time1.65.1
-            - libboost-serialization1.65.1
-            - libboost-chrono1.65.1
-            - libboost-system1.65.1
-            - libboost-thread1.65.1
-            - libboost-locale1.65.1
-            - libboost-atomic1.65.1
-            - libboost-filesystem1.65.1
-            - libboost-program-options1.65.1
-            - libboost-regex1.65.1
+            - libboost-date-time1.58.0
+            - libboost-serialization1.58.0
+            - libboost-chrono1.58.0
+            - libboost-system1.58.0
+            - libboost-thread1.58.0
+            - libboost-locale1.58.0
+            - libboost-atomic1.58.0
+            - libboost-filesystem1.58.0
+            - libboost-program-options1.58.0
+            - libboost-regex1.58.0
             - libssl-dev
-            - libsodium23
+            - libsodium18
             - libstdc++6
             - libgcc1
+            - libreadline-dev
+            - libunwind-dev
         prime:
             - bin
             - usr/lib/
