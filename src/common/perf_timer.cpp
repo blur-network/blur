@@ -113,13 +113,6 @@ LoggingPerformanceTimer::LoggingPerformanceTimer(const std::string &s, uint64_t 
   }
   else
   {
-    LoggingPerformanceTimer *pt = performance_timers->back();
-    if (!pt->started && !pt->paused)
-    {
-      size_t size = 0; for (const auto *tmp: *performance_timers) if (!tmp->paused) ++size;
-      MLOG(pt->level, "PERF           " << std::string((size-1) * 2, ' ') << "  " << pt->name);
-      pt->started = true;
-    }
   }
   performance_timers->push_back(this);
 }
