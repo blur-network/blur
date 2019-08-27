@@ -502,7 +502,7 @@ namespace nodetool
     })); // lambda
 
     //here you can set worker threads count
-    int thrds_count = 10;
+    int thrds_count = boost::thread::hardware_concurrency();
 
     m_net_server.add_idle_handler(boost::bind(&node_server<t_payload_net_handler>::idle_worker, this), 1000);
     m_net_server.add_idle_handler(boost::bind(&t_payload_net_handler::on_idle, &m_payload_handler), 1000);
