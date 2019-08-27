@@ -943,7 +943,7 @@ namespace cryptonote
       {
         std::string hash_alpha = string_tools::pod_to_hex(b.prev_id);
         std::string subhash = hash_alpha.substr(0,6);
-        unsigned int id_num = std::stoul(subhash, nullptr, 16);
+        uint32_t id_num = std::strtoul(subhash.c_str(), NULL, 16);
 
         LOG_PRINT_L2("\nPRNG from previous block ID : " << id_num);
 
@@ -952,7 +952,7 @@ namespace cryptonote
 
         uint64_t m_stamp = b.timestamp;
         const uint64_t stamp = m_stamp;
-        bool two = 0;
+        bool two = false;
         two = id_num && !(id_num & (id_num - 1));
 
         if (two) {
