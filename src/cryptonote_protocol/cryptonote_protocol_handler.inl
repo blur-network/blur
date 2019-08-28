@@ -39,9 +39,11 @@
 #include <boost/interprocess/detail/atomic.hpp>
 #include <list>
 #include <ctime>
+#include <iostream>
 
 #include "cryptonote_basic/cryptonote_format_utils.h"
 #include "profile_tools.h"
+#include "common/hex_str.h"
 #include "net/network_throttle-detail.hpp"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
@@ -1026,9 +1028,11 @@ skip:
             bool parent_requested = m_block_queue.requested(new_block.prev_id);
             if (!parent_requested)
             {
+              std::ostringstream new_block_hash(NULL);
+              epee::to_hex::formatted(new_block_hash, epee::as_byte_span(new_block.hash));
               // this can happen if a connection was sicced onto a late span, if it did not have those blocks,
               // since we don't know that at the sic time
-              LOG_ERROR_CCONTEXT("Got block " << new_block.hash << " with unknown parent " << new_block.prev_id << " which was not requested - querying block hashes");
+              LOG_ERROR_CCONTEXT("Got block " << new_block_hash.str() << " with unknown parent " << new_block.prev_id << " which was not requested - querying block hashes");
 	      context.m_needed_objects.clear();
               context.m_last_response_height = 0;
               goto skip;
