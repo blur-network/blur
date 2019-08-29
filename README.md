@@ -1,6 +1,7 @@
-![Blur: The Private Cryptocurrency](https://i.imgur.com/PG8B6Ca.jpg)
+![Blur: The Private Cryptocurrency](https://ip.bitcointalk.org/?u=https%3A%2F%2Fi.ibb.co%2F5r8s2f0%2Fwebsite.jpg&t=604&c=ZfQqvVHGGDF6Gw)
 # Blur Network 
 Copyright (c) 2018-2019, Blur Network</br>
+
 
 [![Blur Network Command-Line Tools](https://snapcraft.io/blur/badge.svg)](https://snapcraft.io/blur)
 
@@ -35,7 +36,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **Reddit:** | <center> <a href="https://reddit.com/r/blur_network">Official Blur Network Subreddit</a></center>
 **CLI Binary Release(s):** | <center> <a href="https://github.com/blur-network/blur/releases"> Download via Github </a> </center>
 **GUI Wallet Release(s):** | <center><a href="https://github.com/blur-network/blur-network-gui/releases"> Download via Github</a></center>
-**Algorithm:** | <center> Cryptonight-Dynamic v2</center>
+**Algorithm:** | <center> Cryptonight-Dynamic</center>
    **Ports:** | <center> P2P port = 52541 </br>RPC port = 52542</br></center>
   **Seed Nodes:** | <center><li>Node 1: 66.70.189.131:52541</li><li>Node 2: 66.70.188.178:52541</li><li>Node 3: 66.70.189.183:52541</li>
   </center>
@@ -45,8 +46,6 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 **LTC:** LM2tBw25UMfdjAJbo52tzh5r3R47a1aMeM <br>
 **XMR:** 46MT7yy9mF3Bvk61XmRzirB4wdSkPqNRJ3pwUcRYxj3WWCGLMHD9sE5bNtChnYQiPYiCYDPyXyJGKFG3uT2CbeKWCwnvWLv <br>
 **BLUR:** bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu <br>
-
-Old Donation address:  <del>19onVUREbP89qu4dYBfVqtGisWaoyWs3BX</del>
 
 <h1 id="compile-source">Compiling from Source</h1>
 
