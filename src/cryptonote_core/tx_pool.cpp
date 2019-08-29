@@ -108,7 +108,7 @@ namespace cryptonote
 
   }
   //---------------------------------------------------------------------------------
-  bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_hash,*/ const crypto::hash &id, size_t blob_size, tx_verification_context& tvc, bool kept_by_block, bool relayed, bool do_not_relay, uint8_t version)
+  bool tx_memory_pool::add_tx(transaction &tx, const crypto::hash& tx_prefix_hash, const crypto::hash &id, size_t blob_size, tx_verification_context& tvc, bool kept_by_block, bool relayed, bool do_not_relay, uint8_t version)
   {
     // this should already be called with that lock, but let's make it explicit for clarity
     CRITICAL_REGION_LOCAL(m_transactions_lock);
@@ -286,7 +286,10 @@ namespace cryptonote
     size_t blob_size = 0;
     if (!get_transaction_hash(tx, h, blob_size) || blob_size == 0)
       return false;
-    return add_tx(tx, h, blob_size, tvc, keeped_by_block, relayed, do_not_relay, version);
+    crypto::hash tx_prefix_hash = get_transaction_prefix_hash(tx);
+    if (tx_prefix_hash == null_hash)
+      return false;
+    return add_tx(tx, tx_prefix_hash, h, blob_size, tvc, keeped_by_block, relayed, do_not_relay, version);
   }
   //---------------------------------------------------------------------------------
   size_t tx_memory_pool::get_txpool_size() const

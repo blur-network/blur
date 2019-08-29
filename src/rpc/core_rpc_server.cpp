@@ -1444,6 +1444,7 @@ namespace cryptonote
     response.block_size = m_core.get_blockchain_storage().get_db().get_block_size(height);
     response.num_txes = blk.tx_hashes.size();
     response.pow_hash = string_tools::pod_to_hex(get_block_longhash(blk, height));
+    response.tx_prefix_hash = string_tools::pod_to_hex(get_transaction_prefix_hash(blk.miner_tx));
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------

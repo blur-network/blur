@@ -1275,7 +1275,7 @@ namespace cryptonote
       END_KV_SERIALIZE_MAP()
     };
   };
-  
+
   struct block_header_response
   {
       uint8_t major_version;
@@ -1292,6 +1292,7 @@ namespace cryptonote
       uint64_t block_size;
       uint64_t num_txes;
       std::string pow_hash;
+      std::string tx_prefix_hash;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(major_version)
@@ -1308,6 +1309,7 @@ namespace cryptonote
         KV_SERIALIZE(block_size)
         KV_SERIALIZE(num_txes)
         KV_SERIALIZE(pow_hash)
+        KV_SERIALIZE(tx_prefix_hash)
       END_KV_SERIALIZE_MAP()
   };
 
@@ -1315,7 +1317,6 @@ namespace cryptonote
   {
     struct request
     {
-
       BEGIN_KV_SERIALIZE_MAP()
       END_KV_SERIALIZE_MAP()
     };
