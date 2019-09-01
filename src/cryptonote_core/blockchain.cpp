@@ -89,18 +89,17 @@ static const struct {
   uint8_t version;
   uint64_t height;
   uint8_t threshold;
-  time_t time;
 } mainnet_hard_forks[] = {
-  {  1, 1,      0, 1504387246 },
-  {  2, 2,      0, 1507601066 },
-  {  3, 3,      0, 1512206452 },
-  {  4, 4,      0, 1513136914 },
-  {  5, 5,      0, 1525150523 },
-  {  6, 7500,   0, 1529974332 },
-  {  7, 80000,  0, 1534323374 },
-  {  8, 185000, 0, 1540624740 },
-  {  9, 211000, 0, 1543147200 },
-  { 10, 342000, 0, 1551395401 }
+  {  1, 1,      0 },
+  {  2, 2,      0 },
+  {  3, 3,      0 },
+  {  4, 4,      0 },
+  {  5, 5,      0 },
+  {  6, 7500,   0 },
+  {  7, 80000,  0 },
+  {  8, 185000, 0 },
+  {  9, 211000, 0 },
+  { 10, 342000, 0 }
 //  { 11, 450000, 0, 1557532800 }
   //      Set hardfork v11 block for 450,000 - height takes precendence over timestamp
   //      But lets make sure we definitely have enough time afterward... if its too early, things stall.
@@ -111,19 +110,18 @@ static const struct {
   uint8_t version;
   uint64_t height;
   uint8_t threshold;
-  time_t time;
 } testnet_hard_forks[] = {
-  {  1, 1, 0, 1504374656 },
-  {  2, 2, 0, 1507182919 },
-  {  3, 3, 0, 1511981038 },
-  {  4, 4, 0, 1512627130 },
-  {  5, 5, 0, 1524112219 },
-  {  6, 6, 0, 1529841600 },
-  {  7, 7, 0, 1529841601 },
-  {  8, 8, 0, 1529841602 },
-  {  9, 20, 0, 1542681000 },
-  { 10, 40, 0, 1550449900 },
-  { 11, 800, 0, 1550459900 }
+  {  1, 1,   0 },
+  {  2, 2,   0 },
+  {  3, 3,   0 },
+  {  4, 4,   0 },
+  {  5, 5,   0 },
+  {  6, 6,   0 },
+  {  7, 7,   0 },
+  {  8, 8,   0 },
+  {  9, 20,  0 },
+  { 10, 40,  0 },
+  { 11, 800, 0 }
 }; //testnet hardfork v11 HF testing
 
 static const struct {
@@ -132,12 +130,12 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } stagenet_hard_forks[] = {
-  { 1, 1, 0, 1504374656 },
-  { 2, 2, 0, 1521000000 },
-  { 3, 3, 0, 1521120000 },
-  { 4, 4, 0, 1521240000 },
-  { 5, 5, 0, 1524112219 },
-  { 6, 6, 0, 1529841600 }
+  { 1, 1, 0 },
+  { 2, 2, 0 },
+  { 3, 3, 0 },
+  { 4, 4, 0 },
+  { 5, 5, 0 },
+  { 6, 6, 0 }
 };
 
 //------------------------------------------------------------------
@@ -348,22 +346,22 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   if (m_nettype == FAKECHAIN)
   {
     for (size_t n = 0; test_options->hard_forks[n].first; ++n)
-      m_hardfork->add_fork(test_options->hard_forks[n].first, test_options->hard_forks[n].second, 0, n + 1);
+      m_hardfork->add_fork(test_options->hard_forks[n].first, test_options->hard_forks[n].second, 0);
   }
   else if (m_nettype == TESTNET)
   {
     for (size_t n = 0; n < sizeof(testnet_hard_forks) / sizeof(testnet_hard_forks[0]); ++n)
-      m_hardfork->add_fork(testnet_hard_forks[n].version, testnet_hard_forks[n].height, testnet_hard_forks[n].threshold, testnet_hard_forks[n].time);
+      m_hardfork->add_fork(testnet_hard_forks[n].version, testnet_hard_forks[n].height, testnet_hard_forks[n].threshold);
   }
   else if (m_nettype == STAGENET)
   {
     for (size_t n = 0; n < sizeof(stagenet_hard_forks) / sizeof(stagenet_hard_forks[0]); ++n)
-      m_hardfork->add_fork(stagenet_hard_forks[n].version, stagenet_hard_forks[n].height, stagenet_hard_forks[n].threshold, stagenet_hard_forks[n].time);
+      m_hardfork->add_fork(stagenet_hard_forks[n].version, stagenet_hard_forks[n].height, stagenet_hard_forks[n].threshold);
   }
   else
   {
     for (size_t n = 0; n < sizeof(mainnet_hard_forks) / sizeof(mainnet_hard_forks[0]); ++n)
-      m_hardfork->add_fork(mainnet_hard_forks[n].version, mainnet_hard_forks[n].height, mainnet_hard_forks[n].threshold, mainnet_hard_forks[n].time);
+      m_hardfork->add_fork(mainnet_hard_forks[n].version, mainnet_hard_forks[n].height, mainnet_hard_forks[n].threshold);
   }
   m_hardfork->init();
 
