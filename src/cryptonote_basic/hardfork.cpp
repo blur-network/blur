@@ -320,9 +320,11 @@ HardFork::State HardFork::get_state(uint64_t height) const
     return Ready;
 
   uint64_t t_last_fork = heights.back().height;
-  if (height >= t_last_fork)
+  if (height == t_last_fork)
+    return Ready;
+  else if (height < t_last_fork)
     return UpdateNeeded;
-  return Ready;
+ return Ready;
 }
 
 HardFork::State HardFork::get_state() const
