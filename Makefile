@@ -126,6 +126,7 @@ release-static-win64:
 	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/cmake/64-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys64 ../.. && $(MAKE)
 
 release-cross-win64:
+	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-w64-mingw32
 	mkdir -p build/release
 	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-w64-mingw32/share/toolchain.cmake ../.. && ${MAKE}
 
