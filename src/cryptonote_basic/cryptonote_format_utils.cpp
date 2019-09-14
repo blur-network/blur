@@ -38,6 +38,7 @@ using namespace epee;
 #include <iostream>
 #include <sstream> 
 #include <stdio.h>
+#include "common/int-util.h"
 #include "wipeable_string.h"
 #include "string_tools.h"
 #include "serialization/string.h"
@@ -921,23 +922,25 @@ namespace cryptonote
     blobdata bd = get_block_hashing_blob(b);
     const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
     int cn_iters = b.major_version >= 6 ? (b.major_version >= 7 ? 0x40000 :  0x20000) : 0x80000;
+    uint64_t its = 0;
 
       if (b.major_version <= 7)
       {
-        cn_iters += ((height + 1) & 0x3FF);
-        cn_iters <<= 1;
+        its = add(cn_iters, (add(height, 1) & 0x3FF));
+        its <<= 1;
       }
       else if (b.major_version <= 8)
       {
-        cn_iters += ((height + 1) & 0x3FF);
+        its = add(cn_iters, (add(height, 1) & 0x3FF));
         if (height < 185856) {
-        cn_iters <<= 1;
+        its <<= 1;
         }
       }
       else if (b.major_version == 9)
       {
         const uint64_t stamp = b.timestamp;
-        cn_iters += (((stamp % height) + (height + 1))  & 0xFFF);
+        const uint64_t stampheight = stamp % height;
+        its = add(cn_iters, add(stampheight, add(height, 1))  & 0xFFF);
       }
       else if (b.major_version >= 10)
       {
@@ -950,20 +953,18 @@ namespace cryptonote
         if (id_num < 1) { // guard against small probability of zero case
           id_num = 1; }   // in previous hash's first 6 characters
 
-        uint64_t m_stamp = b.timestamp;
-        const uint64_t stamp = m_stamp;
+        const uint64_t m_stamp = b.timestamp;
         bool two = false;
         two = id_num && !(id_num & (id_num - 1));
-
         if (two) {
-          cn_iters += ((( stamp & (id_num - 1)) + height) & 0x7FFF);  }
+          its = add(cn_iters, (add(m_stamp & (id_num - 1), height) & 0x7FFF));
+        }
         else if (!two) {
-          cn_iters += (((stamp % id_num) + height) & 0x7FFF);  }
-
-        LOG_PRINT_L2("\nIterations : "<< cn_iters);
-
+          its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
        }
-    crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, cn_iters);
+          LOG_PRINT_L2("\nIterations : "<< its);
+     }
+    crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, its);
     return true;
   }
   //---------------------------------------------------------------

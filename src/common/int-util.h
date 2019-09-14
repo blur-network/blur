@@ -79,6 +79,12 @@ static inline uint64_t lo_dword(uint64_t val) {
   return val & 0xFFFFFFFF;
 }
 
+static inline uint64_t add(uint64_t a, uint64_t b) {
+  if (b == 0)
+    return a;
+  else return add(a ^ b, (a & b) << 1);
+}
+
 static inline uint64_t mul128(uint64_t multiplier, uint64_t multiplicand, uint64_t* product_hi) {
   // multiplier   = ab = a * 2^32 + b
   // multiplicand = cd = c * 2^32 + d
