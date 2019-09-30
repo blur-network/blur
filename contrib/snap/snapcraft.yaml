@@ -1,5 +1,5 @@
 name: blur
-version: 0.1.9.9
+version: 0.1.9.9.1
 summary: "Blur Network: The private cryptocurrency (https://blur.cash)"
 description: |
     BLUR is a privacy-focused cryptocurrency based on code from Monero. The Blur
@@ -34,6 +34,7 @@ apps:
 parts:
     cmake-build:
         plugin: cmake
+        disable-parallel: true
         configflags:
             - -DCMAKE_BUILD_TYPE=Release
             - -DMANUAL_SUBMODULES=1
@@ -78,6 +79,3 @@ parts:
             contrib/snap/blurd.conf: etc/blurd.conf
             contrib/snap/blurd-wrapper: bin/blurd-wrapper
         prime:
-            - etc
-            - bin
-
