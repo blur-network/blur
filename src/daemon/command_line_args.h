@@ -36,33 +36,36 @@
 
 namespace daemon_args
 {
+  std::string const conf_filename = CRYPTONOTE_NAME + ".conf";
+  std::string const log_filename = CRYPTONOTE_NAME + ".log";
   const command_line::arg_descriptor<std::string, false, true, 2> arg_config_file = {
     "config-file"
   , "Specify configuration file"
-  , (daemonizer::get_default_data_dir() / std::string(CRYPTONOTE_NAME ".conf")).string()
+  , (daemonizer::get_default_data_dir() / conf_filename).string()
   , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on }}
   , [](std::array<bool, 2> testnet_stagenet, bool defaulted, std::string val)->std::string {
       if (testnet_stagenet[0] && defaulted)
         return (daemonizer::get_default_data_dir() / "testnet" /
-                std::string(CRYPTONOTE_NAME ".conf")).string();
+                conf_filename).string();
       else if (testnet_stagenet[1] && defaulted)
         return (daemonizer::get_default_data_dir() / "stagenet" /
-                std::string(CRYPTONOTE_NAME ".conf")).string();
+                conf_filename).string();
       return val;
     }
   };
+
   const command_line::arg_descriptor<std::string, false, true, 2> arg_log_file = {
     "log-file"
   , "Specify log file"
-  , (daemonizer::get_default_data_dir() / std::string(CRYPTONOTE_NAME ".log")).string()
+  , (daemonizer::get_default_data_dir() / log_filename).string()
   , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on }}
   , [](std::array<bool, 2> testnet_stagenet, bool defaulted, std::string val)->std::string {
       if (testnet_stagenet[0] && defaulted)
         return (daemonizer::get_default_data_dir() / "testnet" /
-                std::string(CRYPTONOTE_NAME ".log")).string();
+                log_filename).string();
       else if (testnet_stagenet[1] && defaulted)
         return (daemonizer::get_default_data_dir() / "stagenet" /
-                std::string(CRYPTONOTE_NAME ".log")).string();
+                log_filename).string();
       return val;
     }
   };
