@@ -36,114 +36,114 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 
-#define CRYPTONOTE_DNS_TIMEOUT_MS                       20000
+int const CRYPTONOTE_DNS_TIMEOUT_MS =                       20000;
 
-#define CRYPTONOTE_MAX_BLOCK_NUMBER                     500000000
-#define CRYPTONOTE_MAX_BLOCK_SIZE                       500000000  /* block header blob limit, never used! */
-#define CRYPTONOTE_MAX_TX_SIZE                          1000000000
-#define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER          0
-#define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW            25
-#define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6         25
-#define CURRENT_TRANSACTION_VERSION                     1
-#define CURRENT_BLOCK_MAJOR_VERSION                     1
-#define CURRENT_BLOCK_MINOR_VERSION                     1
-#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              (60*60*2)
-#define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE             10
+int const CRYPTONOTE_MAX_BLOCK_NUMBER =                     500000000;
+int const CRYPTONOTE_MAX_BLOCK_SIZE =                       500000000;  /* block header blob limit, never used! */
+int const CRYPTONOTE_MAX_TX_SIZE =                          1000000000;
+int const CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER =          0;
+int const CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW =            25;
+int const CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6 =         25;
+int const CURRENT_TRANSACTION_VERSION =                     1;
+int const CURRENT_BLOCK_MAJOR_VERSION =                     1;
+int const CURRENT_BLOCK_MINOR_VERSION =                     1;
+int const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT =              (60*60*2);
+int const CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE =            10;
 
-#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
+int const BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW =               60;
 
-#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2           (60*5)
-#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V6           (60*5)
-#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2            12
+int const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2 =           (60*5);
+int const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V6 =           (60*5);
+int const BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2 =            12;
 
 // MONEY_SUPPLY - total number coins to be generated
-#define MONEY_SUPPLY                                    UINT64_C(9223300000000000000)
-#define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
-#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)200000000000) /* 3 * pow(10, 11) */
+uint64_t const MONEY_SUPPLY =                                   UINT64_C(9223300000000000000);
+int const EMISSION_SPEED_FACTOR_PER_MINUTE =                (20);
+uint64_t const FINAL_SUBSIDY_PER_MINUTE =                        ((uint64_t)200000000000); /* 3 * pow(10, 11) */
 
-#define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
-#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1    300000
-#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1
-#define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
-#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                12
+int const CRYPTONOTE_REWARD_BLOCKS_WINDOW =                100;
+int const CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1 =    300000;
+int const CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 =    CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+int const CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE =          600;
+int const CRYPTONOTE_DISPLAY_DECIMAL_POINT =                12;
 // COIN - number of smallest units in one coin
-#define COIN                                            ((uint64_t)1000000000000) /* pow(10, 12) */
+uint64_t const COIN =                                            ((uint64_t)1000000000000); /* pow(10, 12) */
 
-#define DEFAULT_MIXIN                                   4
-#define DEFAULT_RINGSIZE                                DEFAULT_MIXIN + 1
-#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)400000000)
-#define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)9000000000000) /* 9 * pow(10,12) */
+int const DEFAULT_MIXIN =                                   4;
+int const DEFAULT_RINGSIZE =                                DEFAULT_MIXIN + 1;
+uint64_t const DYNAMIC_FEE_PER_KB_BASE_FEE =                     ((uint64_t)400000000);
+uint64_t const DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD =            ((uint64_t)9000000000000); /* 9 * pow(10,12) */
 
-#define DIFFICULTY_TARGET                               60  /* seconds */
-#define DIFFICULTY_WINDOW                               720 /* blocks */
-#define DIFFICULTY_LAG                                  15  /* !!! */
-#define DIFFICULTY_CUT                                  60  /* timestamps to cut after sorting */
-#define DIFFICULTY_BLOCKS_COUNT                         DIFFICULTY_WINDOW + DIFFICULTY_LAG
+int const DIFFICULTY_TARGET =                               60;  /* seconds */
+int const DIFFICULTY_WINDOW =                               720; /* blocks */
+int const DIFFICULTY_LAG =                                  15;  /* !!! */
+int const DIFFICULTY_CUT =                                  60;  /* timestamps to cut after sorting */
+int const DIFFICULTY_BLOCKS_COUNT =                         DIFFICULTY_WINDOW + DIFFICULTY_LAG;
 
-#define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET /* just alias; used by tests */
-#define DIFFICULTY_WINDOW_V2                            17
-#define DIFFICULTY_CUT_V2                               6
-#define DIFFICULTY_BLOCKS_COUNT_V2                      DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2*2
+int const DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN =             DIFFICULTY_TARGET; /* just alias; used by tests */
+int const DIFFICULTY_WINDOW_V2 =                            17;
+int const DIFFICULTY_CUT_V2 =                               6;
+int const DIFFICULTY_BLOCKS_COUNT_V2 =                      DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2*2;
 
-#define DIFFICULTY_WINDOW_V3                            60
-#define DIFFICULTY_BLOCKS_COUNT_V3                      DIFFICULTY_WINDOW_V3
+int const DIFFICULTY_WINDOW_V3 =                            60;
+int const DIFFICULTY_BLOCKS_COUNT_V3 =                      DIFFICULTY_WINDOW_V3;
 
-#define DIFFICULTY_WINDOW_V6                            60
-#define DIFFICULTY_BLOCKS_COUNT_V6                      DIFFICULTY_WINDOW_V6 + 1
+int const DIFFICULTY_WINDOW_V6 =                            60;
+int const DIFFICULTY_BLOCKS_COUNT_V6 =                      DIFFICULTY_WINDOW_V6 + 1;
 
-#define DIFFICULTY_WINDOW_V11                            720
-#define DIFFICULTY_LAG_V11                               15
-#define DIFFICULTY_BLOCKS_COUNT_V11                      DIFFICULTY_WINDOW_V11 + DIFFICULTY_LAG_V11
-#define DIFFICULTY_CUT_V11                               60
+int const DIFFICULTY_WINDOW_V11 =                            720;
+int const DIFFICULTY_LAG_V11 =                               15;
+int const DIFFICULTY_BLOCKS_COUNT_V11 =                      DIFFICULTY_WINDOW_V11 + DIFFICULTY_LAG_V11;
+int const DIFFICULTY_CUT_V11 =                               60;
 
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
+int const CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS =       1;
+int const CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1 =   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
-#define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  /* by default, blocks ids count in synchronizing */
-#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              20     /* by default, blocks count in blocks downloading */
+int const BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT =          10000;  /* by default, blocks ids count in synchronizing */
+int const BLOCKS_SYNCHRONIZING_DEFAULT_COUNT =              20;     /* by default, blocks count in blocks downloading */
 
-#define CRYPTONOTE_MEMPOOL_TX_LIVETIME                    (86400*3) /* seconds, three days */
-#define CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME     604800 /* seconds, one week */
+int const CRYPTONOTE_MEMPOOL_TX_LIVETIME =                    (86400*3); /* seconds, three days */
+int const CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME =     604800; /* seconds, one week */
 
-#define COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT           1000
+int const COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT =           1000;
 
-#define P2P_LOCAL_WHITE_PEERLIST_LIMIT                  1000
-#define P2P_LOCAL_GRAY_PEERLIST_LIMIT                   5000
+int const P2P_LOCAL_WHITE_PEERLIST_LIMIT =                  1000;
+int const P2P_LOCAL_GRAY_PEERLIST_LIMIT =                   5000;
 
-#define P2P_DEFAULT_CONNECTIONS_COUNT                   8
-#define P2P_DEFAULT_HANDSHAKE_INTERVAL                  60           /* secondes */
-#define P2P_DEFAULT_PACKET_MAX_SIZE                     50000000     /* 50000000 bytes maximum packet size */
-#define P2P_DEFAULT_PEERS_IN_HANDSHAKE                  250
-#define P2P_DEFAULT_CONNECTION_TIMEOUT                  5000       /* 5 seconds */
-#define P2P_DEFAULT_PING_CONNECTION_TIMEOUT             5000       /* 2 seconds */
-#define P2P_DEFAULT_INVOKE_TIMEOUT                      120000     /* 2 minutes */
-#define P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT            5000       /* 5 seconds */
-#define P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT       70
-#define P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT            2
-#define P2P_DEFAULT_LIMIT_RATE_UP                       2048       /*  kB/s */
-#define P2P_DEFAULT_LIMIT_RATE_DOWN                     8192       /* kB/s */
+int const P2P_DEFAULT_CONNECTIONS_COUNT  =                  8;
+int const P2P_DEFAULT_HANDSHAKE_INTERVAL =                  60;           /* secondes */
+int const P2P_DEFAULT_PACKET_MAX_SIZE =                     50000000;     /* 50000000 bytes maximum packet size */
+int const P2P_DEFAULT_PEERS_IN_HANDSHAKE =                  250;
+int const P2P_DEFAULT_CONNECTION_TIMEOUT =                  5000;       /* 5 seconds */
+int const P2P_DEFAULT_PING_CONNECTION_TIMEOUT =             5000;       /* 2 seconds */
+int const P2P_DEFAULT_INVOKE_TIMEOUT =                      120000;     /* 2 minutes */
+int const P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT =            5000;       /* 5 seconds */
+int const P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT =       70;
+int const P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT =            2;
+int const P2P_DEFAULT_LIMIT_RATE_UP =                       2048;       /*  kB/s */
+int const P2P_DEFAULT_LIMIT_RATE_DOWN =                    8192;       /* kB/s */
 
-#define P2P_FAILED_ADDR_FORGET_SECONDS                  3600     /* 1 hour */
-#define P2P_IP_BLOCKTIME                                (60*60*24)  /* 24 hour */
-#define P2P_IP_FAILS_BEFORE_BLOCK                       10
-#define P2P_IDLE_CONNECTION_KILL_INTERVAL               (5*60) /* 5 minutes */
+int const P2P_FAILED_ADDR_FORGET_SECONDS =                  3600;     /* 1 hour */
+int const P2P_IP_BLOCKTIME =                                (60*60*24);  /* 24 hour */
+int const P2P_IP_FAILS_BEFORE_BLOCK =                       10;
+int const P2P_IDLE_CONNECTION_KILL_INTERVAL =               (5*60); /* 5 minutes */
 
-#define P2P_SUPPORT_FLAG_FLUFFY_BLOCKS                  0x01
-#define P2P_SUPPORT_FLAGS                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS
+int const P2P_SUPPORT_FLAG_FLUFFY_BLOCKS =                  0x01;
+int const P2P_SUPPORT_FLAGS =                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS;
 
-#define CRYPTONOTE_NAME                         "blurnetwork"
-#define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
-#define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
-#define P2P_NET_DATA_FILENAME                   "peers_state.bin"
-#define MINER_CONFIG_FILE_NAME                  "miner_conf.json"
+std::string const CRYPTONOTE_NAME =                         "blurnetwork";
+std::string const CRYPTONOTE_BLOCKCHAINDATA_FILENAME =      "data.mdb";
+std::string const CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME = "lock.mdb";
+std::string const P2P_NET_DATA_FILENAME =                   "peers_state.bin";
+std::string const MINER_CONFIG_FILE_NAME =                  "miner_conf.json";
 
 #define THREAD_STACK_SIZE                       0x80000
 
-#define PER_KB_FEE_QUANTIZATION_DECIMALS        8
+int const PER_KB_FEE_QUANTIZATION_DECIMALS =        8;
 
-#define HASH_OF_HASHES_STEP                     256
+int const HASH_OF_HASHES_STEP =                     256;
 
-#define DEFAULT_TXPOOL_MAX_SIZE                 648000000ULL /* 3 days at 300000, in bytes */
+uint64_t const DEFAULT_TXPOOL_MAX_SIZE =                 648000000ULL; /* 3 days at 300000, in bytes */
 
 // New constants are intended to go here
 namespace config
