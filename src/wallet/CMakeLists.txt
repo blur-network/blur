@@ -91,7 +91,6 @@ target_link_libraries(wallet_rpc_server
     cryptonote_core
     cncrypto
     common
-    version
     ${Boost_CHRONO_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
@@ -118,8 +117,7 @@ if (BUILD_GUI_DEPS)
             device
             ringct
             ringct_basic
-            checkpoints
-            version)
+            checkpoints)
 
     foreach(lib ${libs_to_merge})
         list(APPEND objlibs $<TARGET_OBJECTS:obj_${lib}>) # matches naming convention in src/CMakeLists.txt
