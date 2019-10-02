@@ -46,8 +46,6 @@ target_link_libraries(gen_multisig
     ${CMAKE_THREAD_LIBS_INIT}
     ${GNU_READLINE_LIBRARY}
     ${EXTRA_LIBRARIES})
-add_dependencies(gen_multisig
-  version)
 set_property(TARGET gen_multisig
   PROPERTY
     OUTPUT_NAME "blur-gen-trusted-multisig")

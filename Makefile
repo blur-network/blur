@@ -43,7 +43,7 @@ debug-test:
 
 debug-all:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=OFF -D BUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE=Debug ../.. && $(MAKE)
+	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=OFF -D BUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE=Debug ../.. && $(MAKE)
 
 debug-static-all:
 	mkdir -p build/debug
@@ -94,6 +94,10 @@ release-static-linux-x86_64:
 	mkdir -p build/release
 	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" ../.. && $(MAKE)
 
+release-static-archlinux-x86_64:
+	mkdir -p build/release
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -DBUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="archlinux-x64" -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_C_COMPILER=/usr/bin/gcc-8 ../.. && $(MAKE)
+
 release-static-freebsd-x86_64:
 	mkdir -p build/release
 	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="freebsd-x64" ../.. && $(MAKE)
@@ -109,7 +113,7 @@ release-static-linux-i686:
 release-cross-linux-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-gnu-linux
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake -DBOOST_ROOT=${PWD}/contrib/depends/x86_64-gnu-linux/ ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
 
 release-cross-gui-linux-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-gnu-linux
