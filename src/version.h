@@ -2,8 +2,7 @@
 
 #pragma once
 
-std::string const DEF_MONERO_VERSION_TAG = "@VERSIONTAG@";
-std::string const DEF_MONERO_VERSION = "0.1.9.9.1";
+std::string const DEF_MONERO_VERSION = "0.1.9.9.2";
 std::string const DEF_MONERO_RELEASE_NAME = "Radiance";
 std::string const DEF_MONERO_VERSION_FULL = DEF_MONERO_VERSION + "-" + DEF_MONERO_VERSION_TAG;
 
