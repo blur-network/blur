@@ -26,16 +26,35 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required (VERSION 2.6)
-project (monero CXX)
+set(cryptonote_protocol_sources
+  block_queue.cpp
+  cryptonote_protocol_handler-base.cpp)
 
-file(GLOB CRYPTONOTE_PROTOCOL *)
-source_group(cryptonote_protocol FILES ${CRYPTONOTE_PROTOCOL})
+set(cryptonote_protocol_headers)
 
-#monero_private_headers(cryptonote_protocol ${CRYPTONOTE_PROTOCOL})
-monero_add_library(cryptonote_protocol ${CRYPTONOTE_PROTOCOL})
+set(cryptonote_protocol_private_headers
+  block_queue.h
+  cryptonote_protocol_defs.h
+  cryptonote_protocol_handler.inl
+  cryptonote_protocol_handler.h
+  cryptonote_protocol_handler_common.h)
+
+monero_private_headers(cryptonote_protocol
+  ${cryptonote_protocol_private_headers})
+monero_add_library(cryptonote_protocol
+  ${cryptonote_protocol_sources}
+  ${cryptonote_protocol_headers}
+  ${cryptonote_protocol_private_headers})
 target_link_libraries(cryptonote_protocol
   PUBLIC
     p2p
+    ${Boost_DATE_TIME_LIBRARY}
+    ${Boost_PROGRAM_OPTIONS_LIBRARY}
+    ${Boost_SERIALIZATION_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
   PRIVATE
+    ${Blocks}
     ${EXTRA_LIBRARIES})
+
