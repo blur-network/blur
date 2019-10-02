@@ -36,100 +36,100 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 
-int const CRYPTONOTE_DNS_TIMEOUT_MS =                       20000;
+uint32_t const CRYPTONOTE_DNS_TIMEOUT_MS =                       20000;
 
-int const CRYPTONOTE_MAX_BLOCK_NUMBER =                     500000000;
-int const CRYPTONOTE_MAX_BLOCK_SIZE =                       500000000;  /* block header blob limit, never used! */
-int const CRYPTONOTE_MAX_TX_SIZE =                          1000000000;
-int const CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER =          0;
-int const CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW =            25;
-int const CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6 =         25;
-int const CURRENT_TRANSACTION_VERSION =                     1;
-int const CURRENT_BLOCK_MAJOR_VERSION =                     1;
-int const CURRENT_BLOCK_MINOR_VERSION =                     1;
-int const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT =              (60*60*2);
-int const CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE =            10;
+uint64_t const CRYPTONOTE_MAX_BLOCK_NUMBER =                     500000000;
+uint64_t const CRYPTONOTE_MAX_BLOCK_SIZE =                       500000000;  /* block header blob limit, never used! */
+uint64_t const CRYPTONOTE_MAX_TX_SIZE =                          1000000000;
+uint32_t const CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER =          0;
+uint32_t const CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW =            25;
+uint32_t const CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V6 =         25;
+uint32_t const CURRENT_TRANSACTION_VERSION =                     1;
+uint32_t const CURRENT_BLOCK_MAJOR_VERSION =                     1;
+uint32_t const CURRENT_BLOCK_MINOR_VERSION =                     1;
+uint32_t const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT =              (60*60*2);
+uint32_t const CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE =            10;
 
-int const BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW =               60;
+uint32_t const BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW =               60;
 
-int const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2 =           (60*5);
-int const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V6 =           (60*5);
-int const BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2 =            12;
+uint32_t const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2 =           (60*5);
+uint32_t const CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V6 =           (60*5);
+uint32_t const BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2 =            12;
 
 // MONEY_SUPPLY - total number coins to be generated
 uint64_t const MONEY_SUPPLY =                                   UINT64_C(9223300000000000000);
-int const EMISSION_SPEED_FACTOR_PER_MINUTE =                (20);
+uint32_t const EMISSION_SPEED_FACTOR_PER_MINUTE =                (20);
 uint64_t const FINAL_SUBSIDY_PER_MINUTE =                        ((uint64_t)200000000000); /* 3 * pow(10, 11) */
 
-int const CRYPTONOTE_REWARD_BLOCKS_WINDOW =                100;
-int const CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1 =    300000;
-int const CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 =    CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
-int const CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE =          600;
-int const CRYPTONOTE_DISPLAY_DECIMAL_POINT =                12;
+uint32_t const CRYPTONOTE_REWARD_BLOCKS_WINDOW =                100;
+uint32_t const CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1 =    300000;
+uint32_t const CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 =    CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+uint32_t const CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE =          600;
+uint32_t const CRYPTONOTE_DISPLAY_DECIMAL_POINT =                12;
 // COIN - number of smallest units in one coin
 uint64_t const COIN =                                            ((uint64_t)1000000000000); /* pow(10, 12) */
 
-int const DEFAULT_MIXIN =                                   4;
-int const DEFAULT_RINGSIZE =                                DEFAULT_MIXIN + 1;
+uint32_t const DEFAULT_MIXIN =                                   4;
+uint32_t const DEFAULT_RINGSIZE =                                DEFAULT_MIXIN + 1;
 uint64_t const DYNAMIC_FEE_PER_KB_BASE_FEE =                     ((uint64_t)400000000);
 uint64_t const DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD =            ((uint64_t)9000000000000); /* 9 * pow(10,12) */
 
-int const DIFFICULTY_TARGET =                               60;  /* seconds */
-int const DIFFICULTY_WINDOW =                               720; /* blocks */
-int const DIFFICULTY_LAG =                                  15;  /* !!! */
-int const DIFFICULTY_CUT =                                  60;  /* timestamps to cut after sorting */
-int const DIFFICULTY_BLOCKS_COUNT =                         DIFFICULTY_WINDOW + DIFFICULTY_LAG;
+uint32_t const DIFFICULTY_TARGET =                               60;  /* seconds */
+uint32_t const DIFFICULTY_WINDOW =                               720; /* blocks */
+uint32_t const DIFFICULTY_LAG =                                  15;  /* !!! */
+uint32_t const DIFFICULTY_CUT =                                  60;  /* timestamps to cut after sorting */
+uint32_t const DIFFICULTY_BLOCKS_COUNT =                         DIFFICULTY_WINDOW + DIFFICULTY_LAG;
 
-int const DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN =             DIFFICULTY_TARGET; /* just alias; used by tests */
-int const DIFFICULTY_WINDOW_V2 =                            17;
-int const DIFFICULTY_CUT_V2 =                               6;
-int const DIFFICULTY_BLOCKS_COUNT_V2 =                      DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2*2;
+uint32_t const DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN =             DIFFICULTY_TARGET; /* just alias; used by tests */
+uint32_t const DIFFICULTY_WINDOW_V2 =                            17;
+uint32_t const DIFFICULTY_CUT_V2 =                               6;
+uint32_t const DIFFICULTY_BLOCKS_COUNT_V2 =                      DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2*2;
 
-int const DIFFICULTY_WINDOW_V3 =                            60;
-int const DIFFICULTY_BLOCKS_COUNT_V3 =                      DIFFICULTY_WINDOW_V3;
+uint32_t const DIFFICULTY_WINDOW_V3 =                            60;
+uint32_t const DIFFICULTY_BLOCKS_COUNT_V3 =                      DIFFICULTY_WINDOW_V3;
 
-int const DIFFICULTY_WINDOW_V6 =                            60;
-int const DIFFICULTY_BLOCKS_COUNT_V6 =                      DIFFICULTY_WINDOW_V6 + 1;
+uint32_t const DIFFICULTY_WINDOW_V6 =                            60;
+uint32_t const DIFFICULTY_BLOCKS_COUNT_V6 =                      DIFFICULTY_WINDOW_V6 + 1;
 
-int const DIFFICULTY_WINDOW_V11 =                            720;
-int const DIFFICULTY_LAG_V11 =                               15;
-int const DIFFICULTY_BLOCKS_COUNT_V11 =                      DIFFICULTY_WINDOW_V11 + DIFFICULTY_LAG_V11;
-int const DIFFICULTY_CUT_V11 =                               60;
+uint32_t const DIFFICULTY_WINDOW_V11 =                            720;
+uint32_t const DIFFICULTY_LAG_V11 =                               15;
+uint32_t const DIFFICULTY_BLOCKS_COUNT_V11 =                      DIFFICULTY_WINDOW_V11 + DIFFICULTY_LAG_V11;
+uint32_t const DIFFICULTY_CUT_V11 =                               60;
 
-int const CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS =       1;
-int const CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1 =   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
+uint32_t const CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS =       1;
+uint32_t const CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1 =   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
-int const BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT =          10000;  /* by default, blocks ids count in synchronizing */
-int const BLOCKS_SYNCHRONIZING_DEFAULT_COUNT =              20;     /* by default, blocks count in blocks downloading */
+uint32_t const BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT =          10000;  /* by default, blocks ids count in synchronizing */
+uint32_t const BLOCKS_SYNCHRONIZING_DEFAULT_COUNT =              20;     /* by default, blocks count in blocks downloading */
 
-int const CRYPTONOTE_MEMPOOL_TX_LIVETIME =                    (86400*3); /* seconds, three days */
-int const CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME =     604800; /* seconds, one week */
+uint32_t const CRYPTONOTE_MEMPOOL_TX_LIVETIME =                    (86400*3); /* seconds, three days */
+uint32_t const CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME =     604800; /* seconds, one week */
 
-int const COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT =           1000;
+uint32_t const COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT =           1000;
 
-int const P2P_LOCAL_WHITE_PEERLIST_LIMIT =                  1000;
-int const P2P_LOCAL_GRAY_PEERLIST_LIMIT =                   5000;
+uint32_t const P2P_LOCAL_WHITE_PEERLIST_LIMIT =                  1000;
+uint32_t const P2P_LOCAL_GRAY_PEERLIST_LIMIT =                   5000;
 
-int const P2P_DEFAULT_CONNECTIONS_COUNT  =                  8;
-int const P2P_DEFAULT_HANDSHAKE_INTERVAL =                  60;           /* secondes */
-int const P2P_DEFAULT_PACKET_MAX_SIZE =                     50000000;     /* 50000000 bytes maximum packet size */
-int const P2P_DEFAULT_PEERS_IN_HANDSHAKE =                  250;
-int const P2P_DEFAULT_CONNECTION_TIMEOUT =                  5000;       /* 5 seconds */
-int const P2P_DEFAULT_PING_CONNECTION_TIMEOUT =             5000;       /* 2 seconds */
-int const P2P_DEFAULT_INVOKE_TIMEOUT =                      120000;     /* 2 minutes */
-int const P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT =            5000;       /* 5 seconds */
-int const P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT =       70;
-int const P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT =            2;
-int const P2P_DEFAULT_LIMIT_RATE_UP =                       2048;       /*  kB/s */
-int const P2P_DEFAULT_LIMIT_RATE_DOWN =                    8192;       /* kB/s */
+uint32_t const P2P_DEFAULT_CONNECTIONS_COUNT  =                  8;
+uint32_t const P2P_DEFAULT_HANDSHAKE_INTERVAL =                  60;           /* secondes */
+uint32_t const P2P_DEFAULT_PACKET_MAX_SIZE =                     50000000;     /* 50000000 bytes maximum packet size */
+uint32_t const P2P_DEFAULT_PEERS_IN_HANDSHAKE =                  250;
+uint32_t const P2P_DEFAULT_CONNECTION_TIMEOUT =                  5000;       /* 5 seconds */
+uint32_t const P2P_DEFAULT_PING_CONNECTION_TIMEOUT =             5000;       /* 2 seconds */
+uint32_t const P2P_DEFAULT_INVOKE_TIMEOUT =                      120000;     /* 2 minutes */
+uint32_t const P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT =            5000;       /* 5 seconds */
+uint32_t const P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT =       70;
+uint32_t const P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT =            2;
+uint32_t const P2P_DEFAULT_LIMIT_RATE_UP =                       2048;       /*  kB/s */
+uint32_t const P2P_DEFAULT_LIMIT_RATE_DOWN =                    8192;       /* kB/s */
 
-int const P2P_FAILED_ADDR_FORGET_SECONDS =                  3600;     /* 1 hour */
-int const P2P_IP_BLOCKTIME =                                (60*60*24);  /* 24 hour */
-int const P2P_IP_FAILS_BEFORE_BLOCK =                       10;
-int const P2P_IDLE_CONNECTION_KILL_INTERVAL =               (5*60); /* 5 minutes */
+uint32_t const P2P_FAILED_ADDR_FORGET_SECONDS =                  3600;     /* 1 hour */
+uint32_t const P2P_IP_BLOCKTIME =                                (60*60*24);  /* 24 hour */
+uint32_t const P2P_IP_FAILS_BEFORE_BLOCK =                       10;
+uint32_t const P2P_IDLE_CONNECTION_KILL_INTERVAL =               (5*60); /* 5 minutes */
 
-int const P2P_SUPPORT_FLAG_FLUFFY_BLOCKS =                  0x01;
-int const P2P_SUPPORT_FLAGS =                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS;
+uint32_t const P2P_SUPPORT_FLAG_FLUFFY_BLOCKS =                  0x01;
+uint32_t const P2P_SUPPORT_FLAGS =                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS;
 
 std::string const CRYPTONOTE_NAME =                         "blurnetwork";
 std::string const CRYPTONOTE_BLOCKCHAINDATA_FILENAME =      "data.mdb";
@@ -139,9 +139,9 @@ std::string const MINER_CONFIG_FILE_NAME =                  "miner_conf.json";
 
 #define THREAD_STACK_SIZE                       0x80000
 
-int const PER_KB_FEE_QUANTIZATION_DECIMALS =        8;
+uint32_t const PER_KB_FEE_QUANTIZATION_DECIMALS =        8;
 
-int const HASH_OF_HASHES_STEP =                     256;
+uint32_t const HASH_OF_HASHES_STEP =                     256;
 
 uint64_t const DEFAULT_TXPOOL_MAX_SIZE =                 648000000ULL; /* 3 days at 300000, in bytes */
 
@@ -153,8 +153,8 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 7757; /* bL */
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 15654; /* uR */
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 8597; /* Ry */
-  uint16_t const P2P_DEFAULT_PORT = 52541;
-  uint16_t const RPC_DEFAULT_PORT = 52542;
+  uint32_t const P2P_DEFAULT_PORT = 52541;
+  uint32_t const RPC_DEFAULT_PORT = 52542;
   boost::uuids::uuid const NETWORK_ID = { {
       0x1E,0x32, 0x11, 0x2F , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x2D
     } };
@@ -168,8 +168,8 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 2124; /* b8 */
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 3462; /* Ps */
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 2195; // Rb
-    uint16_t const P2P_DEFAULT_PORT = 11111;
-    uint16_t const RPC_DEFAULT_PORT = 21111;
+    uint32_t const P2P_DEFAULT_PORT = 11111;
+    uint32_t const RPC_DEFAULT_PORT = 21111;
     boost::uuids::uuid const NETWORK_ID = { {
         0x22 ,0x36, 0xF1, 0x22 , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x16
       } };
@@ -180,8 +180,8 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 5622; /* Bi */
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 2122; /* ao */
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 134; /* Ry */
-    uint16_t const P2P_DEFAULT_PORT = 31105;
-    uint16_t const RPC_DEFAULT_PORT = 31106;
+    uint32_t const P2P_DEFAULT_PORT = 31105;
+    uint32_t const RPC_DEFAULT_PORT = 31106;
     boost::uuids::uuid const NETWORK_ID = { {
         0x22 ,0x36, 0xF1, 0x22 , 0x54, 0x86 , 0x36, 0xFF, 0xAB, 0x51, 0x00, 0x4F, 0x3C, 0x3D, 0xAA, 0x17
       } };
@@ -205,8 +205,8 @@ namespace cryptonote
     uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
     uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX;
     uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX;
-    uint16_t const P2P_DEFAULT_PORT;
-    uint16_t const RPC_DEFAULT_PORT;
+    uint32_t const P2P_DEFAULT_PORT;
+    uint32_t const RPC_DEFAULT_PORT;
     boost::uuids::uuid const NETWORK_ID;
     std::string const GENESIS_TX;
     uint32_t const GENESIS_NONCE;
