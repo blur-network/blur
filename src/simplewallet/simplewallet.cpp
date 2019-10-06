@@ -289,13 +289,6 @@ namespace
     return "invalid";
   }
 
-  bool get_version_string(uint32_t& version)
-  {
-    success_msg_writer() << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")";
-    version = MONERO_VERSION_FULL;
-    return true;
-  }
-
   bool parse_subaddress_indices(const std::string& arg, std::set<uint32_t>& subaddr_indices)
   {
     subaddr_indices.clear();
@@ -319,6 +312,7 @@ namespace
     }
     return true;
   }
+
 
   boost::optional<std::pair<uint32_t, uint32_t>> parse_subaddress_lookahead(const std::string& str)
   {
@@ -3075,7 +3069,7 @@ bool simple_wallet::handle_command_line(const boost::program_options::variables_
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::try_connect_to_daemon(bool silent)
 {
-  if (!m_wallet->check_connection(version))
+  if (!m_wallet->check_connection())
   {
     if (!silent)
       fail_msg_writer() << tr("wallet failed to connect to daemon: ") << m_wallet->get_daemon_address() << ". " <<
@@ -6066,7 +6060,7 @@ std::string simple_wallet::get_prompt() const
 {
   std::string addr_start = m_wallet->get_subaddress_as_str({m_current_subaddress_account, 0}).substr(0, 6);
   std::string prompt = std::string("[") + tr("wallet") + " " + addr_start;
-  if (!m_wallet->check_connection(NULL))
+  if (!m_wallet->check_connection())
     prompt += tr(" (no daemon)");
   else if (!m_wallet->is_synced())
     prompt += tr(" (out of sync)");
@@ -6630,6 +6624,15 @@ bool simple_wallet::get_description(const std::vector<std::string> &args)
   return true;
 }
 //----------------------------------------------------------------------------------------------------
+
+  char const* simple_wallet::get_version_string()
+  {
+    success_msg_writer() << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")";
+    return MONERO_VERSION;
+  }
+
+
+
 bool simple_wallet::status(const std::vector<std::string> &args)
 {
   uint64_t local_height = m_wallet->get_blockchain_current_height();
@@ -6644,8 +6647,7 @@ bool simple_wallet::status(const std::vector<std::string> &args)
   if (err.empty())
   {
     bool synced = local_height == bc_height;
-    uint32_t version;
-    bool r = get_version_str(version);
+    const char* version = get_version_string();
     success_msg_writer() << "Refreshed " << local_height << "/" << bc_height << ", " << (synced ? "synced" : "syncing")
         << ", daemon RPC v" << version;
   }
