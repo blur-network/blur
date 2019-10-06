@@ -63,6 +63,7 @@
 #include "multisig/multisig.h"
 #include "wallet/wallet_args.h"
 #include <stdexcept>
+#include "version.h"
 
 #ifdef WIN32
 #include <boost/locale.hpp>
@@ -288,9 +289,11 @@ namespace
     return "invalid";
   }
 
-  std::string get_version_string(uint32_t version)
+  bool get_version_string(uint32_t& version)
   {
-    return boost::lexical_cast<std::string>(version >> 16) + "." + boost::lexical_cast<std::string>(version & 0xffff);
+    success_msg_writer() << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")";
+    version = MONERO_VERSION_FULL;
+    return true;
   }
 
   bool parse_subaddress_indices(const std::string& arg, std::set<uint32_t>& subaddr_indices)
@@ -1889,6 +1892,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
 {
   if(args.empty())
   {
+    success_msg_writer() << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << std::endl;
     success_msg_writer() << get_commands_str();
   }
   else
@@ -2916,12 +2920,11 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
     }
     if (!m_wallet->explicit_refresh_from_block_height() && m_restoring)
     {
-      uint32_t version;
-      bool connected = try_connect_to_daemon(false, &version);
+      bool connected = try_connect_to_daemon(false);
       while (true)
       {
         std::string heightstr;
-        if (!connected || version < MAKE_CORE_RPC_VERSION(1, 6))
+        if (!connected)
           heightstr = input_line("Restore from specific blockchain height (optional, default 0): ");
         else
           heightstr = input_line("Restore from specific blockchain height (optional, default 0),\nor alternatively from specific date (YYYY-MM-DD): ");
@@ -2939,7 +2942,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
         }
         catch (const boost::bad_lexical_cast &)
         {
-          if (!connected || version < MAKE_CORE_RPC_VERSION(1, 6))
+          if (!connected)
           {
             fail_msg_writer() << tr("bad m_restore_height parameter: ") << heightstr;
             continue;
@@ -3070,23 +3073,14 @@ bool simple_wallet::handle_command_line(const boost::program_options::variables_
   return true;
 }
 //----------------------------------------------------------------------------------------------------
-bool simple_wallet::try_connect_to_daemon(bool silent, uint32_t* version)
+bool simple_wallet::try_connect_to_daemon(bool silent)
 {
-  uint32_t version_ = 0;
-  if (!version)
-    version = &version_;
   if (!m_wallet->check_connection(version))
   {
     if (!silent)
       fail_msg_writer() << tr("wallet failed to connect to daemon: ") << m_wallet->get_daemon_address() << ". " <<
         tr("Daemon either is not started or wrong port was passed. "
         "Please make sure daemon is running or change the daemon address using the 'set_daemon' command.");
-    return false;
-  }
-  if (!m_allow_mismatched_daemon_version && ((*version >> 16) != CORE_RPC_VERSION_MAJOR))
-  {
-    if (!silent)
-      fail_msg_writer() << boost::format(tr("Daemon uses a different RPC major version (%u) than the wallet (%u): %s. Either update one of them, or use --allow-mismatched-daemon-version.")) % (*version>>16) % CORE_RPC_VERSION_MAJOR % m_wallet->get_daemon_address();
     return false;
   }
   return true;
@@ -4098,15 +4092,12 @@ bool simple_wallet::rescan_spent(const std::vector<std::string> &args)
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::print_ring_members(const std::vector<tools::wallet2::pending_tx>& ptx_vector, std::ostream& ostr)
 {
-  uint32_t version;
-  if (!try_connect_to_daemon(false, &version))
+  if (!try_connect_to_daemon(false))
   {
     fail_msg_writer() << tr("failed to connect to the daemon");
     return false;
   }
   // available for RPC version 1.4 or higher
-  if (version < MAKE_CORE_RPC_VERSION(1, 4))
-    return true;
   std::string err;
   uint64_t blockchain_height = get_daemon_blockchain_height(err);
   if (!err.empty())
@@ -6642,8 +6633,7 @@ bool simple_wallet::get_description(const std::vector<std::string> &args)
 bool simple_wallet::status(const std::vector<std::string> &args)
 {
   uint64_t local_height = m_wallet->get_blockchain_current_height();
-  uint32_t version = 0;
-  if (!m_wallet->check_connection(&version))
+  if (!m_wallet->check_connection())
   {
     success_msg_writer() << "Refreshed " << local_height << "/?, no daemon connected";
     return true;
@@ -6654,8 +6644,10 @@ bool simple_wallet::status(const std::vector<std::string> &args)
   if (err.empty())
   {
     bool synced = local_height == bc_height;
+    uint32_t version;
+    bool r = get_version_str(version);
     success_msg_writer() << "Refreshed " << local_height << "/" << bc_height << ", " << (synced ? "synced" : "syncing")
-        << ", daemon RPC v" << get_version_string(version);
+        << ", daemon RPC v" << version;
   }
   else
   {

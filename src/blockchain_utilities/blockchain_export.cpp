@@ -33,8 +33,8 @@
 #include "cryptonote_core/tx_pool.h"
 #include "cryptonote_core/cryptonote_core.h"
 #include "blockchain_db/blockchain_db.h"
-#include "blockchain_db/db_types.h"
 #include "version.h"
+#include "blockchain_db/db_types.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "bcutil"

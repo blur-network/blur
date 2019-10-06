@@ -59,6 +59,7 @@ function (monero_add_executable name)
 
   add_executable("${name}"
     ${ARGN})
+  add_dependencies("${name}" check_git_repository)
   target_link_libraries("${name}"
     PRIVATE
       ${EXTRA_LIBRARIES})

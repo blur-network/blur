@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include "version.h"
-
 
 // bounds checking is done before writing to buffer, but buffer size
 // should be a sensible maximum

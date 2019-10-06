@@ -207,3 +207,5 @@ function(Main)
         SetupGitMonitoring()
     endif()
 endfunction()
+
+main()

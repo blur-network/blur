@@ -3690,7 +3690,7 @@ bool wallet2::prepare_file_names(const std::string& file_path)
   return true;
 }
 //----------------------------------------------------------------------------------------------------
-bool wallet2::check_connection(uint32_t *version, uint32_t timeout)
+bool wallet2::check_connection(uint32_t timeout)
 {
   THROW_WALLET_EXCEPTION_IF(!m_is_initialized, error::wallet_not_initialized);
 
@@ -3701,21 +3701,6 @@ bool wallet2::check_connection(uint32_t *version, uint32_t timeout)
     m_node_rpc_proxy.invalidate();
     if (!m_http_client.connect(std::chrono::milliseconds(timeout)))
       return false;
-  }
-
-  if (version)
-  {
-    cryptonote::COMMAND_RPC_GET_VERSION::request req_t = AUTO_VAL_INIT(req_t);
-    cryptonote::COMMAND_RPC_GET_VERSION::response resp_t = AUTO_VAL_INIT(resp_t);
-    bool r = net_utils::invoke_http_json_rpc("/json_rpc", "get_version", req_t, resp_t, m_http_client);
-    if(!r) {
-      *version = 0;
-      return false;
-    }
-    if (resp_t.status != CORE_RPC_STATUS_OK)
-      *version = 0;
-    else
-      *version = resp_t.version;
   }
 
   return true;
@@ -8262,8 +8247,8 @@ std::string wallet2::get_reserve_proof(const boost::optional<std::pair<uint32_t,
 
 bool wallet2::check_reserve_proof(const cryptonote::account_public_address &address, const std::string &message, const std::string &sig_str, uint64_t &total, uint64_t &spent)
 {
-  uint32_t rpc_version;
-  THROW_WALLET_EXCEPTION_IF(!check_connection(&rpc_version), error::wallet_internal_error, "Failed to connect to daemon: " + get_daemon_address());
+  uint32_t rpc_version = 0;
+  THROW_WALLET_EXCEPTION_IF(!check_connection(rpc_version), error::wallet_internal_error, "Failed to connect to daemon: " + get_daemon_address());
   THROW_WALLET_EXCEPTION_IF(rpc_version < MAKE_CORE_RPC_VERSION(1, 0), error::wallet_internal_error, "Daemon RPC version is too old");
 
   static constexpr char header[] = "ReserveProofV1";
@@ -9521,14 +9506,9 @@ bool wallet2::parse_uri(const std::string &uri, std::string &address, std::strin
 //----------------------------------------------------------------------------------------------------
 uint64_t wallet2::get_blockchain_height_by_date(uint16_t year, uint8_t month, uint8_t day)
 {
-  uint32_t version;
-  if (!check_connection(&version))
+  if (!check_connection())
   {
     throw std::runtime_error("failed to connect to daemon: " + get_daemon_address());
-  }
-  if (version < MAKE_CORE_RPC_VERSION(1, 6))
-  {
-    throw std::runtime_error("this function requires RPC version 1.6 or higher");
   }
   std::tm date = { 0, 0, 0, 0, 0, 0, 0, 0 };
   date.tm_year = year - 1900;

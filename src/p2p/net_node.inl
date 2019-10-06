@@ -37,7 +37,6 @@
 #include <boost/bind.hpp>
 #include <atomic>
 
-#include "version.h"
 #include "string_tools.h"
 #include "common/util.h"
 #include "net/net_helper.h"

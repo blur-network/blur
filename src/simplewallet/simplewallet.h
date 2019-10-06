@@ -215,7 +215,7 @@ namespace cryptonote
     bool blackballed(const std::vector<std::string>& args);
 
     uint64_t get_daemon_blockchain_height(std::string& err);
-    bool try_connect_to_daemon(bool silent = false, uint32_t* version = nullptr);
+    bool try_connect_to_daemon(bool silent = false);
     bool ask_wallet_create_if_needed();
     bool accept_loaded_tx(const std::function<size_t()> get_num_txes, const std::function<const tools::wallet2::tx_construction_data&(size_t)> &get_tx, const std::string &extra_message = std::string());
     bool accept_loaded_tx(const tools::wallet2::unsigned_tx_set &txs);
