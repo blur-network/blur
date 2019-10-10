@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 
     if (command_line::get_arg(vm, command_line::arg_help))
     {
-      std::cout << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+      std::cout << "Blur Network '" << cryptonote::MONERO_RELEASE_NAME << "' (v" << cryptonote::MONERO_VERSION_FULL << ")" << ENDL << ENDL;
       std::cout << "Usage: " + std::string{argv[0]} + " [options|settings] [daemon_command...]" << std::endl << std::endl;
       std::cout << visible_options << std::endl;
       return 0;
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     // Monero Version
     if (command_line::get_arg(vm, command_line::arg_version))
     {
-      std::cout << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL;
+      std::cout << "Blur Network '" << cryptonote::MONERO_RELEASE_NAME << "' (v" << cryptonote::MONERO_VERSION_FULL << ")" << ENDL;
       return 0;
     }
 
@@ -283,7 +283,7 @@ int main(int argc, char* argv[])
     }
 
     // logging is now set up
-    MGINFO("Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")");
+    MGINFO("Blur Network '" << cryptonote::MONERO_RELEASE_NAME << "' (v" << cryptonote::MONERO_VERSION_FULL << ")");
 
     MINFO("Moving from main() into the daemonize now.");
 

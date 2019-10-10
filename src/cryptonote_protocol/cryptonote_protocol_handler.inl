@@ -1032,8 +1032,7 @@ namespace cryptonote
               std::ostringstream new_block_hash(0);
               epee::to_hex::formatted(new_block_hash, epee::as_byte_span(get_block_hash(new_block)));
               MERROR("Got block " << new_block_hash.str() << " with unknown parent " << new_block.prev_id << " which was not requested - querying block hashes");
-	      context.m_needed_objects.clear();
-              context.m_last_response_height = 0;
+              context.m_needed_objects.clear();
             }
 
             // parent was requested, so we wait for it to be retrieved
@@ -1133,7 +1132,6 @@ namespace cryptonote
                 return 1;
               }
 
-              // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
               m_block_queue.remove_spans(span_connection_id, start_height);
               return 1;
             }

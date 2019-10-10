@@ -83,9 +83,9 @@ monero_add_executable(daemon
   ${daemon_private_headers}
   ${blocksdat}
   ${BACKWARD_ENABLE})
+add_dependencies(daemon check_git_repository)
 
 add_backward(daemon)
-add_dependencies(daemon check_git_repository)
 
 target_link_libraries(daemon
   PRIVATE
