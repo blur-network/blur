@@ -110,7 +110,7 @@ namespace cryptonote
       ge_add(&tmp3, &A2, &tmp2);
       ge_p1p1_to_p3(&A2, &tmp3);
       ge_p3_tobytes(&AB, &A2);
-  }
+  }  // TODO: Why do we need this here?
 }
 
 namespace cryptonote
@@ -143,11 +143,8 @@ namespace cryptonote
       }
       for (size_t n = 0; n < tx.rct_signatures.outPk.size(); ++n)
       {
-        if (tx.vout[n].target.type() != typeid(txout_to_key))
-        {
-          LOG_PRINT_L1("Unsupported output type in tx " << get_transaction_hash(tx));
-          return false;
-        }
+        auto const& target = tx.vout[n].target;
+        CHECK_AND_ASSERT_MES(target.type() == typeid(txout_to_key), false, "Unexpected id for target.type()!");
         rv.outPk[n].dest = rct::pk2rct(boost::get<txout_to_key>(tx.vout[n].target).key);
       }
 
@@ -285,7 +282,8 @@ namespace cryptonote
         {
           crypto::public_key subaddr_pk;
           CHECK_AND_ASSERT_MES(hwdev.secret_key_to_public_key(subaddr_sk, subaddr_pk), false, "Failed to derive public key");
-          add_public_key(in_ephemeral.pub, in_ephemeral.pub, subaddr_pk);
+          add_public_key(in_ephemeral.pub, in_ephemeral.pub, subaddr_pk); // TODO: This is the only place where the add_public_key funcion is used.
+                                                                          // Seems like it is maybe doing something unnecessary/unwanted
         }
       }
 
@@ -351,7 +349,7 @@ namespace cryptonote
     uint64_t amount_out = 0;
     for(auto& in: tx.vin)
     {
-      CHECK_AND_ASSERT_MES(in.type() == typeid(txin_to_key), 0, "unexpected type id in transaction");
+      CHECK_AND_ASSERT_MES(in.type() == typeid(txin_to_key), false, "unexpected type id in transaction");
       amount_in += boost::get<txin_to_key>(in).amount;
     }
     for(auto& o: tx.vout)
@@ -824,6 +822,7 @@ namespace cryptonote
       binary_archive<true> ba(ss);
       const size_t inputs = t.vin.size();
       const size_t outputs = t.vout.size();
+      CHECK_AND_ASSERT_MES(t.vin[0].type() == typeid(txin_to_key), false, "Unexpected variant type in inputs!");
       const size_t mixin = t.vin.empty() ? 0 : t.vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(t.vin[0]).key_offsets.size() - 1 : 0;
       bool r = tt.rct_signatures.p.serialize_rctsig_prunable(ba, t.rct_signatures.type, inputs, outputs, mixin);
       CHECK_AND_ASSERT_MES(r, false, "Failed to serialize rct signatures prunable");

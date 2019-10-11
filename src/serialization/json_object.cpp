@@ -32,6 +32,9 @@
 #include <type_traits>
 #include "string_tools.h"
 
+#define CHECK_AND_ASSERT_MES_VOID(expr, message)   do{if(!(expr)) {LOG_ERROR(message); return;};}while(0)
+
+
 namespace cryptonote
 {
 
@@ -280,21 +283,25 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_v& txin, rapid
   if (txin.type() == typeid(cryptonote::txin_gen))
   {
     val.AddMember("type", "txin_gen", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txin.type() == typeid(cryptonote::txin_gen), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_gen>(txin));
   }
   else if (txin.type() == typeid(cryptonote::txin_to_script))
   {
     val.AddMember("type", "txin_to_script", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txin.type() == typeid(cryptonote::txin_to_script), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_to_script>(txin));
   }
   else if (txin.type() == typeid(cryptonote::txin_to_scripthash))
   {
     val.AddMember("type", "txin_to_scripthash", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txin.type() == typeid(cryptonote::txin_to_scripthash), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_to_scripthash>(txin));
   }
   else if (txin.type() == typeid(cryptonote::txin_to_key))
   {
     val.AddMember("type", "txin_to_key", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txin.type() == typeid(cryptonote::txin_to_key), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_to_key>(txin));
   }
 }
@@ -428,16 +435,19 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_target_v& txo
   if (txout.type() == typeid(cryptonote::txout_to_script))
   {
     val.AddMember("type", "txout_to_script", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txout.type() == typeid(cryptonote::txout_to_script), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txout_to_script>(txout));
   }
   else if (txout.type() == typeid(cryptonote::txout_to_scripthash))
   {
     val.AddMember("type", "txout_to_scripthash", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txout.type() == typeid(cryptonote::txout_to_scripthash), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txout_to_scripthash>(txout));
   }
   else if (txout.type() == typeid(cryptonote::txout_to_key))
   {
     val.AddMember("type", "txout_to_key", doc.GetAllocator());
+    CHECK_AND_ASSERT_MES_VOID(txout.type() == typeid(cryptonote::txout_to_key), "Unexpected variant type!");
     INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txout_to_key>(txout));
   }
 }

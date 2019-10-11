@@ -1084,7 +1084,8 @@ bool Blockchain::prevalidate_miner_transaction(const block& b, uint64_t height)
   LOG_PRINT_L3("Blockchain::" << __func__);
   CHECK_AND_ASSERT_MES(b.miner_tx.vin.size() == 1, false, "coinbase transaction in the block has no inputs");
   CHECK_AND_ASSERT_MES(b.miner_tx.vin[0].type() == typeid(txin_gen), false, "coinbase transaction in the block has the wrong type");
-    CHECK_AND_ASSERT_MES(b.miner_tx.rct_signatures.type == rct::RCTTypeNull, false, "V1 miner transactions are not allowed.");
+  CHECK_AND_ASSERT_MES(b.miner_tx.rct_signatures.type == rct::RCTTypeNull, false, "V1 miner transactions are not allowed.");
+  CHECK_AND_ASSERT_MES(b.miner_tx.vin[0].type() == typeid(txin_gen), false, "Unexpected variant type in miner_tx prevalidation!");
   if(boost::get<txin_gen>(b.miner_tx.vin[0]).height != height)
   {
     MWARNING("The miner transaction in block has invalid height: " << boost::get<txin_gen>(b.miner_tx.vin[0]).height << ", expected: " << height);
@@ -2360,6 +2361,7 @@ void Blockchain::on_new_tx_from_block(const cryptonote::transaction &tx)
     TIME_MEASURE_FINISH(a);
     if(m_show_time_stats)
     {
+      CHECK_AND_ASSERT_MES(tx.vin[0].type() == typeid(txin_to_key), false, "Unexpected variant type in new tx from block!");
       size_t ring_size = !tx.vin.empty() && tx.vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(tx.vin[0]).key_offsets.size() : 0;
       MINFO("HASH: " << "-" << " I/M/O: " << tx.vin.size() << "/" << ring_size << "/" << tx.vout.size() << " H: " << 0 << " chcktx: " << a);
     }
@@ -2395,6 +2397,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, uint64_t& max_used_block_heigh
   TIME_MEASURE_FINISH(a);
   if(m_show_time_stats)
   {
+    CHECK_AND_ASSERT_MES(tx.vin[0].type() == typeid(txin_to_key), false, "Unexpected variant type in check_tx_inputs!");
     size_t ring_size = !tx.vin.empty() && tx.vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(tx.vin[0]).key_offsets.size() : 0;
     MINFO("HASH: " <<  get_transaction_hash(tx) << " I/M/O: " << tx.vin.size() << "/" << ring_size << "/" << tx.vout.size() << " H: " << max_used_block_height << " ms: " << a + m_fake_scan_time << " B: " << get_object_blobsize(tx));
   }
@@ -2428,6 +2431,7 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
   // forbid invalid pubkeys
   if (hf_version >= 1) {
     for (const auto &o: tx.vout) {
+      CHECK_AND_ASSERT_MES(o.target.type() == typeid(txout_to_key), false, "Unexpected variant at check_tx_outputs!");
       if (o.target.type() == typeid(txout_to_key)) {
         const txout_to_key& out_to_key = boost::get<txout_to_key>(o.target);
         if (!crypto::check_key(out_to_key.key)) {
@@ -2511,8 +2515,10 @@ bool Blockchain::expand_transaction_2(transaction &tx, const crypto::hash &tx_pr
   {
     rv.p.MGs.resize(1);
     rv.p.MGs[0].II.resize(tx.vin.size());
-    for (size_t n = 0; n < tx.vin.size(); ++n)
+    for (size_t n = 0; n < tx.vin.size(); ++n) {
+      CHECK_AND_ASSERT_MES(tx.vin[n].type() == typeid(txin_to_key), false, "Unexpected variant type in full bulletproof!");
       rv.p.MGs[0].II[n] = rct::ki2rct(boost::get<txin_to_key>(tx.vin[n]).k_image);
+    }
   }
   else if (rv.type == rct::RCTTypeSimple || rv.type == rct::RCTTypeSimpleBulletproof)
   {
@@ -2520,6 +2526,7 @@ bool Blockchain::expand_transaction_2(transaction &tx, const crypto::hash &tx_pr
     for (size_t n = 0; n < tx.vin.size(); ++n)
     {
       rv.p.MGs[n].II.resize(1);
+      CHECK_AND_ASSERT_MES(tx.vin[n].type() == typeid(txin_to_key), false, "Unexpected variant type in simple bulletproof!");
       rv.p.MGs[n].II[0] = rct::ki2rct(boost::get<txin_to_key>(tx.vin[n]).k_image);
     }
   }
@@ -2556,6 +2563,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
   {
     for (const auto& txin : tx.vin)
     {
+      CHECK_AND_ASSERT_MES(txin.type() == typeid(txin_to_key), false, "Unexpected variant type in check_tx_inputs!");
       if (boost::get<txin_to_key>(txin).key_offsets.size() != DEFAULT_RINGSIZE)
       {
         MERROR_VER("Tx " << get_transaction_hash(tx) << " must have ring size (" << DEFAULT_RINGSIZE << ")");
@@ -2587,6 +2595,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
     for (size_t n = 0; n < tx.vin.size(); ++n)
     {
       const txin_v &txin = tx.vin[n];
+      CHECK_AND_ASSERT_MES(tx.vin[n].type() == typeid(txin_to_key), false, "Unexpected variant type in check_tx_inputs!");
       if (txin.type() == typeid(txin_to_key))
       {
         const txin_to_key& in_to_key = boost::get<txin_to_key>(txin);
@@ -2713,6 +2722,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       }
       for (size_t n = 0; n < tx.vin.size(); ++n)
       {
+        CHECK_AND_ASSERT_MES(tx.vin[n].type() == typeid(txin_to_key), false, "Unexpected variant type in ring signature check!");
         if (rv.p.MGs[n].II.empty() || memcmp(&boost::get<txin_to_key>(tx.vin[n]).k_image, &rv.p.MGs[n].II[0], 32))
         {
           MERROR_VER("Failed to check ringct signatures: mismatched key image");
@@ -2773,6 +2783,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       }
       for (size_t n = 0; n < tx.vin.size(); ++n)
       {
+        CHECK_AND_ASSERT_MES(tx.vin[n].type() == typeid(txin_to_key), false, "Unexpected variant type in ring signature check!");
         if (memcmp(&boost::get<txin_to_key>(tx.vin[n]).k_image, &rv.p.MGs[0].II[n], 32))
         {
           MERROR_VER("Failed to check ringct signatures: mismatched II/vin sizes");
@@ -3986,6 +3997,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
       // get all amounts from tx.vin(s)
       for (const auto &txin : tx.vin)
       {
+        CHECK_AND_ASSERT_MES(txin.type() == typeid(txin_to_key), false, "Unexpected variant type in handle_incoming_block!");
         const txin_to_key &in_to_key = boost::get < txin_to_key > (txin);
 
         // check for duplicate
@@ -4014,6 +4026,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
       // add new absolute_offsets to offset_map
       for (const auto &txin : tx.vin)
       {
+        CHECK_AND_ASSERT_MES(txin.type() == typeid(txin_to_key), false, "Unexpected variant type in handle_incoming_block!");
         const txin_to_key &in_to_key = boost::get < txin_to_key > (txin);
         // no need to check for duplicate here.
         auto absolute_offsets = relative_output_offsets_to_absolute(in_to_key.key_offsets);
@@ -4083,6 +4096,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
 
       for (const auto &txin : tx.vin)
       {
+        CHECK_AND_ASSERT_MES(txin.type() == typeid(txin_to_key), false, "Unexpected variant type in handle_incoming_block!");
         const txin_to_key &in_to_key = boost::get < txin_to_key > (txin);
         auto needed_offsets = relative_output_offsets_to_absolute(in_to_key.key_offsets);
 
