@@ -139,7 +139,7 @@ void BlockchainDB::add_transaction(const crypto::hash& blk_hash, const transacti
 
   for (const txin_v& tx_input : tx.vin)
   {
-    bool r = ((tx_input.type() != typeid(txin_to_key)) &&  (tx_input.type() != typeid(txin_to_key)));
+    bool r = ((tx_input.type() != typeid(txin_to_key)) &&  (tx_input.type() != typeid(txin_gen)));
     CHECK_AND_ASSERT_MES(!r, , "Unexpected txin variant type in add_transaction!");
     if (tx_input.type() == typeid(txin_to_key)) {
       add_spent_key(boost::get<txin_to_key>(tx_input).k_image);
