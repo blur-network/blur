@@ -1572,6 +1572,7 @@ namespace cryptonote
       error_resp.message = "Internal error: coinbase transaction in the block has the wrong type";
       return false;
     }
+    CHECK_AND_ASSERT_MES(blk.miner_tx.vin.front().type() == typeid(txin_gen), false, "Unexpected txin variant in coinbase tx!");
     uint64_t block_height = boost::get<txin_gen>(blk.miner_tx.vin.front()).height;
     bool response_filled = fill_block_header_response(blk, orphan, block_height, block_hash, res.block_header);
     if (!response_filled)
@@ -1614,6 +1615,7 @@ namespace cryptonote
         error_resp.message = "Internal error: coinbase transaction in the block has the wrong type";
         return false;
       }
+      CHECK_AND_ASSERT_MES(blk.miner_tx.vin.front().type() == typeid(txin_gen), false, "Unexpected txin variant in coinbase tx!");
       uint64_t block_height = boost::get<txin_gen>(blk.miner_tx.vin.front()).height;
       if (block_height != h)
       {
@@ -1708,6 +1710,7 @@ namespace cryptonote
       error_resp.message = "Internal error: coinbase transaction in the block has the wrong type";
       return false;
     }
+    CHECK_AND_ASSERT_MES(blk.miner_tx.vin.front().type() == typeid(txin_gen), false, "Unexpected txin variant in coinbase tx!");
     uint64_t block_height = boost::get<txin_gen>(blk.miner_tx.vin.front()).height;
     bool response_filled = fill_block_header_response(blk, orphan, block_height, block_hash, res.block_header);
     if (!response_filled)

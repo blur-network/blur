@@ -278,7 +278,7 @@ namespace cryptonote
     std::random_shuffle(shuffled_dsts.begin(), shuffled_dsts.end(), [](unsigned int i) { return crypto::rand<unsigned int>() % i; });
 
     // sort ins by their key image
-    std::vector<size_t> ins_order(sources.size());
+/*    std::vector<size_t> ins_order(sources.size());
     for (size_t n = 0; n < sources.size(); ++n)
       ins_order[n] = n;
     std::sort(ins_order.begin(), ins_order.end(), [&](const size_t i0, const size_t i1) {
@@ -290,7 +290,7 @@ namespace cryptonote
       std::swap(tx.vin[i0], tx.vin[i1]);
       std::swap(in_contexts[i0], in_contexts[i1]);
       std::swap(sources[i0], sources[i1]);
-    });
+    });*/
 
     // figure out if we need to make additional tx pubkeys
     size_t num_stdaddresses = 0;
@@ -469,6 +469,7 @@ namespace cryptonote
       }
       for (size_t i = 0; i < tx.vout.size(); ++i)
       {
+        CHECK_AND_ASSERT_MES(tx.vout[i].target.type() == typeid(txout_to_key), false, "Unexpected variant type in tx_utils!");
         destinations.push_back(rct::pk2rct(boost::get<txout_to_key>(tx.vout[i].target).key));
         outamounts.push_back(tx.vout[i].amount);
         amount_out += tx.vout[i].amount;

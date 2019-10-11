@@ -323,8 +323,7 @@ int main(int argc, char* argv[])
     {
       for (const auto &in: tx.vin)
       {
-        if (in.type() != typeid(txin_to_key))
-          continue;
+        CHECK_AND_ASSERT_MES(in.type() == typeid(txin_to_key), 1, "Unexpected variant type in blockchain_blackball.cpp!");
         const auto &txin = boost::get<txin_to_key>(in);
         if (opt_rct_only && txin.amount != 0)
           continue;

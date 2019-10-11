@@ -602,9 +602,10 @@ namespace cryptonote
         tvc.m_verifivation_failed = true;
         return false;
       }
-      for (size_t n = 0; n < tx.rct_signatures.outPk.size(); ++n)
+      for (size_t n = 0; n < tx.rct_signatures.outPk.size(); ++n) {
+        CHECK_AND_ASSERT_MES(tx.vout[n].target.type() == typeid(cryptonote::txout_to_key), false, "Unexpected variant type in handle_incoming_tx_post!");
         rv.outPk[n].dest = rct::pk2rct(boost::get<txout_to_key>(tx.vout[n].target).key);
-
+      }
       const bool bulletproof = rv.type == rct::RCTTypeFullBulletproof || rv.type == rct::RCTTypeSimpleBulletproof;
       if (bulletproof)
       {

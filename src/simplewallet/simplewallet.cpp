@@ -4110,8 +4110,7 @@ bool simple_wallet::print_ring_members(const std::vector<tools::wallet2::pending
     std::vector<crypto::hash> spent_key_txid  (tx.vin.size());
     for (size_t i = 0; i < tx.vin.size(); ++i)
     {
-      if (tx.vin[i].type() != typeid(cryptonote::txin_to_key))
-        continue;
+      CHECK_AND_ASSERT_MES(tx.vin[i].type() == typeid(cryptonote::txin_to_key), false, "Unexpected variant type in simplewallet!");
       const cryptonote::txin_to_key& in_key = boost::get<cryptonote::txin_to_key>(tx.vin[i]);
       const tools::wallet2::transfer_details &td = m_wallet->get_transfer_details(construction_data.selected_transfers[i]);
       const cryptonote::tx_source_entry *sptr = NULL;

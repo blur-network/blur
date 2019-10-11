@@ -214,7 +214,7 @@ void BootstrapFile::write_block(block& block)
   bp.block = block;
 
   std::vector<transaction> txs;
-
+  CHECK_AND_ASSERT_MES(block.miner_tx.vin.front().type() == typeid(txin_gen), ,"Unexpected variant type in bootstrap file!");
   uint64_t block_height = boost::get<txin_gen>(block.miner_tx.vin.front()).height;
 
 

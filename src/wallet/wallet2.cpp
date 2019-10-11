@@ -997,15 +997,11 @@ void wallet2::set_unspent(size_t idx)
 //----------------------------------------------------------------------------------------------------
 void wallet2::check_acc_out_precomp(const tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info) const
 {
+  CHECK_AND_ASSERT_MES(o.target.type() == typeid(txout_to_key), , "Unexpected txout variant type at check_acc_out_precomp!");
+
   hw::device &hwdev = m_account.get_device();
   boost::unique_lock<hw::device> hwdev_lock (hwdev);
   hwdev.set_mode(hw::device::TRANSACTION_PARSE);
-  if (o.target.type() !=  typeid(txout_to_key))
-  {
-     tx_scan_info.error = true;
-     LOG_ERROR("wrong type id in transaction out");
-     return;
-  }
   tx_scan_info.received = is_out_to_acc_precomp(m_subaddresses, boost::get<txout_to_key>(o.target).key, derivation, additional_derivations, i, hwdev);
   if(tx_scan_info.received)
   {
@@ -1059,12 +1055,14 @@ void wallet2::scan_output(const cryptonote::transaction &tx, const crypto::publi
   THROW_WALLET_EXCEPTION_IF(i >= tx.vout.size(), error::wallet_internal_error, "Invalid vout index");
   if (m_multisig)
   {
+    CHECK_AND_ASSERT_MES(tx.vout[i].target.type() == typeid(txout_to_key), , "Unexpected txout variant type at scan_output!");
     tx_scan_info.in_ephemeral.pub = boost::get<cryptonote::txout_to_key>(tx.vout[i].target).key;
     tx_scan_info.in_ephemeral.sec = crypto::null_skey;
     tx_scan_info.ki = rct::rct2ki(rct::zero());
   }
   else
   {
+    CHECK_AND_ASSERT_MES(tx.vout[i].target.type() == typeid(txout_to_key), , "Unexpected txout variant type at scan_output!");
     bool r = cryptonote::generate_key_image_helper_precomp(m_account.get_keys(), boost::get<cryptonote::txout_to_key>(tx.vout[i].target).key, tx_scan_info.received->derivation, i, tx_scan_info.received->index, tx_scan_info.in_ephemeral, tx_scan_info.ki, m_account.get_device());
     THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key image for tx: " + epee::string_tools::pod_to_hex(get_transaction_hash(tx)));
     THROW_WALLET_EXCEPTION_IF(tx_scan_info.in_ephemeral.pub != boost::get<cryptonote::txout_to_key>(tx.vout[i].target).key, error::wallet_internal_error, "Key_image generated ephemeral public key not matched with output_key");
@@ -1363,8 +1361,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
   // check all outputs for spending (compare key images)
   for(auto& in: tx.vin)
   {
-    if(in.type() != typeid(cryptonote::txin_to_key))
-      continue;
+    CHECK_AND_ASSERT_MES(in.type() == typeid(cryptonote::txin_to_key), , "Unexpected txin variant type at process_new_tx!");
     auto it = m_key_images.find(boost::get<cryptonote::txin_to_key>(in).k_image);
     if(it != m_key_images.end())
     {
@@ -1559,8 +1556,7 @@ void wallet2::process_outgoing(const crypto::hash &txid, const cryptonote::trans
 
   for (const auto &in: tx.vin)
   {
-    if (in.type() != typeid(cryptonote::txin_to_key))
-      continue;
+    CHECK_AND_ASSERT_MES(in.type() == typeid(cryptonote::txin_to_key), ,"Unexpected variant type at process_outgoing!");
     const auto &txin = boost::get<cryptonote::txin_to_key>(in);
     entry.first->second.m_rings.push_back(std::make_pair(txin.k_image, txin.key_offsets));
   }
@@ -1969,18 +1965,16 @@ void wallet2::update_pool_state(bool refreshed)
         remove_rings(pit->second.m_tx);
         for (size_t vini = 0; vini < pit->second.m_tx.vin.size(); ++vini)
         {
-          if (pit->second.m_tx.vin[vini].type() == typeid(txin_to_key))
+          CHECK_AND_ASSERT_MES(pit->second.m_tx.vin[vini].type() == typeid(txin_to_key), ,"Unexpected variant type at update_pool_state!");
+          txin_to_key &tx_in_to_key = boost::get<txin_to_key>(pit->second.m_tx.vin[vini]);
+          for (size_t i = 0; i < m_transfers.size(); ++i)
           {
-            txin_to_key &tx_in_to_key = boost::get<txin_to_key>(pit->second.m_tx.vin[vini]);
-            for (size_t i = 0; i < m_transfers.size(); ++i)
+            const transfer_details &td = m_transfers[i];
+            if (td.m_key_image == tx_in_to_key.k_image)
             {
-              const transfer_details &td = m_transfers[i];
-              if (td.m_key_image == tx_in_to_key.k_image)
-              {
-                 LOG_PRINT_L1("Resetting spent status for output " << vini << ": " << td.m_key_image);
-                 set_unspent(i);
-                 break;
-              }
+               LOG_PRINT_L1("Resetting spent status for output " << vini << ": " << td.m_key_image);
+               set_unspent(i);
+               break;
             }
           }
         }
@@ -4422,8 +4416,7 @@ void wallet2::add_unconfirmed_tx(const cryptonote::transaction& tx, uint64_t amo
   utd.m_subaddr_indices = subaddr_indices;
   for (const auto &in: tx.vin)
   {
-    if (in.type() != typeid(cryptonote::txin_to_key))
-      continue;
+    CHECK_AND_ASSERT_MES(in.type() != typeid(cryptonote::txin_to_key), , "Unexpected txin variant type at add_uncomfirmed_tx!");
     const auto &txin = boost::get<cryptonote::txin_to_key>(in);
     utd.m_rings.push_back(std::make_pair(txin.k_image, txin.key_offsets));
   }
@@ -6005,15 +5998,18 @@ void wallet2::get_outs(std::vector<std::vector<tools::wallet2::get_outs_entry>> 
       for (size_t n = 0; n < requested_outputs_count; ++n)
       {
         size_t i = base + n;
-        if (req.outputs[i].index == td.m_global_output_index)
+        if (req.outputs[i].index == td.m_global_output_index) {
+          CHECK_AND_ASSERT_MES(td.m_tx.vout[td.m_internal_output_index].target.type() == typeid(txout_to_key), , "Unexpected output type at get_outs!");
           if (daemon_resp.outs[i].key == boost::get<txout_to_key>(td.m_tx.vout[td.m_internal_output_index].target).key)
             if (daemon_resp.outs[i].mask == mask)
               real_out_found = true;
+        }
       }
       THROW_WALLET_EXCEPTION_IF(!real_out_found, error::wallet_internal_error,
           "Daemon response did not include the requested real output");
 
       // pick real out first (it will be sorted when done)
+      CHECK_AND_ASSERT_MES(td.m_tx.vout[td.m_internal_output_index].target.type() == typeid(txout_to_key), , "Unexpected txout variant at get_outs!");
       outs.back().push_back(std::make_tuple(td.m_global_output_index, boost::get<txout_to_key>(td.m_tx.vout[td.m_internal_output_index].target).key, mask));
 
       // then pick outs from an existing ring, if any
@@ -6165,6 +6161,7 @@ void wallet2::transfer_selected(const std::vector<cryptonote::tx_destination_ent
 
     tx_output_entry real_oe;
     real_oe.first = td.m_global_output_index;
+    CHECK_AND_ASSERT_MES(td.m_tx.vout[td.m_internal_output_index].target.type() == typeid(txout_to_key), , "Unexpected txout variant at get_outs!");
     real_oe.second.dest = rct::pk2rct(boost::get<txout_to_key>(td.m_tx.vout[td.m_internal_output_index].target).key);
     real_oe.second.mask = rct::commit(td.amount(), td.m_mask);
     *it_to_replace = real_oe;
@@ -7583,7 +7580,8 @@ std::string wallet2::get_spend_proof(const crypto::hash &txid, const std::string
 
   for(size_t i = 0; i < tx.vin.size(); ++i)
   {
-    const txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
+    CHECK_AND_ASSERT_MES(tx.vin[i].type() == typeid(txin_to_key), "", "Unexpected txin variant type in get_spend_proof!");
+    txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
     if (in_key == nullptr)
       continue;
 
@@ -7597,7 +7595,8 @@ std::string wallet2::get_spend_proof(const crypto::hash &txid, const std::string
 
     // derive the real output keypair
     const transfer_details& in_td = m_transfers[found->second];
-    const txout_to_key* const in_tx_out_pkey = boost::get<txout_to_key>(std::addressof(in_td.m_tx.vout[in_td.m_internal_output_index].target));
+    CHECK_AND_ASSERT_MES(in_td.m_tx.vout[in_td.m_internal_output_index].target.type() == typeid(txout_to_key), "", "Unexpected txout variant type in get_spend_proof!");
+    txout_to_key const* in_tx_out_pkey = boost::get<txout_to_key>(std::addressof(in_td.m_tx.vout[in_td.m_internal_output_index].target));
     THROW_WALLET_EXCEPTION_IF(in_tx_out_pkey == nullptr, error::wallet_internal_error, "Output is not txout_to_key");
     const crypto::public_key in_tx_pub_key = get_tx_pub_key_from_extra(in_td.m_tx, in_td.m_pk_index);
     const std::vector<crypto::public_key> in_additionakl_tx_pub_keys = get_additional_tx_pub_keys_from_extra(in_td.m_tx);
@@ -7697,7 +7696,8 @@ bool wallet2::check_spend_proof(const crypto::hash &txid, const std::string &mes
   size_t num_sigs = 0;
   for(size_t i = 0; i < tx.vin.size(); ++i)
   {
-    const txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
+    CHECK_AND_ASSERT_MES(tx.vin[i].type() == typeid(txin_to_key), false, "Unexpected variant type in get_spend_proof!");
+    txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
     if (in_key != nullptr)
       num_sigs += in_key->key_offsets.size();
   }
@@ -7711,7 +7711,8 @@ bool wallet2::check_spend_proof(const crypto::hash &txid, const std::string &mes
   size_t offset = header_len;
   for(size_t i = 0; i < tx.vin.size(); ++i)
   {
-    const txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
+    CHECK_AND_ASSERT_MES(tx.vin[i].type() == typeid(txin_to_key), false, "Unexpected variant type in get_spend_proof!");
+    txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
     if (in_key == nullptr)
       continue;
     signatures.resize(signatures.size() + 1);
@@ -7735,7 +7736,8 @@ bool wallet2::check_spend_proof(const crypto::hash &txid, const std::string &mes
   std::vector<std::vector<crypto::signature>>::const_iterator sig_iter = signatures.cbegin();
   for(size_t i = 0; i < tx.vin.size(); ++i)
   {
-    const txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
+    CHECK_AND_ASSERT_MES(tx.vin[i].type() == typeid(txin_to_key), false, "Unexpected variant type in get_spend_proof!");
+    txin_to_key* const in_key = boost::get<txin_to_key>(std::addressof(tx.vin[i]));
     if (in_key == nullptr)
       continue;
 
@@ -7824,7 +7826,8 @@ void wallet2::check_tx_key_helper(const crypto::hash &txid, const crypto::key_de
   hw::device &hwdev =  m_account.get_device();
   for (size_t n = 0; n < tx.vout.size(); ++n)
   {
-    const cryptonote::txout_to_key* const out_key = boost::get<cryptonote::txout_to_key>(std::addressof(tx.vout[n].target));
+    CHECK_AND_ASSERT_MES(tx.vout[n].target.type() == typeid(txout_to_key), , "Unexpected variant type in get_spend_proof!");
+    cryptonote::txout_to_key const* out_key = boost::get<cryptonote::txout_to_key>(std::addressof(tx.vout[n].target));
     if (!out_key)
       continue;
 
@@ -8708,8 +8711,7 @@ uint64_t wallet2::import_key_images(const std::vector<std::pair<crypto::key_imag
 
     // get ephemeral public key
     const cryptonote::tx_out &out = td.m_tx.vout[td.m_internal_output_index];
-    THROW_WALLET_EXCEPTION_IF(out.target.type() != typeid(txout_to_key), error::wallet_internal_error,
-      "Non txout_to_key output found");
+    CHECK_AND_ASSERT_MES(out.target.type() == typeid(txout_to_key), 0, "Unexpected variant type in import_key_images!");
     const cryptonote::txout_to_key &o = boost::get<cryptonote::txout_to_key>(out.target);
     const crypto::public_key pkey = o.key;
 
@@ -8776,6 +8778,7 @@ uint64_t wallet2::import_key_images(const std::vector<std::pair<crypto::key_imag
         bool is_spent_tx = false;
         for(const cryptonote::txin_v& in : it->m_tx.vin)
         {
+          CHECK_AND_ASSERT_MES(in.type() == typeid(txin_to_key), 0, "Unexpected txin variant type in import_key_images!");
           if(in.type() == typeid(cryptonote::txin_to_key) && td.m_key_image == boost::get<cryptonote::txin_to_key>(in).k_image)
           {
             is_spent_tx = true;
@@ -8866,8 +8869,7 @@ uint64_t wallet2::import_key_images(const std::vector<std::pair<crypto::key_imag
       std::set<uint32_t> subaddr_indices;
       for (const cryptonote::txin_v& in : spent_tx.vin)
       {
-        if (in.type() != typeid(cryptonote::txin_to_key))
-          continue;
+        CHECK_AND_ASSERT_MES(in.type() == typeid(cryptonote::txin_to_key), false, "Unexpected txin variant type in import_key_images!");
         auto it = m_key_images.find(boost::get<cryptonote::txin_to_key>(in).k_image);
         if (it != m_key_images.end())
         {
@@ -9011,8 +9013,8 @@ size_t wallet2::import_outputs(const std::vector<tools::wallet2::transfer_detail
     THROW_WALLET_EXCEPTION_IF(td.m_tx.vout.empty(), error::wallet_internal_error, "tx with no outputs at index " + boost::lexical_cast<std::string>(i));
     crypto::public_key tx_pub_key = get_tx_pub_key_from_received_outs(td);
     const std::vector<crypto::public_key> additional_tx_pub_keys = get_additional_tx_pub_keys_from_extra(td.m_tx);
-
-    const crypto::public_key& out_key = boost::get<cryptonote::txout_to_key>(td.m_tx.vout[td.m_internal_output_index].target).key;
+    CHECK_AND_ASSERT_MES(td.m_tx.vout[td.m_internal_output_index].target.type() == typeid(txout_to_key), (i+1), "Unexpected txout variant type at import_outputs!");
+    crypto::public_key const& out_key = boost::get<cryptonote::txout_to_key>(td.m_tx.vout[td.m_internal_output_index].target).key;
     bool r = cryptonote::generate_key_image_helper(m_account.get_keys(), m_subaddresses, out_key, tx_pub_key, additional_tx_pub_keys, td.m_internal_output_index, in_ephemeral, td.m_key_image, m_account.get_device());
     THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key image");
     expand_subaddresses(td.m_subaddr_index);

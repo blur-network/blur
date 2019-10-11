@@ -139,8 +139,9 @@ void BlockchainDB::add_transaction(const crypto::hash& blk_hash, const transacti
 
   for (const txin_v& tx_input : tx.vin)
   {
-    if (tx_input.type() == typeid(txin_to_key))
-    {
+    bool r = ((tx_input.type() != typeid(txin_to_key)) &&  (tx_input.type() != typeid(txin_to_key)));
+    CHECK_AND_ASSERT_MES(!r, , "Unexpected txin variant type in add_transaction!");
+    if (tx_input.type() == typeid(txin_to_key)) {
       add_spent_key(boost::get<txin_to_key>(tx_input).k_image);
     }
     else if (tx_input.type() == typeid(txin_gen))
@@ -148,7 +149,7 @@ void BlockchainDB::add_transaction(const crypto::hash& blk_hash, const transacti
       /* nothing to do here */
       miner_tx = true;
     }
-    else
+    else // If txin variant is invalid, we should have already returned
     {
       LOG_PRINT_L1("Unsupported input type, removing key images and aborting transaction addition");
       for (const txin_v& tx_input : tx.vin)
@@ -268,6 +269,8 @@ void BlockchainDB::remove_transaction(const crypto::hash& tx_hash)
 
   for (const txin_v& tx_input : tx.vin)
   {
+    bool r = (tx_input.type() != typeid(txin_to_key));
+    CHECK_AND_ASSERT_MES(!r, , "Unexpected variant type at remove_transaction in DB!");
     if (tx_input.type() == typeid(txin_to_key))
     {
       remove_spent_key(boost::get<txin_to_key>(tx_input).k_image);

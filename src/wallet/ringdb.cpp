@@ -247,8 +247,7 @@ bool ringdb::add_rings(const crypto::chacha_key &chacha_key, const cryptonote::t
 
   for (const auto &in: tx.vin)
   {
-    if (in.type() != typeid(cryptonote::txin_to_key))
-      continue;
+    CHECK_AND_ASSERT_MES(in.type() == typeid(cryptonote::txin_to_key), false, "Unexpected variant type in ringdb!");
     const auto &txin = boost::get<cryptonote::txin_to_key>(in);
     const uint32_t ring_size = txin.key_offsets.size();
     if (ring_size == 1)
@@ -278,8 +277,7 @@ bool ringdb::remove_rings(const crypto::chacha_key &chacha_key, const cryptonote
 
   for (const auto &in: tx.vin)
   {
-    if (in.type() != typeid(cryptonote::txin_to_key))
-      continue;
+    CHECK_AND_ASSERT_MES(in.type() == typeid(cryptonote::txin_to_key), false, "Unexpected variant type in ringdb!");
     const auto &txin = boost::get<cryptonote::txin_to_key>(in);
     const uint32_t ring_size = txin.key_offsets.size();
     if (ring_size == 1)
