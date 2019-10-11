@@ -905,8 +905,10 @@ namespace cryptonote
         drop_connection(context, false, false);
         return 1;
       }
-      if (start_height == std::numeric_limits<uint64_t>::max())
+      if (start_height == std::numeric_limits<uint64_t>::max()) {
+        CHECK_AND_ASSERT_MES(b.miner_tx.vin[0].type() == typeid(cryptonote::txin_gen), 1, "Unexpected variant type in cryptonote_protocol_handler.inl!");
         start_height = boost::get<txin_gen>(b.miner_tx.vin[0]).height;
+      }
 
       const crypto::hash block_hash = get_block_hash(b);
       auto req_it = context.m_requested_objects.find(block_hash);
