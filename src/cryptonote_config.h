@@ -129,11 +129,11 @@ uint32_t const P2P_IDLE_CONNECTION_KILL_INTERVAL =               300; /* 5 minut
 #define P2P_SUPPORT_FLAG_FLUFFY_BLOCKS                  1
 #define P2P_SUPPORT_FLAGS                               1
 
-std::string const CRYPTONOTE_NAME =                         "blurnetwork";
-std::string const CRYPTONOTE_BLOCKCHAINDATA_FILENAME =      "data.mdb";
-std::string const CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME = "lock.mdb";
-std::string const P2P_NET_DATA_FILENAME =                   "peers_state.bin";
-std::string const MINER_CONFIG_FILE_NAME =                  "miner_conf.json";
+char const* CRYPTONOTE_NAME =                         "blurnetwork";
+char const* CRYPTONOTE_BLOCKCHAINDATA_FILENAME =      "data.mdb";
+char const* CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME = "lock.mdb";
+char const* P2P_NET_DATA_FILENAME =                   "peers_state.bin";
+char const* MINER_CONFIG_FILE_NAME =                  "miner_conf.json";
 
 #define THREAD_STACK_SIZE                       524288
 
@@ -156,16 +156,16 @@ namespace config
   boost::uuids::uuid const NETWORK_ID = { {
       0x1E,0x32, 0x11, 0x2F , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x2D
     } };
-  std::string const GENESIS_TX = "011901ff0001ffffffffffff0102bca7c97f7074ea888eac572fda0964cc864baf7bc07d6cecc052728039009d7621017133140c2abc1825f8d411db7bee4379a2a0f21b7af60e44ed7f07e9e66ccd8800";
+  char const* GENESIS_TX = "011901ff0001ffffffffffff0102bca7c97f7074ea888eac572fda0964cc864baf7bc07d6cecc052728039009d7621017133140c2abc1825f8d411db7bee4379a2a0f21b7af60e44ed7f07e9e66ccd8800";
 
 
   uint32_t const GENESIS_NONCE = 10000;
 
   namespace testnet
   {
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 2124; /* b8 */
-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 3462; /* Ps */
-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 2195; // Rb
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 2124; /* b8 */
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 3462; /* Ps */
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 2195; // Rb
     uint16_t const P2P_DEFAULT_PORT = 11111;
     uint16_t const RPC_DEFAULT_PORT = 21111;
     boost::uuids::uuid const NETWORK_ID = { {
@@ -175,9 +175,9 @@ namespace config
 
   namespace stagenet
   {
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 5622; /* Bi */
-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 2122; /* ao */
-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 134; /* Ry */
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 5622; /* Bi */
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 2122; /* ao */
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 134; /* Ry */
     uint16_t const P2P_DEFAULT_PORT = 31105;
     uint16_t const RPC_DEFAULT_PORT = 31106;
     boost::uuids::uuid const NETWORK_ID = { {
@@ -206,7 +206,7 @@ namespace cryptonote
     uint16_t const P2P_DEFAULT_PORT;
     uint16_t const RPC_DEFAULT_PORT;
     boost::uuids::uuid const NETWORK_ID;
-    std::string const GENESIS_TX;
+    char const* GENESIS_TX;
     uint32_t const GENESIS_NONCE;
   };
   inline const config_t& get_config(network_type nettype)
