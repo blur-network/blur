@@ -571,7 +571,8 @@ namespace cryptonote
     bl = boost::value_initialized<block>();
 
     blobdata tx_bl;
-    bool r = string_tools::parse_hexstr_to_binbuff(config::GENESIS_TX, tx_bl);
+    std::string gen(config::GENESIS_TX);
+    bool r = string_tools::parse_hexstr_to_binbuff(gen, tx_bl);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
     r = parse_and_validate_tx_from_blob(tx_bl, bl.miner_tx);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");

@@ -209,9 +209,9 @@ namespace cryptonote
     char const* GENESIS_TX;
     uint32_t const GENESIS_NONCE;
   };
-  inline const config_t& get_config(network_type nettype)
+  inline config_t const get_config(network_type nettype)
   {
-    static const config_t mainnet = {
+    config_t const mainnet = {
       ::config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
       ::config::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
       ::config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
@@ -221,7 +221,7 @@ namespace cryptonote
       ::config::GENESIS_TX,
       ::config::GENESIS_NONCE
     };
-    static const config_t testnet = {
+    config_t const testnet = {
       ::config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
       ::config::testnet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
       ::config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
@@ -229,7 +229,7 @@ namespace cryptonote
       ::config::testnet::RPC_DEFAULT_PORT,
       ::config::testnet::NETWORK_ID,
     };
-    static const config_t stagenet = {
+    config_t const stagenet = {
       ::config::stagenet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
       ::config::stagenet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
       ::config::stagenet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
