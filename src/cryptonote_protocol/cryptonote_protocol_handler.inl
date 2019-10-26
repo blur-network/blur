@@ -1029,11 +1029,9 @@ namespace cryptonote
             bool parent_requested = m_block_queue.requested(new_block.prev_id);
             if (!parent_requested)
             {
-              std::ostringstream new_block_hash(NULL);
+              std::ostringstream new_block_hash(0);
               epee::to_hex::formatted(new_block_hash, epee::as_byte_span(get_block_hash(new_block)));
               MERROR("Got block " << new_block_hash.str() << " with unknown parent " << new_block.prev_id << " which was not requested - querying block hashes");
-	      context.m_needed_objects.clear();
-              context.m_last_response_height = 0;
             }
 
             // parent was requested, so we wait for it to be retrieved

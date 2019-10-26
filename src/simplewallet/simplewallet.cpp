@@ -63,7 +63,7 @@
 #include "multisig/multisig.h"
 #include "wallet/wallet_args.h"
 #include <stdexcept>
-
+#include "version.h"
 #ifdef WIN32
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
@@ -1889,6 +1889,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
 {
   if(args.empty())
   {
+    success_msg_writer() << "Blur Network '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << std::endl;
     success_msg_writer() << get_commands_str();
   }
   else

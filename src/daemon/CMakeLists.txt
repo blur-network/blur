@@ -83,6 +83,7 @@ monero_add_executable(daemon
   ${daemon_private_headers}
   ${blocksdat}
   ${BACKWARD_ENABLE})
+add_dependencies(daemon check_git_repository)
 
 add_backward(daemon)
 
@@ -100,7 +101,6 @@ target_link_libraries(daemon
     daemon_rpc_server
     epee
     ${EPEE_READLINE}
-    version
     ${Boost_CHRONO_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
@@ -133,7 +133,6 @@ target_link_libraries(daemon
     daemon_rpc_server
     epee
     ${EPEE_READLINE}
-    version
     ${Boost_CHRONO_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}

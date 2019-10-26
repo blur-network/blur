@@ -34,7 +34,6 @@ include(CheckCXXCompilerFlag)
 include(CheckLinkerFlag)
 include(CheckLibraryExists)
 include(CheckFunctionExists)
-
 if (IOS)
     INCLUDE(CmakeLists_IOS.txt)
 endif()
@@ -886,4 +885,9 @@ endif()
 option(BUILD_GUI_DEPS "Build GUI dependencies." OFF)
 
 CHECK_C_COMPILER_FLAG(-std=c11 HAVE_C11)
+# Define the two required variables before including
+# the source code for watching a git repository.
+set(PRE_CONFIGURE_FILE "${CMAKE_SOURCE_DIR}/src/git_version.h.in")
+set(POST_CONFIGURE_FILE "${CMAKE_SOURCE_DIR}/src/version.h")
 
+include(cmake/git-watcher.cmake)

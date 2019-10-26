@@ -68,7 +68,6 @@ target_link_libraries(core_tests
     multisig
     cryptonote_core
     p2p
-    version
     epee
     device
     ${CMAKE_THREAD_LIBS_INIT}

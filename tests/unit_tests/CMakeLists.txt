@@ -60,7 +60,7 @@ set(unit_tests_sources
   test_tx_utils.cpp
   test_peerlist.cpp
   test_protocol_pack.cpp
-  hardfork.cpp
+#  hardfork.cpp
   varint.cpp
   ringct.cpp
   output_selection.cpp
@@ -81,7 +81,6 @@ target_link_libraries(unit_tests
     rpc
     wallet
     p2p
-    version
     epee
     ${Boost_CHRONO_LIBRARY}
     ${Boost_THREAD_LIBRARY}
