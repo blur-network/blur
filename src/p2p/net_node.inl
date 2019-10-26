@@ -396,7 +396,7 @@ namespace nodetool
     }
     else
     {
-      memcpy(&m_network_id, &::config::NETWORK_ID, 16);
+      memcpy(&m_network_id, &::config::mainnet::NETWORK_ID, 16);
       if (m_exclusive_peers.empty())
       {
         if ((full_addrs.size() < MIN_WANTED_SEED_NODES) && (m_nettype == cryptonote::MAINNET))
@@ -419,7 +419,7 @@ namespace nodetool
 
     m_config_folder = command_line::get_arg(vm, cryptonote::arg_data_dir);
 
-    if ((m_nettype == cryptonote::MAINNET && m_port != std::to_string(::config::P2P_DEFAULT_PORT))
+    if ((m_nettype == cryptonote::MAINNET && m_port != std::to_string(::config::mainnet::P2P_DEFAULT_PORT))
         || (m_nettype == cryptonote::TESTNET && m_port != std::to_string(::config::testnet::P2P_DEFAULT_PORT))
         || (m_nettype == cryptonote::STAGENET && m_port != std::to_string(::config::stagenet::P2P_DEFAULT_PORT))) {
       m_config_folder = m_config_folder + "/non-standard-port";

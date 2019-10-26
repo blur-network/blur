@@ -36,8 +36,8 @@
 
 namespace daemon_args
 {
-  std::string const conf_filename = CRYPTONOTE_NAME + ".conf";
-  std::string const log_filename = CRYPTONOTE_NAME + ".log";
+  std::string const conf_filename = CRYPTONOTE_NAME ".conf";
+  std::string const log_filename = CRYPTONOTE_NAME ".log";
   const command_line::arg_descriptor<std::string, false, true, 2> arg_config_file = {
     "config-file"
   , "Specify configuration file"

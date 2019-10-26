@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     //   if log-file argument given:
     //     absolute path
     //     relative path: relative to data_dir
-    std::string const logfile_name = CRYPTONOTE_NAME + ".log";
+    std::string const logfile_name = CRYPTONOTE_NAME ".log";
     bf::path log_file_path {data_dir / logfile_name};
     if (!command_line::is_arg_defaulted(vm, daemon_args::arg_log_file))
       log_file_path = command_line::get_arg(vm, daemon_args::arg_log_file);

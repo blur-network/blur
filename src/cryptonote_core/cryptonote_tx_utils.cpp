@@ -571,7 +571,7 @@ namespace cryptonote
     bl = boost::value_initialized<block>();
 
     blobdata tx_bl;
-    std::string gen(config::GENESIS_TX);
+    std::string gen = GENESIS_TX;
     bool r = string_tools::parse_hexstr_to_binbuff(gen, tx_bl);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
     r = parse_and_validate_tx_from_blob(tx_bl, bl.miner_tx);
@@ -579,7 +579,7 @@ namespace cryptonote
     bl.major_version = CURRENT_BLOCK_MAJOR_VERSION;
     bl.minor_version = CURRENT_BLOCK_MINOR_VERSION;
     bl.timestamp = 0;
-    bl.nonce = config::GENESIS_NONCE;
+    bl.nonce = GENESIS_NONCE;
     miner::find_nonce_for_given_block(bl, 1, 0);
     bl.invalidate_hashes();
     return true;

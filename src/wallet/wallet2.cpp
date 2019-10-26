@@ -218,7 +218,7 @@ std::unique_ptr<tools::wallet2> make_basic(const boost::program_options::variabl
 
   if (!daemon_port)
   {
-    daemon_port = testnet ? config::testnet::RPC_DEFAULT_PORT : stagenet ? config::stagenet::RPC_DEFAULT_PORT : config::RPC_DEFAULT_PORT;
+    daemon_port = testnet ? config::testnet::RPC_DEFAULT_PORT : stagenet ? config::stagenet::RPC_DEFAULT_PORT : config::mainnet::RPC_DEFAULT_PORT;
   }
 
   if (daemon_address.empty())
@@ -4433,7 +4433,7 @@ void wallet2::add_unconfirmed_tx(const cryptonote::transaction& tx, uint64_t amo
 void wallet2::transfer(const std::vector<cryptonote::tx_destination_entry>& dsts, const size_t fake_outs_count, const std::vector<size_t> &unused_transfers_indices,
                        uint64_t unlock_time, uint64_t fee, const std::vector<uint8_t>& extra, cryptonote::transaction& tx, pending_tx& ptx, bool trusted_daemon)
 {
-  transfer(dsts, fake_outs_count, unused_transfers_indices, unlock_time, fee, extra, detail::digit_split_strategy, tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD), tx, ptx, trusted_daemon);
+  transfer(dsts, fake_outs_count, unused_transfers_indices, unlock_time, fee, extra, detail::digit_split_strategy, tx_dust_policy(DEFAULT_DUST_THRESHOLD), tx, ptx, trusted_daemon);
 }
 //----------------------------------------------------------------------------------------------------
 void wallet2::transfer(const std::vector<cryptonote::tx_destination_entry>& dsts, const size_t fake_outs_count, const std::vector<size_t> &unused_transfers_indices,
@@ -6971,7 +6971,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
           test_tx, test_ptx, bulletproof);
       else
         transfer_selected(tx.dsts, tx.selected_transfers, fake_outs_count, outs, unlock_time, needed_fee, extra,
-          detail::digit_split_strategy, tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
+          detail::digit_split_strategy, tx_dust_policy(DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
       auto txBlob = t_serializable_object_to_blob(test_ptx.tx);
       needed_fee = calculate_fee(fee_per_kb, txBlob, fee_multiplier);
       available_for_fee = test_ptx.fee + test_ptx.change_dts.amount + (!test_ptx.dust_added_to_fee ? test_ptx.dust : 0);
@@ -7014,7 +7014,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
               test_tx, test_ptx, bulletproof);
           else
             transfer_selected(tx.dsts, tx.selected_transfers, fake_outs_count, outs, unlock_time, needed_fee, extra,
-              detail::digit_split_strategy, tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
+              detail::digit_split_strategy, tx_dust_policy(DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
           txBlob = t_serializable_object_to_blob(test_ptx.tx);
           needed_fee = calculate_fee(fee_per_kb, txBlob, fee_multiplier);
           LOG_PRINT_L2("Made an attempt at a  final " << get_size_string(txBlob) << " tx, with " << print_money(test_ptx.fee) <<
@@ -7093,7 +7093,7 @@ skip_tx:
                         needed_fee,
                         extra,
                         detail::digit_split_strategy,
-                        tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD),
+                        tx_dust_policy(DEFAULT_DUST_THRESHOLD),
                         test_tx,
                         test_ptx);
     }
@@ -7277,7 +7277,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_from(const crypton
           test_tx, test_ptx, bulletproof);
       else
         transfer_selected(tx.dsts, tx.selected_transfers, fake_outs_count, outs, unlock_time, needed_fee, extra,
-          detail::digit_split_strategy, tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
+          detail::digit_split_strategy, tx_dust_policy(DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
       auto txBlob = t_serializable_object_to_blob(test_ptx.tx);
       needed_fee = calculate_fee(fee_per_kb, txBlob, fee_multiplier);
       available_for_fee = test_ptx.fee + test_ptx.dests[0].amount + test_ptx.change_dts.amount;
@@ -7294,7 +7294,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_from(const crypton
             test_tx, test_ptx, bulletproof);
         else
           transfer_selected(tx.dsts, tx.selected_transfers, fake_outs_count, outs, unlock_time, needed_fee, extra,
-            detail::digit_split_strategy, tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
+            detail::digit_split_strategy, tx_dust_policy(DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
         txBlob = t_serializable_object_to_blob(test_ptx.tx);
         needed_fee = calculate_fee(fee_per_kb, txBlob, fee_multiplier);
         LOG_PRINT_L2("Made an attempt at a final " << get_size_string(txBlob) << " tx, with " << print_money(test_ptx.fee) <<
@@ -7332,7 +7332,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_from(const crypton
         test_tx, test_ptx, bulletproof);
     } else {
       transfer_selected(tx.dsts, tx.selected_transfers, fake_outs_count, tx.outs, unlock_time, needed_fee, extra,
-        detail::digit_split_strategy, tx_dust_policy(::config::DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
+        detail::digit_split_strategy, tx_dust_policy(DEFAULT_DUST_THRESHOLD), test_tx, test_ptx);
     }
     auto txBlob = t_serializable_object_to_blob(test_ptx.tx);
     tx.tx = test_tx;
@@ -7505,7 +7505,7 @@ std::vector<wallet2::pending_tx> wallet2::create_unmixable_sweep_transactions(bo
 {
   // From hard fork 1, we don't consider small amounts to be dust anymore
   const bool hf1_rules = use_fork_rules(2, 10); // first hard fork has version 2
-  tx_dust_policy dust_policy(hf1_rules ? 0 : ::config::DEFAULT_DUST_THRESHOLD);
+  tx_dust_policy dust_policy(hf1_rules ? 0 : DEFAULT_DUST_THRESHOLD);
 
   const uint64_t fee_per_kb  = get_per_kb_fee();
 

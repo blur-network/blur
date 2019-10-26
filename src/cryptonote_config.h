@@ -129,11 +129,11 @@ uint32_t const P2P_IDLE_CONNECTION_KILL_INTERVAL =               300; /* 5 minut
 #define P2P_SUPPORT_FLAG_FLUFFY_BLOCKS                  1
 #define P2P_SUPPORT_FLAGS                               1
 
-char const* CRYPTONOTE_NAME =                         "blurnetwork";
-char const* CRYPTONOTE_BLOCKCHAINDATA_FILENAME =      "data.mdb";
-char const* CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME = "lock.mdb";
-char const* P2P_NET_DATA_FILENAME =                   "peers_state.bin";
-char const* MINER_CONFIG_FILE_NAME =                  "miner_conf.json";
+#define CRYPTONOTE_NAME                          "blurnetwork"
+#define CRYPTONOTE_BLOCKCHAINDATA_FILENAME       "data.mdb"
+#define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME  "lock.mdb"
+#define P2P_NET_DATA_FILENAME                    "peers_state.bin"
+#define MINER_CONFIG_FILE_NAME                   "miner_conf.json"
 
 #define THREAD_STACK_SIZE                       524288
 
@@ -143,10 +143,11 @@ uint32_t const HASH_OF_HASHES_STEP =                     256;
 
 uint64_t const DEFAULT_TXPOOL_MAX_SIZE =                 648000000ULL; /* 3 days at 300000, in bytes */
 
+uint64_t const DEFAULT_DUST_THRESHOLD = 0; /* deprecated */
 // New constants are intended to go here
 namespace config
 {
-  uint64_t const DEFAULT_DUST_THRESHOLD = 0; /* deprecated */
+  namespace mainnet {
 
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 7757; /* bL */
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 15654; /* uR */
@@ -156,10 +157,10 @@ namespace config
   boost::uuids::uuid const NETWORK_ID = { {
       0x1E,0x32, 0x11, 0x2F , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x2D
     } };
-  char const* GENESIS_TX = "011901ff0001ffffffffffff0102bca7c97f7074ea888eac572fda0964cc864baf7bc07d6cecc052728039009d7621017133140c2abc1825f8d411db7bee4379a2a0f21b7af60e44ed7f07e9e66ccd8800";
+  #define GENESIS_TX "011901ff0001ffffffffffff0102bca7c97f7074ea888eac572fda0964cc864baf7bc07d6cecc052728039009d7621017133140c2abc1825f8d411db7bee4379a2a0f21b7af60e44ed7f07e9e66ccd8800"
 
-
-  uint32_t const GENESIS_NONCE = 10000;
+  #define GENESIS_NONCE  10000
+  }
 
   namespace testnet
   {
@@ -206,20 +207,16 @@ namespace cryptonote
     uint16_t const P2P_DEFAULT_PORT;
     uint16_t const RPC_DEFAULT_PORT;
     boost::uuids::uuid const NETWORK_ID;
-    char const* GENESIS_TX;
-    uint32_t const GENESIS_NONCE;
   };
   inline config_t const get_config(network_type nettype)
   {
     config_t const mainnet = {
-      ::config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-      ::config::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
-      ::config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
-      ::config::P2P_DEFAULT_PORT,
-      ::config::RPC_DEFAULT_PORT,
-      ::config::NETWORK_ID,
-      ::config::GENESIS_TX,
-      ::config::GENESIS_NONCE
+      ::config::mainnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+      ::config::mainnet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
+      ::config::mainnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
+      ::config::mainnet::P2P_DEFAULT_PORT,
+      ::config::mainnet::RPC_DEFAULT_PORT,
+      ::config::mainnet::NETWORK_ID
     };
     config_t const testnet = {
       ::config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
@@ -227,7 +224,7 @@ namespace cryptonote
       ::config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
       ::config::testnet::P2P_DEFAULT_PORT,
       ::config::testnet::RPC_DEFAULT_PORT,
-      ::config::testnet::NETWORK_ID,
+      ::config::testnet::NETWORK_ID
     };
     config_t const stagenet = {
       ::config::stagenet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
@@ -235,7 +232,7 @@ namespace cryptonote
       ::config::stagenet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
       ::config::stagenet::P2P_DEFAULT_PORT,
       ::config::stagenet::RPC_DEFAULT_PORT,
-      ::config::stagenet::NETWORK_ID,
+      ::config::stagenet::NETWORK_ID
     };
     switch (nettype)
     {

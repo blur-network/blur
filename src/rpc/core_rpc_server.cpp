@@ -2287,7 +2287,7 @@ namespace cryptonote
   const command_line::arg_descriptor<std::string, false, true, 2> core_rpc_server::arg_rpc_bind_port = {
       "rpc-bind-port"
     , "Port for RPC server"
-    , std::to_string(config::RPC_DEFAULT_PORT)
+    , std::to_string(config::mainnet::RPC_DEFAULT_PORT)
     , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on }}
     , [](std::array<bool, 2> testnet_stagenet, bool defaulted, std::string val)->std::string {
         if (testnet_stagenet[0] && defaulted)
