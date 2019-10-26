@@ -56,6 +56,8 @@ namespace cryptonote
      * @param default_threshold_percent the size of the majority in percents
      */
     HardFork(cryptonote::BlockchainDB &db, uint8_t original_version = 1, uint64_t original_version_till_height = DEFAULT_ORIGINAL_VERSION_TILL_HEIGHT, uint64_t window_size = DEFAULT_WINDOW_SIZE, uint8_t default_threshold_percent = DEFAULT_THRESHOLD_PERCENT);
+    uint8_t get_block_vote(cryptonote::block const* b) const;
+    uint8_t get_block_version(cryptonote::block const& b) const;
 
     /**
      * @brief add a new hardfork height
@@ -66,7 +68,7 @@ namespace cryptonote
      * @param height The height the hardfork takes effect
      * @param threshold The threshold of votes needed for this fork (0-100)
      */
-    bool add_fork(uint8_t version, uint64_t height, uint8_t threshold);
+    bool add_fork(uint8_t const& version, uint64_t const& height, uint8_t const& threshold);
 
     /**
      * @brief add a new hardfork height
@@ -76,7 +78,7 @@ namespace cryptonote
      * @param version the major block version for the fork
      * @param height The height the hardfork takes effect
      */
-    bool add_fork(uint8_t version, uint64_t height);
+    bool add_fork(uint8_t const& version, uint64_t const& height);
 
     /**
      * @brief initialize the object
@@ -118,7 +120,7 @@ namespace cryptonote
      * @param block the new block
      * @param height which height to check for
      */
-    bool check_for_height(const cryptonote::block &block, uint64_t height) const;
+    bool check_for_height(const cryptonote::block &block, uint64_t const& height) const;
 
     /**
      * @brief add a new block
@@ -127,7 +129,7 @@ namespace cryptonote
      *
      * @param block the new block
      */
-    bool add(const cryptonote::block &block, uint64_t height);
+    bool add(const cryptonote::block &block, uint64_t const& height);
 
     /**
      * @brief called when the blockchain is reorganized
@@ -140,18 +142,10 @@ namespace cryptonote
      * @param blockchain the blockchain
      * @param height of the last block kept from the previous blockchain
      */
-    bool reorganize_from_block_height(uint64_t height);
-    bool reorganize_from_chain_height(uint64_t height);
+    bool reorganize_from_block_height(uint64_t const& height);
+    bool reorganize_from_chain_height(uint64_t const& height);
 
-    /**
-     * @brief returns current state at the given height
-     *
-     * Based on the approximate height of the last known hard fork,
-     * estimate whether we need to update, or if we're way behind
-     *
-     * @param t the time to consider
-     */
-    State get_state(uint64_t height) const;
+    State get_state(uint64_t const& height) const;
     State get_state() const;
 
     /**
@@ -159,7 +153,7 @@ namespace cryptonote
      *
      * @param height height of the block to check
      */
-    uint8_t get(uint64_t height) const;
+    uint8_t get(uint64_t const& height) const;
 
     /**
      * @brief returns the latest "ideal" version
@@ -173,7 +167,7 @@ namespace cryptonote
      *
      * @param height height of the block to check
      */
-    uint8_t get_ideal_version(uint64_t height) const;
+    uint8_t get_ideal_version(uint64_t const& height) const;
 
     /**
      * @brief returns the next version
@@ -207,7 +201,7 @@ namespace cryptonote
      * @param threshold number of votes needed to switch to next version
      * @param earliest_height earliest height at which the version can take effect
      */
-    bool get_voting_info(uint8_t version, uint32_t &window, uint32_t &votes, uint32_t &threshold, uint64_t &earliest_height, uint8_t &voting) const;
+    bool get_voting_info(uint8_t const& version, uint32_t& window, uint32_t& votes, uint32_t& threshold, uint64_t& earliest_height, uint8_t& voting) const;
 
     /**
      * @brief returns the size of the voting window in blocks
@@ -216,15 +210,15 @@ namespace cryptonote
 
   private:
 
-    uint8_t get_block_version(uint64_t height) const;
-    bool do_check(uint8_t block_version, uint8_t voting_version) const;
-    bool do_check_for_height(uint8_t block_version, uint8_t voting_version, uint64_t height) const;
-    int get_voted_fork_index(uint64_t height) const;
+    uint8_t get_block_version(uint64_t const& height) const;
+    bool do_check(uint8_t const& block_version, uint8_t voting_version) const;
+    bool do_check_for_height(uint8_t const& block_version, uint8_t voting_version, uint64_t const& height) const;
+    int get_voted_fork_index(uint64_t const& height) const;
     uint8_t get_effective_version(uint8_t voting_version) const;
-    bool add(uint8_t block_version, uint8_t voting_version, uint64_t height);
+    bool add(uint8_t const& block_version, uint8_t voting_version, uint64_t const& height);
 
-    bool rescan_from_block_height(uint64_t height);
-    bool rescan_from_chain_height(uint64_t height);
+    bool rescan_from_block_height(uint64_t const& height);
+    bool rescan_from_chain_height(uint64_t const& height);
 
   private:
 
@@ -240,12 +234,12 @@ namespace cryptonote
       uint8_t version;
       uint8_t threshold;
       uint64_t height;
-      Params(uint8_t version, uint64_t height, uint8_t threshold): version(version), threshold(threshold), height(height) {}
+      Params(uint8_t const& version, uint64_t const& height, uint8_t const& threshold): version(version), threshold(threshold), height(height) {}
     };
     std::vector<Params> heights;
 
     std::deque<uint8_t> versions; /* rolling window of the last N blocks' versions */
-    unsigned int last_versions[256]; /* count of the block versions in the last N blocks */
+    unsigned int last_versions[255]; /* count of the block versions in the last N blocks */
     uint32_t current_fork_index;
 
     mutable epee::critical_section lock;
