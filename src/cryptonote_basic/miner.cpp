@@ -35,6 +35,7 @@
 #include <boost/interprocess/detail/atomic.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/limits.hpp>
+#include <boost/thread.hpp>
 #include "include_base_utils.h"
 #include "misc_language.h"
 #include "syncobj.h"
@@ -69,6 +70,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
+#include <functional>
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "miner"
@@ -84,6 +86,25 @@ namespace cryptonote
 {
   class thread_counter;
   thread_counter thread_count;
+
+  uint32_t* thread_counter::add(uint32_t val)
+  {
+    boost::recursive_mutex::scoped_lock m_threads_count_lock(m_threads_mutex);
+    m_thread_count += val;
+    return &m_thread_count;
+  }
+
+       uint32_t thread_counter::increment() {
+         boost::recursive_mutex::scoped_lock m_threads_count_lock(m_threads_mutex);
+         const uint32_t* post = add(1);
+         thread_indices.push_back(*post);
+         return *post;
+       }
+
+       uint32_t thread_counter::check() {
+         return m_thread_count;
+       }
+
 
   namespace
   {
@@ -292,8 +313,8 @@ namespace cryptonote
         if(command_line::has_arg(vm, arg_mining_threads))
         {
           for (uint32_t i = 0; i < (command_line::get_arg(vm, arg_mining_threads)); ++i) {
-            threads.create_thread(&cryptonote::miner::miner_thread);
-            m_threads_total = i;
+             threads.create_thread(boost::bind(&miner::miner_thread, this));
+             m_threads_total = i;
           }
         }
       }
@@ -326,8 +347,7 @@ namespace cryptonote
     } else {
       for (size_t i = 0; i < threads_count; i++) {
         m_threads_total = thread_count.increment();
-        threads.create_thread(&cryptonote::miner::miner_thread);
-//        m_threads.push_back(boost::thread(attrs, boost::bind(&miner::worker_thread, this)));
+        threads.create_thread(boost::bind(&miner::miner_thread, this));
       }
     }
     m_starter_nonce = crypto::rand<uint32_t>();

@@ -28,11 +28,12 @@
 // 
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-#pragma once 
+#pragma once
 
 #include <boost/program_options.hpp>
 #include <boost/logic/tribool_fwd.hpp>
-#include <boost/thread/thread.hpp>
+#include <boost/thread.hpp>
+#include <functional>
 #include <atomic>
 #include "cryptonote_basic.h"
 #include "difficulty.h"
@@ -45,28 +46,6 @@
 #include <sys/times.h>
 #include <time.h>
 #endif
-
-using namespace boost::this_thread;
-
-class thread_group
-{
-public:
-    thread_group(const thread_group&) = delete;
-    thread_group& operator=(const thread_group&) = delete;
-
-    thread_group();
-    ~thread_group();
-
-    template<typename F>
-    boost::thread* create_thread(F threadfunc);
-    void add_thread(boost::thread* thrd);
-    void remove_thread(boost::thread* thrd);
-    bool is_this_thread_in();
-    bool is_thread_in(boost::thread* thrd);
-    void join_all();
-    void interrupt_all();
-    int size() const;
-};
 
 namespace cryptonote
 {
@@ -95,29 +74,16 @@ namespace cryptonote
     public:
      thread_counter() : m_thread_count(0) { }
 
-     uint32_t* add(uint32_t val)
-     {
-       boost::recursive_mutex::scoped_lock m_threads_count_lock(m_threads_mutex);
-       m_thread_count += val;
-       return &m_thread_count;
-     }
+     uint32_t* add(uint32_t val);
+     uint32_t increment();
+     uint32_t check();
 
-       uint32_t increment() {
-         boost::recursive_mutex::scoped_lock m_threads_count_lock(m_threads_mutex);
-         const uint32_t* post = add(1);
-         thread_indices.push_back(*post);
-         return *post;
-       }
-
-       uint32_t check() {
-         return m_thread_count;
-       }
-
-     private:
-       boost::recursive_mutex m_threads_mutex;
-       std::vector<uint32_t> thread_indices;
-       thread_group threads;
-       uint32_t m_thread_count;
+   private:
+     boost::recursive_mutex m_threads_mutex;
+     std::vector<uint32_t> thread_indices;
+     uint32_t m_thread_count;
+     boost::thread* thread;
+     boost::thread_group threads;
    };
 
 
