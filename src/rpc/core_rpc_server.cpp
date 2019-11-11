@@ -1014,10 +1014,7 @@ namespace cryptonote
       return true;
     }
 
-    boost::thread::attributes attrs;
-    attrs.set_stack_size(THREAD_STACK_SIZE);
-
-    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count), attrs))
+    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count)))
     {
       res.status = "Failed, mining not started";
       LOG_PRINT_L0(res.status);
@@ -1044,12 +1041,12 @@ namespace cryptonote
   {
     PERF_TIMER(on_mining_status);
 
-    const miner& lMiner = m_core.get_miner();
+    miner& lMiner = m_core.get_miner();
     res.active = lMiner.is_mining();
 
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
-      res.threads_count = lMiner.get_threads_count();
+      res.threads_count = lMiner.get_thread_count();
       const account_public_address& lMiningAdr = lMiner.get_mining_address();
       res.address = get_account_address_as_str(m_nettype, false, lMiningAdr);
     }

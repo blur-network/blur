@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -81,6 +82,8 @@ extern "C" void slow_hash_allocate_state();
 extern "C" void slow_hash_free_state();
 namespace cryptonote
 {
+  class thread_counter;
+  thread_counter thread_count;
 
   namespace
   {
@@ -105,14 +108,14 @@ namespace cryptonote
     m_do_mining(false),
     m_current_hash_rate(0)
   {
-  } // is this closed brace intended/appropriate to have here?
+  }
   //-----------------------------------------------------------------------------------------------------
   miner::~miner()
   {
     stop();
   }
   //-----------------------------------------------------------------------------------------------------
-  bool miner::set_block_template(const block& bl, const difficulty_type& di, uint64_t height)
+  bool miner::set_block_template(block const& bl, difficulty_type const& di, uint64_t const& height)
   {
     CRITICAL_REGION_LOCAL(m_template_lock);
     m_template = bl;
@@ -134,8 +137,8 @@ namespace cryptonote
   bool miner::request_block_template()
   {
     block bl = AUTO_VAL_INIT(bl);
-    difficulty_type di = AUTO_VAL_INIT(di);
-    uint64_t height = AUTO_VAL_INIT(height);
+    difficulty_type di = 1;
+    uint64_t height = 1;
     uint64_t expected_reward; //only used for RPC calls - could possibly be useful here too?
 
     cryptonote::blobdata extra_nonce;
@@ -202,6 +205,53 @@ namespace cryptonote
     command_line::add_arg(desc, arg_mining_threads);
   }
   //-----------------------------------------------------------------------------------------------------
+  void miner::miner_thread()
+  {
+    LOG_PRINT_L1("Miner thread [" << std::to_string(thread_count.increment()) << "] started!" << std::endl);
+    uint32_t nonce = miner::m_starter_nonce + thread_count.check();
+    uint64_t height = 0;
+    difficulty_type local_diff = 0;
+    uint32_t local_template_ver = 0;
+    block b;
+    slow_hash_allocate_state();
+    while(!m_stop)
+    {
+
+      if(local_template_ver != m_template_no)
+      {
+        CRITICAL_REGION_BEGIN(m_template_lock);
+        b = m_template;
+        local_diff = m_diffic;
+        height = m_height;
+        nonce = miner::m_starter_nonce + thread_count.check();
+        local_template_ver = m_template_no;
+        CRITICAL_REGION_END();
+      }
+
+      b.nonce = nonce;
+      crypto::hash h;
+      get_block_longhash(b, h, height);
+
+      if(check_hash(h, local_diff))
+      {
+        //we lucky!
+        ++miner::m_config.current_extra_message_index;
+        MGINFO_GREEN("Found block " << get_block_hash(b) << " at height " << height << " for difficulty: " << local_diff);
+        if(!m_phandler->handle_block_found(b))
+        {
+          --m_config.current_extra_message_index;
+          if (!m_config_folder_path.empty())
+            epee::serialization::store_t_to_json_file(m_config, m_config_folder_path + "/" + MINER_CONFIG_FILE_NAME);
+        }
+      }
+      nonce+=miner::m_threads_total;
+      ++miner::m_hashes;
+    }
+    slow_hash_free_state();
+    MGINFO("Miner thread stopped ["<< thread_count.check() << "]");
+    return;
+  }
+  //-----------------------------------------------------------------------------------------------------
   bool miner::init(const boost::program_options::variables_map& vm, network_type nettype)
   {
     if(command_line::has_arg(vm, arg_extra_messages))
@@ -223,7 +273,8 @@ namespace cryptonote
       }
       m_config_folder_path = boost::filesystem::path(command_line::get_arg(vm, arg_extra_messages)).parent_path().string();
       m_config = AUTO_VAL_INIT(m_config);
-      epee::serialization::load_t_from_json_file(m_config, m_config_folder_path + "/" + MINER_CONFIG_FILE_NAME);
+      const std::string filename = m_config_folder_path + "/" + MINER_CONFIG_FILE_NAME;
+      CHECK_AND_ASSERT_MES(epee::serialization::load_t_from_json_file(m_config, filename), false, "Failed to load data from " << filename);
       MINFO("Loaded " << m_extra_messages.size() << " extra messages, current index " << m_config.current_extra_message_index);
     }
 
@@ -234,13 +285,17 @@ namespace cryptonote
       {
         LOG_ERROR("Target account address " << command_line::get_arg(vm, arg_start_mining) << " has wrong format, starting daemon canceled");
         return false;
-      }
-      m_mine_address = info.address;
-      m_threads_total = 1;
-      m_do_mining = true;
-      if(command_line::has_arg(vm, arg_mining_threads))
-      {
-        m_threads_total = command_line::get_arg(vm, arg_mining_threads);
+      } else {
+        m_mine_address = info.address;
+        m_threads_total = thread_count.increment();
+        m_do_mining = true;
+        if(command_line::has_arg(vm, arg_mining_threads))
+        {
+          for (uint32_t i = 0; i < (command_line::get_arg(vm, arg_mining_threads)); ++i) {
+            threads.create_thread(&cryptonote::miner::miner_thread);
+            m_threads_total = i;
+          }
+        }
       }
     }
 
@@ -257,38 +312,34 @@ namespace cryptonote
     return m_mine_address;
   }
   //-----------------------------------------------------------------------------------------------------
-  uint32_t miner::get_threads_count() const {
-    return m_threads_total;
-  }
+/*  uint32_t miner::get_thread_count() {
+    return thread_count.check();
+  }*/
   //-----------------------------------------------------------------------------------------------------
-  bool miner::start(const account_public_address& adr, size_t threads_count, const boost::thread::attributes& attrs)
+  bool miner::start(const account_public_address& adr, uint32_t const& threads_count)
   {
     m_mine_address = adr;
-    m_threads_total = static_cast<uint32_t>(threads_count);
+    if (get_thread_count() > 0) {
+      MWARNING("Mining already started with thread count = " << std::to_string(get_thread_count()) << ". Continuing with this count! If you wish to add more threads, stop mining first!");
+      m_threads_total = get_thread_count();
+      return true;
+    } else {
+      for (size_t i = 0; i < threads_count; i++) {
+        m_threads_total = thread_count.increment();
+        threads.create_thread(&cryptonote::miner::miner_thread);
+//        m_threads.push_back(boost::thread(attrs, boost::bind(&miner::worker_thread, this)));
+      }
+    }
     m_starter_nonce = crypto::rand<uint32_t>();
-    CRITICAL_REGION_LOCAL(m_threads_lock);
     if(is_mining())
     {
       LOG_ERROR("Starting miner but it's already started");
       return false;
     }
 
-    if(!m_threads.empty())
-    {
-      LOG_ERROR("Unable to start miner because there are active mining threads");
-      return false;
-    }
-
     request_block_template();//lets update block template
 
     boost::interprocess::ipcdetail::atomic_write32(&m_stop, 0);
-    boost::interprocess::ipcdetail::atomic_write32(&m_thread_index, 0);
-
-    for(size_t i = 0; i != threads_count; i++)
-    {
-      m_threads.push_back(boost::thread(attrs, boost::bind(&miner::worker_thread, this)));
-    }
-
     LOG_PRINT_L0("Mining has started with " << threads_count << " threads, good luck!" );
 
     return true;
@@ -312,7 +363,7 @@ namespace cryptonote
   bool miner::stop()
   {
     MTRACE("Miner has received stop signal");
-
+    threads.join_all();
     if (!is_mining())
     {
       MDEBUG("Not mining - nothing to stop" );
@@ -320,14 +371,14 @@ namespace cryptonote
     }
 
     send_stop_signal();
-    CRITICAL_REGION_LOCAL(m_threads_lock);
+    //CRITICAL_REGION_LOCAL(m_threads_lock);
 
     MINFO("Mining has been stopped, " << m_threads.size() << " finished" );
     m_threads.clear();
     return true;
   }
   //-----------------------------------------------------------------------------------------------------
-  bool miner::find_nonce_for_given_block(block& bl, const difficulty_type& diffic, uint64_t height)
+  bool miner::find_nonce_for_given_block(block& bl, const difficulty_type& diffic, uint64_t const& height)
   {
     for(; bl.nonce != std::numeric_limits<uint32_t>::max(); bl.nonce++)
     {
@@ -351,13 +402,12 @@ namespace cryptonote
       boost::thread::attributes attrs;
       attrs.set_stack_size(THREAD_STACK_SIZE);
 
-      start(m_mine_address, m_threads_total, attrs);
+      start(m_mine_address, m_threads_total);
     }
   }
   //-----------------------------------------------------------------------------------------------------
   void miner::pause()
   {
-    CRITICAL_REGION_LOCAL(m_miners_count_lock);
     MDEBUG("miner::pause: " << m_pausers_count << " -> " << (m_pausers_count + 1));
     ++m_pausers_count;
     if(m_pausers_count == 1 && is_mining())
@@ -366,7 +416,6 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------------
   void miner::resume()
   {
-    CRITICAL_REGION_LOCAL(m_miners_count_lock);
     MDEBUG("miner::resume: " << m_pausers_count << " -> " << (m_pausers_count - 1));
     --m_pausers_count;
     if(m_pausers_count < 0)
@@ -376,70 +425,6 @@ namespace cryptonote
     }
     if(!m_pausers_count && is_mining())
       MDEBUG("MINING RESUMED");
-  }
-  //-----------------------------------------------------------------------------------------------------
-  bool miner::worker_thread()
-  {
-    uint32_t th_local_index = boost::interprocess::ipcdetail::atomic_inc32(&m_thread_index);
-    MLOG_SET_THREAD_NAME(std::string("[miner ") + std::to_string(th_local_index) + "]");
-    MGINFO("Miner thread was started ["<< th_local_index << "]");
-    uint32_t nonce = m_starter_nonce + th_local_index;
-    uint64_t height = 0;
-    difficulty_type local_diff = 0;
-    uint32_t local_template_ver = 0;
-    block b;
-    slow_hash_allocate_state();
-    while(!m_stop)
-    {
-      if(m_pausers_count)//anti split workaround
-      {
-        misc_utils::sleep_no_w(100);
-        continue;
-      }
-
-      if(local_template_ver != m_template_no)
-      {
-        CRITICAL_REGION_BEGIN(m_template_lock);
-        b = m_template;
-        local_diff = m_diffic;
-        height = m_height;
-        CRITICAL_REGION_END();
-        local_template_ver = m_template_no;
-        nonce = m_starter_nonce + th_local_index;
-      }
-
-      if(!local_template_ver)//no any set_block_template call
-      {
-        LOG_PRINT_L2("Block template not set yet");
-        epee::misc_utils::sleep_no_w(1000);
-        continue;
-      }
-
-      b.nonce = nonce;
-      crypto::hash h;
-      get_block_longhash(b, h, height);
-
-      if(check_hash(h, local_diff))
-      {
-        //we lucky!
-        ++m_config.current_extra_message_index;
-        MGINFO_GREEN("Found block " << get_block_hash(b) << " at height " << height << " for difficulty: " << local_diff);
-        if(!m_phandler->handle_block_found(b))
-        {
-          --m_config.current_extra_message_index;
-        }else
-        {
-          //success update, lets update config
-          if (!m_config_folder_path.empty())
-            epee::serialization::store_t_to_json_file(m_config, m_config_folder_path + "/" + MINER_CONFIG_FILE_NAME);
-        }
-      }
-      nonce+=m_threads_total;
-      ++m_hashes;
-    }
-    slow_hash_free_state();
-    MGINFO("Miner thread stopped ["<< th_local_index << "]");
-    return true;
   }
   //-----------------------------------------------------------------------------------------------------
 }

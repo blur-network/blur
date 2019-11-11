@@ -90,7 +90,7 @@ static std::atomic<uint64_t> block_hashes_cached_count(0);
 
 #define CHECK_AND_ASSERT_THROW_MES_L1(expr, message) {if(!(expr)) {MWARNING(message); throw std::runtime_error(message);}}
 
-namespace cryptonote
+/*namespace cryptonote
 {
   static inline unsigned char *operator &(ec_point &point) {
     return &reinterpret_cast<unsigned char &>(point);
@@ -111,7 +111,9 @@ namespace cryptonote
       ge_p1p1_to_p3(&A2, &tmp3);
       ge_p3_tobytes(&AB, &A2);
   }
-}
+}*/
+
+// TODO: This seems bad. Only used in one line, and seems like it could be potentially adding a pk or using one to subvert privacy/security
 
 namespace cryptonote
 {
@@ -192,6 +194,7 @@ namespace cryptonote
     bool r = tx.serialize_base(ba);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
     CHECK_AND_ASSERT_MES(expand_transaction_1(tx, true), false, "Failed to expand transaction data");
+    tx.invalidate_hashes();
     return true;
   }
   //---------------------------------------------------------------
@@ -285,7 +288,7 @@ namespace cryptonote
         {
           crypto::public_key subaddr_pk;
           CHECK_AND_ASSERT_MES(hwdev.secret_key_to_public_key(subaddr_sk, subaddr_pk), false, "Failed to derive public key");
-          add_public_key(in_ephemeral.pub, in_ephemeral.pub, subaddr_pk);
+        //  add_public_key(in_ephemeral.pub, in_ephemeral.pub, subaddr_pk);
         }
       }
 
@@ -370,11 +373,13 @@ namespace cryptonote
     return r;
   }
   //---------------------------------------------------------------
- bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields)
+  bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields)
   {
     tx_extra_fields.clear();
+
     if(tx_extra.empty())
       return true;
+
     std::string extra_str(reinterpret_cast<const char*>(tx_extra.data()), tx_extra.size());
     std::istringstream iss(extra_str);
     binary_archive<false> ar(iss);

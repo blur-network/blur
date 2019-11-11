@@ -32,6 +32,7 @@
 
 #include <boost/program_options.hpp>
 #include <boost/logic/tribool_fwd.hpp>
+#include <boost/thread/thread.hpp>
 #include <atomic>
 #include "cryptonote_basic.h"
 #include "difficulty.h"
@@ -45,8 +46,37 @@
 #include <time.h>
 #endif
 
+using namespace boost::this_thread;
+
+class thread_group
+{
+public:
+    thread_group(const thread_group&) = delete;
+    thread_group& operator=(const thread_group&) = delete;
+
+    thread_group();
+    ~thread_group();
+
+    template<typename F>
+    boost::thread* create_thread(F threadfunc);
+    void add_thread(boost::thread* thrd);
+    void remove_thread(boost::thread* thrd);
+    bool is_this_thread_in();
+    bool is_thread_in(boost::thread* thrd);
+    void join_all();
+    void interrupt_all();
+    int size() const;
+};
+
 namespace cryptonote
 {
+  template<class T, class Tt>
+  T get_index(T i, Tt j) {
+    std::string I = std::to_string(i);
+    decltype(i) s;
+    s = j[i];
+    return s;
+  }
 
   struct i_miner_handler
   {
@@ -59,18 +89,50 @@ namespace cryptonote
   /************************************************************************/
   /*                                                                      */
   /************************************************************************/
-  class miner
+  class thread_counter
   {
-  public: 
+    friend class miner;
+    public:
+     thread_counter() : m_thread_count(0) { }
+
+     uint32_t* add(uint32_t val)
+     {
+       boost::recursive_mutex::scoped_lock m_threads_count_lock(m_threads_mutex);
+       m_thread_count += val;
+       return &m_thread_count;
+     }
+
+       uint32_t increment() {
+         boost::recursive_mutex::scoped_lock m_threads_count_lock(m_threads_mutex);
+         const uint32_t* post = add(1);
+         thread_indices.push_back(*post);
+         return *post;
+       }
+
+       uint32_t check() {
+         return m_thread_count;
+       }
+
+     private:
+       boost::recursive_mutex m_threads_mutex;
+       std::vector<uint32_t> thread_indices;
+       thread_group threads;
+       uint32_t m_thread_count;
+   };
+
+
+  class miner : public thread_counter
+  {
+  public:
     miner(i_miner_handler* phandler);
     ~miner();
     bool init(const boost::program_options::variables_map& vm, network_type nettype);
     static void init_options(boost::program_options::options_description& desc);
-    bool set_block_template(const block& bl, const difficulty_type& diffic, uint64_t height);
+    bool set_block_template(block const& bl, difficulty_type const& diffic, uint64_t const& height);
     bool on_block_chain_update();
-    bool start(const account_public_address& adr, size_t threads_count, const boost::thread::attributes& attrs);
+    bool start(const account_public_address& adr, uint32_t const& threads_count);
     uint64_t get_speed() const;
-    uint32_t get_threads_count() const;
+    virtual uint32_t get_thread_count() { return thread_count.check(); };
     void send_stop_signal();
     bool stop();
     bool is_mining() const;
@@ -78,12 +140,13 @@ namespace cryptonote
     bool on_idle();
     void on_synchronized();
     //synchronous analog (for fast calls)
-    static bool find_nonce_for_given_block(block& bl, const difficulty_type& diffic, uint64_t height);
+    bool find_nonce_for_given_block(block& bl, difficulty_type const& diffic, uint64_t const& height);
     void pause();
     void resume();
     void do_print_hashrate(bool do_hr);
 
   private:
+    thread_counter thread_count;
     bool worker_thread();
     bool request_block_template();
     void  merge_hr();
@@ -97,7 +160,7 @@ namespace cryptonote
       END_KV_SERIALIZE_MAP()
     };
 
-
+    std::list<uint32_t> m_threads;
     volatile uint32_t m_stop;
     epee::critical_section m_template_lock;
     block m_template;
@@ -105,13 +168,11 @@ namespace cryptonote
     std::atomic<uint32_t> m_starter_nonce;
     difficulty_type m_diffic;
     uint64_t m_height;
-    volatile uint32_t m_thread_index;
-    volatile uint32_t m_threads_total;
+    std::atomic<uint32_t> m_thread_index;
+    virtual std::vector<uint32_t> get_thread_indices() { return thread_count.thread_indices; };
+    std::atomic<uint32_t> m_threads_total;
     std::atomic<int32_t> m_pausers_count;
-    epee::critical_section m_miners_count_lock;
 
-    std::list<boost::thread> m_threads;
-    epee::critical_section m_threads_lock;
     i_miner_handler* m_phandler;
     account_public_address m_mine_address;
     epee::math_helper::once_a_time_seconds<5> m_update_block_template_interval;
@@ -126,6 +187,6 @@ namespace cryptonote
     std::list<uint64_t> m_last_hash_rates;
     bool m_do_print_hashrate;
     bool m_do_mining;
-
+    void miner_thread();
   };
 }

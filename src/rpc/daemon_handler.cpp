@@ -446,10 +446,7 @@ namespace rpc
       return;
     }
 
-    boost::thread::attributes attrs;
-    attrs.set_stack_size(THREAD_STACK_SIZE);
-
-    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count), attrs))
+    if(!m_core.get_miner().start(info.address, static_cast<size_t>(req.threads_count)))
     {
       res.error_details = "Failed, mining not started";
       LOG_PRINT_L0(res.error_details);
@@ -519,12 +516,13 @@ namespace rpc
 
   void DaemonHandler::handle(const MiningStatus::Request& req, MiningStatus::Response& res)
   {
-    const cryptonote::miner& lMiner = m_core.get_miner();
+    cryptonote::miner& lMiner = m_core.get_miner();
     res.active = lMiner.is_mining();
 
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
-      res.threads_count = lMiner.get_threads_count();
+      const uint32_t threads = lMiner.get_thread_count();
+      res.threads_count = threads;
       const account_public_address& lMiningAdr = lMiner.get_mining_address();
       res.address = get_account_address_as_str(m_core.get_nettype(), false, lMiningAdr);
     }
