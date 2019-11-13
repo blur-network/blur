@@ -4,7 +4,7 @@ Copyright (c) 2018-2019, Blur Network</br>
 
 
 [![Blur Network Command-Line Tools](https://snapcraft.io/blur/badge.svg)](https://snapcraft.io/blur)
-![](https://github.com/blur-network/blur/workflows/blur-ci/badge.svg)
+![](https://github.com/blur-network/blur/workflows/Blur%20Master%20Branch/badge.svg?branch=master)
 
 
 
