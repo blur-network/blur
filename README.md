@@ -1,9 +1,12 @@
-![Blur: The Private Cryptocurrency](https://ip.bitcointalk.org/?u=https%3A%2F%2Fi.ibb.co%2F5r8s2f0%2Fwebsite.jpg&t=604&c=ZfQqvVHGGDF6Gw)
+![Blur: The Private Cryptocurrency](https://i.ibb.co/CJyDmLm/blur-repo.jpg)
 # Blur Network 
 Copyright (c) 2018-2019, Blur Network</br>
 
 
 [![Blur Network Command-Line Tools](https://snapcraft.io/blur/badge.svg)](https://snapcraft.io/blur)
+![](https://github.com/blur-network/blur/workflows/blur-ci/badge.svg)
+
+
 
 
 *See [LICENSE](License).*<br>
