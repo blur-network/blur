@@ -3074,44 +3074,16 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
 
  uint64_t wallet2::estimate_blockchain_height()
  {
-   // -1 month for fluctuations in block time and machine date/time setup.
-   // avg seconds per block
-   const int seconds_per_block = DIFFICULTY_TARGET;
-   // ~num blocks per month
-   const uint64_t blocks_per_month = 60*60*24*30/seconds_per_block;
-
-   // try asking the daemon first
-   std::string err;
-   uint64_t height = 0;
-
-   // we get the max of approximated height and local height.
-   // approximated height is the least of daemon target height
-   // (the max of what the other daemons are claiming is their
-   // height) and the theoretical height based on the local
-   // clock. This will be wrong only if both the local clock
-   // is bad *and* a peer daemon claims a highest height than
-   // the real chain.
-   // local height is the height the local daemon is currently
-   // synced to, it will be lower than the real chain height if
-   // the daemon is currently syncing.
-   // If we use the approximate height we subtract one month as
-   // a safety margin.
-   height = get_approximate_blockchain_height();
-   uint64_t target_height = get_daemon_blockchain_target_height(err);
-   if (err.empty()) {
-     if (target_height < height)
-       height = target_height;
-   } else {
-     // if we couldn't talk to the daemon, check safety margin.
-     if (height > blocks_per_month)
-       height -= blocks_per_month;
-     else
-       height = 0;
-   }
-   uint64_t local_height = get_daemon_blockchain_height(err);
-   if (err.empty() && local_height > height)
-     height = local_height;
-   return height;
+    cryptonote::COMMAND_RPC_GET_HEIGHT::request getheight_req;
+    cryptonote::COMMAND_RPC_GET_HEIGHT::response getheight_res;
+    m_daemon_rpc_mutex.lock();
+    bool r = net_utils::invoke_http_json_rpc("/json_rpc", "get_height", getheight_req, getheight_res, m_http_client);
+    m_daemon_rpc_mutex.unlock();
+    if (!r) {
+      return 0;
+    }
+    THROW_WALLET_EXCEPTION_IF(getheight_res.status == CORE_RPC_STATUS_BUSY, error::daemon_busy, "get_height");
+    return getheight_res.height;
  }
 
 /*!
