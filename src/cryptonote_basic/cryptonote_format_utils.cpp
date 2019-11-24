@@ -949,20 +949,28 @@ namespace cryptonote
         uint32_t id_num = std::strtoul(subhash.c_str(), NULL, 16);
 
         LOG_PRINT_L2("\nPRNG from previous block ID : " << id_num);
+                                             // guard against small probability of zero case
+        id_num =  id_num < 1 ? 1 : id_num;   // in previous hash's first 6 characters
 
-        if (id_num < 1) { // guard against small probability of zero case
-          id_num = 1; }   // in previous hash's first 6 characters
-
-        const uint64_t m_stamp = b.timestamp;
-        bool two = false;
-        two = id_num && !(id_num & (id_num - 1));
-        if (two) {
+        uint64_t m_stamp = b.timestamp;
+        bool two = id_num && !(id_num & (id_num - 1));
+        if (!two) {
+          uint32_t m = add(id_num, 1);
+          bool mersenne = m && !(m & (m - 1));
+          if (!mersenne) {
+            if (!mod3(m_stamp) && !mod3(id_num)) {
+           //   MWARNING("Encountered reducible operands, dividing by 3!");
+              uint32_t inner = div3(m_stamp) % div3(id_num);
+              its = add(cn_iters, (add(inner, height) & 0x7FFF));
+            }
+            its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
+          } else {
+            its = add(cn_iters,(add(mod_mersenne(m_stamp,m), height) & 0x7FFF));
+          }
+       } else {
           its = add(cn_iters, (add(m_stamp & (id_num - 1), height) & 0x7FFF));
-        }
-        else if (!two) {
-          its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
        }
-          LOG_PRINT_L2("\nIterations : "<< its);
+       LOG_PRINT_L2("\nIterations : "<< its);
      }
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, its);
     return true;
