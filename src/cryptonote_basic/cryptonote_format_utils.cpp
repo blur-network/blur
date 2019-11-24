@@ -944,33 +944,33 @@ namespace cryptonote
       }
       else if (b.major_version >= 10)
       {
-        std::string hash_alpha = string_tools::pod_to_hex(b.prev_id);
-        std::string subhash = hash_alpha.substr(0,6);
-        uint32_t id_num = std::strtoul(subhash.c_str(), NULL, 16);
+        // get 6 char from previous hash
+        std::string subhash = string_tools::pod_to_hex(b.prev_id).substr(0,6);
+        uint32_t id_num = std::strtoul(subhash.c_str(), NULL, 16); // base10 int
+        id_num =  id_num < 1 ? 1 : id_num; // guard against zero case
 
-        LOG_PRINT_L2("\nPRNG from previous block ID : " << id_num);
-                                             // guard against small probability of zero case
-        id_num =  id_num < 1 ? 1 : id_num;   // in previous hash's first 6 characters
-
+        // rest is just ((m_stamp % id_num) + height) % 32768
+        // ordered by branch most commonly taken
         uint64_t m_stamp = b.timestamp;
-        bool two = id_num && !(id_num & (id_num - 1));
+        bool two = id_num && !(id_num & (id_num - 1)); // id_num is pow of 2
         if (!two) {
           uint32_t m = add(id_num, 1);
-          bool mersenne = m && !(m & (m - 1));
+          bool mersenne = m && !(m & id_num); // id_num is (pow2 - 1)
           if (!mersenne) {
-            if (!mod3(m_stamp) && !mod3(id_num)) {
-           //   MWARNING("Encountered reducible operands, dividing by 3!");
-              uint32_t inner = div3(m_stamp) % div3(id_num);
-              its = add(cn_iters, (add(inner, height) & 0x7FFF));
-            }
-            its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
+/*            if (!mod3(m_stamp) && !mod3(id_num)) { // multiples of 3
+              MWARNING(" so none of special cases");
+              its = add(cn_iters, (add(div3(div3(m_stamp) % div3(id_num)), height) & 0x7FFF));
+            } else {*/
+              its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
+          //  }
           } else {
+              // pow2 - 1
             its = add(cn_iters,(add(mod_mersenne(m_stamp,m), height) & 0x7FFF));
           }
        } else {
+             // pow2
           its = add(cn_iters, (add(m_stamp & (id_num - 1), height) & 0x7FFF));
        }
-       LOG_PRINT_L2("\nIterations : "<< its);
      }
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, its);
     return true;
