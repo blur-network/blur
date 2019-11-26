@@ -46,6 +46,8 @@ namespace epee
 
 namespace cryptonote
 {
+  union _subhash { uint8_t bytes[3]; uint32_t uint; };
+  typedef union _subhash subhash;
   //---------------------------------------------------------------
   void get_transaction_prefix_hash(const transaction_prefix& tx, crypto::hash& h);
   crypto::hash get_transaction_prefix_hash(const transaction_prefix& tx);

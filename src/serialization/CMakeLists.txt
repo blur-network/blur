@@ -40,6 +40,7 @@ monero_add_library(serialization
   ${serialization_sources}
   ${serialization_headers}
   ${serialization_private_headers})
+add_dependencies(serialization cryptonote_core cryptonote_protocol)
 target_link_libraries(serialization
   LINK_PRIVATE
     cryptonote_core

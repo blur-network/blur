@@ -57,12 +57,26 @@ function (monero_add_executable name)
     FILES
       ${ARGN})
 
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+  add_executable("${name}"
+    ${ARGN}
+    ${BACKWARD_ENABLE})
+  add_backward("${name}")
+  add_dependencies("${name}" check_git_repository)
+  target_link_libraries("${name}"
+    PRIVATE
+      ${EXTRA_LIBRARIES}
+    PUBLIC
+      Backward::Backward)
+else()
   add_executable("${name}"
     ${ARGN})
   add_dependencies("${name}" check_git_repository)
   target_link_libraries("${name}"
     PRIVATE
       ${EXTRA_LIBRARIES})
+endif()
+
   set_property(TARGET "${name}"
     PROPERTY
       FOLDER "prog")

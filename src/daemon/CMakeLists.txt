@@ -81,11 +81,8 @@ monero_add_executable(daemon
   ${daemon_sources}
   ${daemon_headers}
   ${daemon_private_headers}
-  ${blocksdat}
-  ${BACKWARD_ENABLE})
+  ${blocksdat})
 add_dependencies(daemon check_git_repository rpc daemonizer daemon_rpc_server)
-
-add_backward(daemon)
 
 target_link_libraries(daemon
   PRIVATE
@@ -110,8 +107,7 @@ target_link_libraries(daemon
     ${GNU_READLINE_LIBRARY}
     ${SODIUM_LIBRARY}
     ${EXTRA_LIBRARIES}
-  PUBLIC
-    Backward::Backward)
+  PUBLIC)
 else()
 monero_add_executable(daemon
   ${daemon_sources}

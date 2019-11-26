@@ -55,10 +55,10 @@ monero_add_library(wallet
 add_dependencies(wallet check_git_repository)
 target_link_libraries(wallet
   PUBLIC
-    multisig
     common
     cryptonote_core
     mnemonics
+    multisig
     ${LMDB_LIBRARY}
     ${Boost_CHRONO_LIBRARY}
     ${Boost_SERIALIZATION_LIBRARY}

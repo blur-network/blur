@@ -944,25 +944,32 @@ namespace cryptonote
       }
       else if (b.major_version >= 10)
       {
-        // get 6 char from previous hash
-        std::string subhash = string_tools::pod_to_hex(b.prev_id).substr(0,6);
-        uint32_t id_num = std::strtoul(subhash.c_str(), NULL, 16); // base10 int
-        id_num =  id_num < 1 ? 1 : id_num; // guard against zero case
+        // get 6 char from previous hash as varint
+        epee::span<const uint8_t> span_bytes = epee::as_byte_span(b.prev_id);
+
+        uint8_t i = 0;
+        subhash sub; sub.uint = 0;
+        uint32_t id_num = 0;
+        for (const auto& byte : span_bytes) {
+          memcpy(&sub.bytes[i++], &byte, sizeof(byte));
+          id_num |= byte << (24 - (8*i));
+          if (i == 3)
+            break;
+        }
+
+        // guard against zero case
+        id_num = (id_num < 1) ? 1 : id_num;
 
         // rest is just ((m_stamp % id_num) + height) % 32768
         // ordered by branch most commonly taken
         uint64_t m_stamp = b.timestamp;
         bool two = id_num && !(id_num & (id_num - 1)); // id_num is pow of 2
         if (!two) {
-          uint32_t m = add(id_num, 1);
+          uint32_t const m = add(id_num, 1);
           bool mersenne = m && !(m & id_num); // id_num is (pow2 - 1)
           if (!mersenne) {
-/*            if (!mod3(m_stamp) && !mod3(id_num)) { // multiples of 3
-              MWARNING(" so none of special cases");
-              its = add(cn_iters, (add(div3(div3(m_stamp) % div3(id_num)), height) & 0x7FFF));
-            } else {*/
-              its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
-          //  }
+              // no special cases
+            its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
           } else {
               // pow2 - 1
             its = add(cn_iters,(add(mod_mersenne(m_stamp,m), height) & 0x7FFF));
