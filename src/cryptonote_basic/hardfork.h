@@ -239,7 +239,7 @@ namespace cryptonote
     std::vector<Params> heights;
 
     std::deque<uint8_t> versions; /* rolling window of the last N blocks' versions */
-    unsigned int last_versions[255]; /* count of the block versions in the last N blocks */
+    unsigned int last_versions[256]; /* count of the block versions in the last N blocks */
     uint32_t current_fork_index;
 
     mutable epee::critical_section lock;
