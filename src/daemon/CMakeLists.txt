@@ -83,7 +83,7 @@ monero_add_executable(daemon
   ${daemon_private_headers}
   ${blocksdat}
   ${BACKWARD_ENABLE})
-add_dependencies(daemon check_git_repository)
+add_dependencies(daemon check_git_repository rpc daemonizer daemon_rpc_server)
 
 add_backward(daemon)
 

@@ -31,6 +31,7 @@ set(gen_multisig_sources
 
 monero_add_executable(gen_multisig
   ${gen_multisig_sources})
+add_dependencies(gen_multisig multisig wallet)
 target_link_libraries(gen_multisig
   PRIVATE
     wallet

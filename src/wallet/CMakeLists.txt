@@ -83,7 +83,7 @@ monero_add_executable(wallet_rpc_server
   ${wallet_rpc_sources}
   ${wallet_rpc_headers}
   ${wallet_rpc_private_headers})
-add_dependencies(wallet_rpc_server check_git_repository)
+add_dependencies(wallet_rpc_server check_git_repository wallet)
 
 target_link_libraries(wallet_rpc_server
   PRIVATE
