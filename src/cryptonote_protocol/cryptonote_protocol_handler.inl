@@ -1018,26 +1018,6 @@ namespace cryptonote
             MERROR("Failed to parse block, but it should already have been parsed");
             break;
           }
-          bool parent_known = m_core.have_block(new_block.prev_id);
-          if (!parent_known)
-          {
-            // it could be:
-            //  - later in the current chain
-            //  - later in an alt chain
-            //  - orphan
-            // if it was requested, then it'll be resolved later, otherwise it's an orphan
-            bool parent_requested = m_block_queue.requested(new_block.prev_id);
-            if (!parent_requested)
-            {
-              std::ostringstream new_block_hash(0);
-              epee::to_hex::formatted(new_block_hash, epee::as_byte_span(get_block_hash(new_block)));
-              MERROR("Got block " << new_block_hash.str() << " with unknown parent " << new_block.prev_id << " which was not requested - querying block hashes");
-            }
-
-            // parent was requested, so we wait for it to be retrieved
-            MINFO(context << " parent was requested, we'll get back to it");
-            break;
-          }
 
           const boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
           context.m_last_request_time = start;
