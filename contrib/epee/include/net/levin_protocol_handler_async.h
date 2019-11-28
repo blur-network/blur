@@ -275,11 +275,12 @@ public:
   }
   virtual ~async_protocol_handler()
   {
-    m_deletion_initiated = true;
-    if(m_connection_initialized)
-    {
-      m_config.del_connection(this);
-    }
+    try {
+      m_deletion_initiated = true;
+      if(m_connection_initialized)
+      {
+        m_config.del_connection(this);
+      }
 
     for (size_t i = 0; i < 60 * 1000 / 100 && 0 != boost::interprocess::ipcdetail::atomic_read32(&m_wait_count); ++i)
     {
@@ -288,15 +289,18 @@ public:
     CHECK_AND_ASSERT_MES_NO_RET(0 == boost::interprocess::ipcdetail::atomic_read32(&m_wait_count), "Failed to wait for operation completion. m_wait_count = " << m_wait_count);
 
     MTRACE(m_connection_context << "~async_protocol_handler()");
-  }
 
+    } catch (std::exception& e) {
+      MTRACE("Exception in levin_protocol_async:" << e.what() << std::endl);
+    }
+
+  }
   bool start_outer_call()
   {
     MTRACE(m_connection_context << "[levin_protocol] -->> start_outer_call");
     if(!m_pservice_endpoint->add_ref())
     {
       MERROR(m_connection_context << "[levin_protocol] -->> start_outer_call failed");
-      return false;
     }
     boost::interprocess::ipcdetail::atomic_inc32(&m_wait_count);
     return true;
