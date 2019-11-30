@@ -113,7 +113,7 @@ release-static-linux-i686:
 release-cross-linux-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-gnu-linux
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake -DBOOST_ROOT=${PWD}/contrib/depends/x86_64-gnu-linux/ ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D BUILD_SHARED_LIBS=OFF -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake -DBOOST_ROOT=${PWD}/contrib/depends/x86_64-gnu-linux/lib -D BOOST_IGNORE_SYSTEM_PATHS=ON ../.. && ${MAKE}
 
 release-cross-gui-linux-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-gnu-linux
