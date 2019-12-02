@@ -29,7 +29,7 @@
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
-#include "include_base_utils.h"
+#include "misc_log_ex.h"
 
 #include <set>
 #include <unordered_map>

@@ -351,12 +351,6 @@ ELPP_INTERNAL_DEBUGGING_OUT_INFO << ELPP_INTERNAL_DEBUGGING_MSG(internalInfoStre
 #include <csignal>
 #include <cerrno>
 #include <cstdarg>
-#if defined(ELPP_UNICODE)
-#   include <locale>
-#  if ELPP_OS_WINDOWS
-#      include <codecvt>
-#  endif // ELPP_OS_WINDOWS
-#endif  // defined(ELPP_UNICODE)
 #if ELPP_STACKTRACE
 #   include <cxxabi.h>
 #   include <execinfo.h>

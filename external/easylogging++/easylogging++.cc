@@ -680,10 +680,6 @@ base::type::fstream_t* File::newFileStream(const std::string& filename) {
                                                        );
 #if defined(ELPP_UNICODE)
   std::locale elppUnicodeLocale("");
-#  if ELPP_OS_WINDOWS
-  std::locale elppUnicodeLocaleWindows(elppUnicodeLocale, new std::codecvt_utf8_utf16<wchar_t>);
-  elppUnicodeLocale = elppUnicodeLocaleWindows;
-#  endif // ELPP_OS_WINDOWS
   fs->imbue(elppUnicodeLocale);
 #endif  // defined(ELPP_UNICODE)
   if (fs->is_open()) {

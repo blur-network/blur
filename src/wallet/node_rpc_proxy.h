@@ -30,7 +30,7 @@
 
 #include <string>
 #include <boost/thread/mutex.hpp>
-#include "include_base_utils.h"
+#include "misc_log_ex.h"
 #include "net/http_client.h"
 
 namespace tools

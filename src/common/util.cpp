@@ -35,7 +35,7 @@
 #include <gnu/libc-version.h>
 #endif
 
-#include "include_base_utils.h"
+#include "misc_log_ex.h"
 #include "file_io_utils.h"
 #include "wipeable_string.h"
 using namespace epee;
