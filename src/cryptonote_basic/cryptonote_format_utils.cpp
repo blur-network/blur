@@ -963,20 +963,17 @@ namespace cryptonote
         // rest is just ((m_stamp % id_num) + height) % 32768
         // ordered by branch most commonly taken
         uint64_t m_stamp = b.timestamp;
-        bool two = id_num && !(id_num & (id_num - 1)); // id_num is pow of 2
-        if (!two) {
-          uint32_t const m = add(id_num, 1);
-          bool mersenne = m && !(m & id_num); // id_num is (pow2 - 1)
-          if (!mersenne) {
-              // no special cases
-            its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
+        uint32_t exp = 0;
+        if (id_num & 1) {
+          // odd number, find next highest binary radix
+          uint32_t mersenne = next_largest_radix(id_num) - 1;
+          MWARNING("next largest radix = " << std::to_string(mersenne));
+          if (mod3(id_num)) {
+              // non-multiple of three
+              its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
           } else {
-              // pow2 - 1
-            its = add(cn_iters,(add(mod_mersenne(m_stamp,m), height) & 0x7FFF));
+              its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
           }
-       } else {
-             // pow2
-          its = add(cn_iters, (add(m_stamp & (id_num - 1), height) & 0x7FFF));
        }
      }
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, its);

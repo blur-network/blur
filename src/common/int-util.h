@@ -80,9 +80,7 @@ static inline uint64_t lo_dword(uint64_t val) {
 }
 
 static inline uint64_t add(uint64_t a, uint64_t b) {
-  if (b == 0)
-    return a;
-  else return add(a ^ b, (a & b) << 1);
+  return (b == 0) ? a : add(a ^ b, (a & b) << 1);
 }
 
 static inline uint32_t mod3( uint32_t a ){
@@ -97,20 +95,20 @@ static inline uint32_t mod3( uint32_t a ){
   return a;
 }
 
-/*static inline uint32_t modular_pow3(uint32_t base, uint32_t exponent, uint32_t result)
-{
-  result = 1;
-  base = mod3(base);
-  while (exponent > 0) {
-      if (exponent & 1)
-         result = mod3(result * base);
-      exponent = exponent >> 1;
-      base = mod3(base * base);
-  }
-  return result;
-}*/
+static inline uint32_t next_largest_radix(uint32_t num)
+{ 
+  num--;
+  num |= num >> 1;
+  num |= num >> 2;
+  num |= num >> 4;
+  num |= num >> 8;
+  num |= num >> 16;
+  num++;
+  return num;
+}
 
-static inline uint32_t mod_mersenne(uint32_t const num, uint32_t const s) // s = (mersenne + 1), i.e. pow2
+// where s = pow2 - 1
+static inline uint32_t mod_mersenne(uint32_t const num, uint32_t const s)
 {
  // https://graphics.stanford.edu/~seander/bithacks.html#ModulusDivisionParallel
   const unsigned int M[] =
