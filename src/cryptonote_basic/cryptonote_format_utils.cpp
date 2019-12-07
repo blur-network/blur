@@ -968,14 +968,16 @@ namespace cryptonote
           // odd number, find next highest binary radix
           uint32_t mersenne = next_largest_radix(id_num) - 1;
           MWARNING("next largest radix = " << std::to_string(mersenne));
-          if (mod3(id_num)) {
+       //   if (mod3(id_num)) {
               // non-multiple of three
               its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
-          } else {
+       /*   } else {
               its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
-          }
-       }
+          }*/
+       } else {         
+         its = add(cn_iters, (add(m_stamp % id_num, height) & 0x7FFF));
      }
+   }
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant, its);
     return true;
   }
