@@ -42,7 +42,6 @@ monero_add_library(multisig
   ${multisig_headers}
   ${multisig_private_headers})
 
-add_dependencies(multisig wallet)
 
 target_link_libraries(multisig
   PUBLIC
