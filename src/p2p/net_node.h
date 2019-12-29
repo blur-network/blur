@@ -125,7 +125,7 @@ namespace nodetool
     virtual std::map<std::string, time_t> get_blocked_hosts() { CRITICAL_REGION_LOCAL(m_blocked_hosts_lock); return m_blocked_hosts; }
   private:
     // TODO-TK: need seed list through DNS lookups.
-    const std::vector<std::string> m_seed_nodes_list = {};
+    const std::vector<std::string> m_seed_nodes_list = { "66.70.189.183:52541", "66.70.188.178:52541", "66.70.189.131:52541" };
 
     bool islimitup=false;
     bool islimitdown=false;
@@ -171,10 +171,8 @@ namespace nodetool
     //----------------- i_connection_filter  --------------------------------------------------------
     virtual bool is_remote_host_allowed(const epee::net_utils::network_address &address);
     //-----------------------------------------------------------------------------------------------
-    bool parse_peer_from_string(epee::net_utils::network_address& pe, const std::string& node_addr, uint16_t default_port = 0);
-    bool handle_command_line(
-        const boost::program_options::variables_map& vm
-      );
+    bool parse_peer_from_string(epee::net_utils::network_address& pe, const std::string& node_addr, uint16_t default_port = 52541);
+    bool handle_command_line(const boost::program_options::variables_map& vm);
     bool idle_worker();
     bool handle_remote_peerlist(const std::list<peerlist_entry>& peerlist, time_t local_time, const epee::net_utils::connection_context_base& context);
     bool get_local_node_data(basic_node_data& node_data);
@@ -278,7 +276,7 @@ namespace nodetool
 
     epee::math_helper::once_a_time_seconds<P2P_DEFAULT_HANDSHAKE_INTERVAL> m_peer_handshake_idle_maker_interval;
     epee::math_helper::once_a_time_seconds<1> m_connections_maker_interval;
-    epee::math_helper::once_a_time_seconds<60*30, false> m_peerlist_store_interval;
+    epee::math_helper::once_a_time_seconds<30> m_peerlist_store_interval;
     epee::math_helper::once_a_time_seconds<60> m_gray_peerlist_housekeeping_interval;
 
     std::string m_bind_ip;
@@ -308,7 +306,7 @@ namespace nodetool
     const int64_t default_limit_up = 4096;    // kB/s
     const int64_t default_limit_down = 8192;  // kB/s
     extern const command_line::arg_descriptor<std::string> arg_p2p_bind_ip;
-    extern const command_line::arg_descriptor<std::string, false, true, 2> arg_p2p_bind_port;
+    extern const command_line::arg_descriptor<std::string> arg_p2p_bind_port;
     extern const command_line::arg_descriptor<uint32_t>    arg_p2p_external_port;
     extern const command_line::arg_descriptor<bool>        arg_p2p_allow_local_ip;
     extern const command_line::arg_descriptor<std::vector<std::string> > arg_p2p_add_peer;

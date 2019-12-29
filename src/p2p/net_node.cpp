@@ -33,20 +33,8 @@
 
 namespace nodetool
 {
-    const command_line::arg_descriptor<std::string> arg_p2p_bind_ip        = {"p2p-bind-ip", "Interface for p2p network protocol", "0.0.0.0"};
-    const command_line::arg_descriptor<std::string, false, true, 2> arg_p2p_bind_port = {
-        "p2p-bind-port"
-      , "Port for p2p network protocol"
-      , std::to_string(config::P2P_DEFAULT_PORT)
-      , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on }}
-      , [](std::array<bool, 2> testnet_stagenet, bool defaulted, std::string val)->std::string {
-          if (testnet_stagenet[0] && defaulted)
-            return std::to_string(config::testnet::P2P_DEFAULT_PORT);
-          else if (testnet_stagenet[1] && defaulted)
-            return std::to_string(config::stagenet::P2P_DEFAULT_PORT);
-          return val;
-        }
-      };
+    const command_line::arg_descriptor<std::string> arg_p2p_bind_ip = {"p2p-bind-ip", "Interface for p2p network protocol", "0.0.0.0"};
+    const command_line::arg_descriptor<std::string> arg_p2p_bind_port = {   "p2p-bind-port", "Port for p2p network protocol", std::to_string(config::P2P_DEFAULT_PORT) };
     const command_line::arg_descriptor<uint32_t>    arg_p2p_external_port  = {"p2p-external-port", "External port for p2p network protocol (if port forwarding used with NAT)", 0};
     const command_line::arg_descriptor<bool>        arg_p2p_allow_local_ip = {"allow-local-ip", "Allow local ip add to peer list, mostly in debug purposes"};
     const command_line::arg_descriptor<std::vector<std::string> > arg_p2p_add_peer   = {"add-peer", "Manually add peer to local peerlist"};

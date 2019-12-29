@@ -63,7 +63,7 @@ namespace nodetool
   void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description& desc)
   {
     command_line::add_arg(desc, arg_p2p_bind_ip);
-    command_line::add_arg(desc, arg_p2p_bind_port, false);
+    command_line::add_arg(desc, arg_p2p_bind_port);
     command_line::add_arg(desc, arg_p2p_external_port);
     command_line::add_arg(desc, arg_p2p_allow_local_ip);
     command_line::add_arg(desc, arg_p2p_add_peer);
@@ -778,18 +778,19 @@ namespace nodetool
   bool node_server<t_payload_net_handler>::is_addr_connected(const epee::net_utils::network_address& peer)
   {
     bool connected = false;
-    m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
+    m_net_server.get_config_object().foreach_connection([&connected, &peer](const p2p_connection_context& cntxt)
     {
-      if(!cntxt.m_is_income && peer == cntxt.m_remote_address)
+      if(peer == cntxt.m_remote_address)
       {
         connected = true;
-        return false;//stop enumerating
+        return true;
       }
-      return true;
+      return false;
     });
 
     return connected;
   }
+  //-----------------------------------------------------------------------------------
 
 #define LOG_PRINT_CC_PRIORITY_NODE(priority, con, msg) \
   do { \
@@ -799,7 +800,7 @@ namespace nodetool
       LOG_INFO_CC(con, msg); \
     } \
   } while(0)
-
+  //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address& na, bool just_take_peerlist, uint64_t last_seen_stamp, PeerType peer_type, uint64_t first_seen_stamp)
   {
@@ -1561,6 +1562,7 @@ namespace nodetool
   {
     LOG_DEBUG_CC(context, "COMMAND_PING");
     rsp.status = PING_OK_RESPONSE_STATUS_TEXT;
+    rsp.peer_id = m_config.m_peer_id;
     return 1;
   }
   //-----------------------------------------------------------------------------------
