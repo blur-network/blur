@@ -30,7 +30,7 @@ all: release-all
 
 cmake-debug:
 	mkdir -p build/debug
-	cd build/debug && cmake -D CMAKE_BUILD_TYPE=Debug ../..
+	cd build/debug && cmake -D CMAKE_BUILD_TYPE="Debug" ../..
 
 debug: cmake-debug
 	cd build/debug && $(MAKE)
@@ -39,109 +39,108 @@ debug: cmake-debug
 #  * libwallet_api_tests fail (Issue #895)
 debug-test:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=ON -D CMAKE_BUILD_TYPE=Debug ../.. &&  $(MAKE) && $(MAKE) ARGS="-E libwallet_api_tests" test
+	cd build/debug && cmake -D BUILD_TESTS=ON -D CMAKE_BUILD_TYPE="Debug" ../.. &&  $(MAKE) && $(MAKE) ARGS="-E libwallet_api_tests" test
 
 debug-all:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=OFF -D BUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE=Debug ../.. && $(MAKE)
+	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=OFF -D BUILD_SHARED_LIBS=ON -D CMAKE_BUILD_TYPE="Debug" ../.. && $(MAKE)
 
 debug-static-all:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=ON -D CMAKE_BUILD_TYPE=Debug ../.. && $(MAKE)
+	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=ON -D BUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE="Debug" ../.. && $(MAKE)
 
 cmake-release:
 	mkdir -p build/release
-	cd build/release && cmake -D CMAKE_BUILD_TYPE=Release ../..
+	cd build/release && cmake -D CMAKE_BUILD_TYPE="Release" ../..
 
 release: cmake-release
 	cd build/release && $(MAKE)
 
 release-test:
 	mkdir -p build/release
-	cd build/release && cmake -D BUILD_TESTS=ON -D CMAKE_BUILD_TYPE=Release ../.. && $(MAKE) && $(MAKE) test
+	cd build/release && cmake -D BUILD_TESTS=ON -D CMAKE_BUILD_TYPE="Release" ../.. && $(MAKE) && $(MAKE) test
 
 release-all:
 	mkdir -p build/release
-	cd build/release && cmake -D BUILD_TESTS=OFF -D CMAKE_BUILD_TYPE=Release ../.. && $(MAKE)
+	cd build/release && cmake -D BUILD_TESTS=OFF -D CMAKE_BUILD_TYPE="Release" ../.. && $(MAKE)
 
 release-static:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release ../.. && $(MAKE)
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D USE_READLINE=ON -D BUILD_64=ON -D BUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE="Release" ../.. && $(MAKE)
 
 coverage:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=OFF -D CMAKE_BUILD_TYPE=Debug -D COVERAGE=ON ../.. && $(MAKE) && $(MAKE) test
+	cd build/debug && cmake -D BUILD_TESTS=OFF -D CMAKE_BUILD_TYPE="Debug" -D COVERAGE=ON ../.. && $(MAKE) && $(MAKE) test
 
 # Targets for specific prebuilt builds which will be advertised for updates by their build tag
 
 release-static-linux-armv6:
 	mkdir -p build/release
-	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv6zk" -D STATIC=ON -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-armv6" ../.. && $(MAKE)
+	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv6zk" -D STATIC=ON -D BUILD_64=OFF -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="linux-armv6" ../.. && $(MAKE)
 
 release-static-linux-armv7:
 	mkdir -p build/release
-	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv7-a" -D STATIC=ON -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-armv7" ../.. && $(MAKE)
+	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv7-a" -D STATIC=ON -D BUILD_64=OFF -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="linux-armv7" ../.. && $(MAKE)
 
 release-static-android:
 	mkdir -p build/release
-	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv7-a" -D STATIC=ON -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Release -D ANDROID=true  -D BUILD_TAG="android" ../.. && $(MAKE)
+	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv7-a" -D STATIC=ON -D BUILD_64=OFF -D CMAKE_BUILD_TYPE="Release" -D ANDROID=true  -D BUILD_TAG="android" ../.. && $(MAKE)
 
 release-static-linux-armv8:
 	mkdir -p build/release
-	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv8-a" -D STATIC=ON -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-armv8" ../.. && $(MAKE)
+	cd build/release && cmake -D BUILD_TESTS=OFF -D ARCH="armv8-a" -D STATIC=ON -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="linux-armv8" ../.. && $(MAKE)
 
 release-static-linux-x86_64:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" ../.. && $(MAKE)
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="linux-x64" ../.. && $(MAKE)
 
 release-static-archlinux-x86_64:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -DBUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="archlinux-x64" -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_C_COMPILER=/usr/bin/gcc-8 ../.. && $(MAKE)
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -DBUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="archlinux-x64" -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_C_COMPILER=/usr/bin/gcc-8 ../.. && $(MAKE)
 
 release-static-freebsd-x86_64:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="freebsd-x64" ../.. && $(MAKE)
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="freebsd-x64" ../.. && $(MAKE)
 
 release-static-mac-x86_64:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="mac-x64" ../.. && $(MAKE)
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="mac-x64" ../.. && $(MAKE)
 
 release-static-linux-i686:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x86" ../.. && $(MAKE)
+	cd build/release && cmake -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="linux-x86" ../.. && $(MAKE)
 
 release-cross-linux-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-gnu-linux
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D BUILD_SHARED_LIBS=OFF -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake -DBOOST_ROOT=${PWD}/contrib/depends/x86_64-gnu-linux/lib -D BOOST_IGNORE_SYSTEM_PATHS=ON ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="linux-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
 
 release-cross-gui-linux-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-gnu-linux
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D BUILD_GUI_DEPS=ON  -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D BUILD_GUI_DEPS=ON  -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
 
 release-cross-mac-x86_64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-apple-darwin
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="mac-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-apple-darwin/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="mac-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-apple-darwin/share/toolchain.cmake ../.. && ${MAKE}
 
 release-static-win64:
 	mkdir -p build/release
-	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/cmake/64-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys64 ../.. && $(MAKE)
+	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/cmake/64-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys64 ../.. && $(MAKE)
 
 release-cross-win64:
-	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-w64-mingw32
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-w64-mingw32/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-w64-mingw32/share/toolchain.cmake ../.. && ${MAKE}
 
 release-cross-gui-win64:
 	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-w64-mingw32
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D BUILD_GUI_DEPS=ON  -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-w64-mingw32/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D BUILD_GUI_DEPS=ON  -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-w64-mingw32/share/toolchain.cmake ../.. && ${MAKE}
 
 release-static-win32:
 	mkdir -p build/release
-	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x32" -D CMAKE_TOOLCHAIN_FILE=../../cmake/32-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys32 ../.. && $(MAKE)
+	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="win-x32" -D CMAKE_TOOLCHAIN_FILE=../../cmake/32-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys32 ../.. && $(MAKE)
 
 fuzz:
 	mkdir -p build/fuzz
@@ -154,6 +153,6 @@ clean:
 	rm -rf build
 
 tags:
-	ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ src contrib tests/gtest
+	ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q src contrib tests/gtest
 
 .PHONY: all cmake-debug debug debug-test debug-all cmake-release release release-test release-all clean tags

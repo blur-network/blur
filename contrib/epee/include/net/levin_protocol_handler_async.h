@@ -295,12 +295,14 @@ public:
     }
 
   }
+
   bool start_outer_call()
   {
     MTRACE(m_connection_context << "[levin_protocol] -->> start_outer_call");
     if(!m_pservice_endpoint->add_ref())
     {
       MERROR(m_connection_context << "[levin_protocol] -->> start_outer_call failed");
+      return false;
     }
     boost::interprocess::ipcdetail::atomic_inc32(&m_wait_count);
     return true;
