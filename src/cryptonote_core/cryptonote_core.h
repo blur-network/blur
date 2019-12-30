@@ -58,9 +58,10 @@ namespace cryptonote
    };
 
   extern const command_line::arg_descriptor<std::string, false, true, 2> arg_data_dir;
-  extern const command_line::arg_descriptor<bool, false> arg_testnet_on;
-  extern const command_line::arg_descriptor<bool, false> arg_stagenet_on;
-  extern const command_line::arg_descriptor<bool> arg_offline;
+  extern const command_line::arg_descriptor<bool,false> arg_testnet_on;
+  extern const command_line::arg_descriptor<bool,false> arg_stagenet_on;
+  extern const command_line::arg_descriptor<bool,false> arg_offline;
+
 
   /************************************************************************/
   /*                                                                      */
@@ -722,12 +723,12 @@ namespace cryptonote
       * @return the number of blocks to sync in one go
       */
      std::pair<uint64_t, uint64_t> get_coinbase_tx_sum(const uint64_t start_offset, const size_t count);
-     
+
      /**
       * @brief get the network type we're on
       *
       * @return which network are we on?
-      */     
+      */
      network_type get_nettype() const { return m_nettype; };
 
      /**
@@ -750,6 +751,12 @@ namespace cryptonote
       * @return free space in bytes
       */
      uint64_t get_free_space() const;
+
+     bool testnet = get_nettype() == cryptonote::TESTNET;
+     bool stagenet = get_nettype() == cryptonote::STAGENET;
+     bool is_testnet() const { return testnet; }
+     bool is_stagenet() const { return stagenet; }
+     bool is_mainnet() const { return ((is_testnet() == false) && (is_stagenet() == false)); }
 
      /**
       * @brief get whether the core is running offline

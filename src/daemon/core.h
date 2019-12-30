@@ -67,17 +67,18 @@ public:
     m_core.set_cryptonote_protocol(&protocol);
   }
 
+    bool is_testnet() {
+     return m_core.is_testnet();
+    }
+    bool is_stagenet() {
+     return m_core.is_stagenet();
+    }
+    bool is_mainnet() {
+     return (!m_core.is_testnet() && !m_core.is_stagenet());
+    }
+
   std::string get_config_subdir() const
   {
-    bool testnet = command_line::get_arg(m_vm_HACK, cryptonote::arg_testnet_on);
-    bool stagenet = command_line::get_arg(m_vm_HACK, cryptonote::arg_stagenet_on);
-    bool mainnet = !testnet && !stagenet;
-    std::string port = command_line::get_arg(m_vm_HACK, nodetool::arg_p2p_bind_port);
-    if ((mainnet && port != std::to_string(::config::P2P_DEFAULT_PORT))
-        || (testnet && port != std::to_string(::config::testnet::P2P_DEFAULT_PORT))
-        || (stagenet && port != std::to_string(::config::stagenet::P2P_DEFAULT_PORT))) {
-      return port;
-    }
     return std::string();
   }
 

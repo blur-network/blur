@@ -62,12 +62,12 @@ DISABLE_VS_WARNINGS(4355)
 
 namespace cryptonote
 {
-  const command_line::arg_descriptor<bool, false> arg_testnet_on  = {
+  const command_line::arg_descriptor<bool> arg_testnet_on  = {
     "testnet"
   , "Run on testnet. The wallet must be launched with --testnet flag."
   , false
   };
-  const command_line::arg_descriptor<bool, false> arg_stagenet_on  = {
+  const command_line::arg_descriptor<bool> arg_stagenet_on  = {
     "stagenet"
   , "Run on stagenet. The wallet must be launched with --stagenet flag."
   , false
@@ -155,6 +155,50 @@ namespace cryptonote
     m_checkpoints_updating.clear();
     set_cryptonote_protocol(pprotocol);
   }
+
+  bool core::handle_command_line(const boost::program_options::variables_map& vm)
+  {
+    if (m_nettype != FAKECHAIN)
+    {
+      testnet = command_line::get_arg(vm, arg_testnet_on);
+      stagenet = command_line::get_arg(vm, arg_stagenet_on);
+      m_nettype = testnet ? TESTNET : stagenet ? STAGENET : MAINNET;
+    }
+
+    m_config_folder = command_line::get_arg(vm, arg_data_dir);
+
+    auto data_dir = boost::filesystem::path(m_config_folder);
+
+    if (m_nettype == MAINNET)
+    {
+      cryptonote::checkpoints checkpoints;
+      if (!checkpoints.init_default_checkpoints(m_nettype))
+      {
+        throw std::runtime_error("Failed to initialize checkpoints");
+      }
+      set_checkpoints(std::move(checkpoints));
+
+      boost::filesystem::path json(JSON_HASH_FILE_NAME);
+      boost::filesystem::path checkpoint_json_hashfile_fullpath = data_dir / json;
+
+      set_checkpoints_file_path(checkpoint_json_hashfile_fullpath.string());
+    }
+
+
+    test_drop_download_height(command_line::get_arg(vm, arg_test_drop_download_height));
+    m_fluffy_blocks_enabled = !command_line::get_arg(vm, arg_no_fluffy_blocks);
+    m_offline = command_line::get_arg(vm, arg_offline);
+    if (!command_line::is_arg_defaulted(vm, arg_fluffy_blocks))
+      MWARNING(arg_fluffy_blocks.name << " is obsolete, it is now default");
+
+    if (command_line::get_arg(vm, arg_test_drop_download) == true)
+      test_drop_download();
+
+    epee::debug::g_test_dbg_lock_sleep() = command_line::get_arg(vm, arg_test_dbg_lock_sleep);
+
+    return true;
+  }
+
   void core::set_cryptonote_protocol(i_cryptonote_protocol* pprotocol)
   {
     if(pprotocol)
@@ -222,49 +266,6 @@ namespace cryptonote
 
     miner::init_options(desc);
     BlockchainDB::init_options(desc);
-  }
-  //-----------------------------------------------------------------------------------------------
-  bool core::handle_command_line(const boost::program_options::variables_map& vm)
-  {
-    if (m_nettype != FAKECHAIN)
-    {
-      const bool testnet = command_line::get_arg(vm, arg_testnet_on);
-      const bool stagenet = command_line::get_arg(vm, arg_stagenet_on);
-      m_nettype = testnet ? TESTNET : stagenet ? STAGENET : MAINNET;
-    }
-
-    m_config_folder = command_line::get_arg(vm, arg_data_dir);
-
-    auto data_dir = boost::filesystem::path(m_config_folder);
-
-    if (m_nettype == MAINNET)
-    {
-      cryptonote::checkpoints checkpoints;
-      if (!checkpoints.init_default_checkpoints(m_nettype))
-      {
-        throw std::runtime_error("Failed to initialize checkpoints");
-      }
-      set_checkpoints(std::move(checkpoints));
-
-      boost::filesystem::path json(JSON_HASH_FILE_NAME);
-      boost::filesystem::path checkpoint_json_hashfile_fullpath = data_dir / json;
-
-      set_checkpoints_file_path(checkpoint_json_hashfile_fullpath.string());
-    }
-
-
-    test_drop_download_height(command_line::get_arg(vm, arg_test_drop_download_height));
-    m_fluffy_blocks_enabled = !get_arg(vm, arg_no_fluffy_blocks);
-    m_offline = get_arg(vm, arg_offline);
-    if (!command_line::is_arg_defaulted(vm, arg_fluffy_blocks))
-      MWARNING(arg_fluffy_blocks.name << " is obsolete, it is now default");
-
-    if (command_line::get_arg(vm, arg_test_drop_download) == true)
-      test_drop_download();
-
-    epee::debug::g_test_dbg_lock_sleep() = command_line::get_arg(vm, arg_test_dbg_lock_sleep);
-
-    return true;
   }
   //-----------------------------------------------------------------------------------------------
   uint64_t core::get_current_blockchain_height() const

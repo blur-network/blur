@@ -38,6 +38,7 @@ using namespace epee;
 #include "serialization/container.h"
 #include "cryptonote_format_utils.h"
 #include "cryptonote_config.h"
+#include "cryptonote_core/cryptonote_core.h"
 #include "misc_language.h"
 #include "common/base58.h"
 #include "crypto/hash.h"
@@ -88,6 +89,8 @@ namespace cryptonote {
     const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
 
     const uint64_t premine = 360000000000000000U;
+  //  network_type nettype = is_testnet() ? cryptonote::TESTNET : (is_stagenet() ? cryptonote::STAGENET : cryptonote::MAINNET);
+
      if (version < 2 && median_size > 0 && already_generated_coins < premine) {
        reward = premine;
        return true;
