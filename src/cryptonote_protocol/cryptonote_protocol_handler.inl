@@ -309,8 +309,6 @@ namespace cryptonote
       << " [Your node is " << abs_diff << " blocks (" << (abs(diff) / (24 * 60 * 60 / DIFFICULTY_TARGET))  << " days) "
       << (0 <= diff ? std::string("behind") : std::string("ahead"))
       << "] " << ENDL << "SYNCHRONIZATION started");
-      if (hshd.current_height >= m_core.get_current_blockchain_height() + 5) // don't switch to unsafe mode just for a few blocks
-        m_core.safesyncmode(false);
     }
     LOG_PRINT_L1("Remote blockchain height: " << hshd.current_height << ", id: " << hshd.top_id);
     context.m_state = cryptonote_connection_context::state_synchronizing;
@@ -972,16 +970,6 @@ namespace cryptonote
   int t_cryptonote_protocol_handler<t_core>::try_add_next_blocks(cryptonote_connection_context& context)
   {
     {
-      // We try to lock the sync lock. If we can, it means no other thread is
-      // currently adding blocks, so we do that for as long as we can from the
-      // block queue. Then, we go back to download.
-      const boost::unique_lock<boost::mutex> sync{m_sync_lock, boost::try_to_lock};
-      if (!sync.owns_lock())
-      {
-        MINFO("Failed to lock m_sync_lock, going back to download");
-      }
-      MDEBUG(context << " lock m_sync_lock, adding blocks to chain...");
-
       {
         m_core.pause_mine();
         epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler(
@@ -1515,7 +1503,6 @@ skip:
         << "**********************************************************************");
       m_core.on_synchronized();
     }
-    m_core.safesyncmode(true);
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------
