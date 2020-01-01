@@ -66,6 +66,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
   target_link_libraries("${name}"
     PRIVATE
       ${EXTRA_LIBRARIES}
+      ${BACKWARD_LIBRARIES}
     PUBLIC
       Backward::Backward)
 else()

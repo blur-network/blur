@@ -379,12 +379,12 @@ namespace trace_resolver_tag {
 	struct libdwarf;
 	struct backtrace_symbol;
 
-#	if   BACKWARD_HAS_DW == 1
+#	if BACKWARD_HAS_DWARF == 1
+		typedef libdwarf current;
+#	elif   BACKWARD_HAS_DW == 1
 		typedef libdw current;
 #	elif BACKWARD_HAS_BFD == 1
 		typedef libbfd current;
-#	elif BACKWARD_HAS_DWARF == 1
-		typedef libdwarf current;
 #	elif BACKWARD_HAS_BACKTRACE_SYMBOL == 1
 		typedef backtrace_symbol current;
 #	else

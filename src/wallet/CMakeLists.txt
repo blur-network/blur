@@ -54,7 +54,7 @@ monero_add_library(wallet
   ${wallet_private_headers})
 add_dependencies(wallet check_git_repository)
 target_link_libraries(wallet
-  PUBLIC
+  PRIVATE
     common
     cryptonote_core
     mnemonics
@@ -66,7 +66,6 @@ target_link_libraries(wallet
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
-  PRIVATE
     ${EXTRA_LIBRARIES})
 
 set(wallet_rpc_sources
@@ -83,14 +82,15 @@ monero_add_executable(wallet_rpc_server
   ${wallet_rpc_sources}
   ${wallet_rpc_headers}
   ${wallet_rpc_private_headers})
-add_dependencies(wallet_rpc_server check_git_repository wallet)
 
+add_dependencies(wallet_rpc_server check_git_repository wallet)
 target_link_libraries(wallet_rpc_server
   PRIVATE
     wallet
     epee
     rpc_base
     cryptonote_core
+    mnemonics
     cncrypto
     common
     ${Boost_CHRONO_LIBRARY}

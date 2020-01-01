@@ -43,7 +43,7 @@ debug-test:
 
 debug-all:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=OFF -D BUILD_SHARED_LIBS=ON -D CMAKE_BUILD_TYPE="Debug" ../.. && $(MAKE)
+	cd build/debug && cmake -D BUILD_TESTS=OFF -D STATIC=OFF -D BUILD_SHARED_LIBS=ON -D CMAKE_BUILD_TYPE="Debug" -D BUILD_GUI_DEPS=OFF ../.. && $(MAKE)
 
 debug-static-all:
 	mkdir -p build/debug

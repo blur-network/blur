@@ -39,13 +39,11 @@
 
 // - apt-get install libdw-dev ...
 // - g++/clang++ -ldw ...
-//#define BACKWARD_HAS_DW 1
+#define BACKWARD_HAS_DW 1
 
 // - apt-get install binutils-dev ...
 // - g++/clang++ -lbfd ...
-#ifndef BACKWARD_HAS_BFD
-#define BACKWARD_HAS_BFD 1
-#endif
+//#define BACKWARD_HAS_BFD 1
 
 #include "backward.hpp"
 

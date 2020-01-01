@@ -122,7 +122,6 @@ install(TARGETS blockchain_import DESTINATION bin)
 monero_add_executable(blockchain_export
   ${blockchain_export_sources}
   ${blockchain_export_private_headers})
-
 target_link_libraries(blockchain_export
   PRIVATE
     cryptonote_core
@@ -166,7 +165,6 @@ install(TARGETS blockchain_blackball DESTINATION bin)
 monero_add_executable(blockchain_usage
   ${blockchain_usage_sources}
   ${blockchain_usage_private_headers})
-
 target_link_libraries(blockchain_usage
   PRIVATE
     cryptonote_core
