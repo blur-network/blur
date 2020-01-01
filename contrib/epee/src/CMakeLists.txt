@@ -28,7 +28,7 @@
 
 add_library(epee STATIC hex.cpp http_auth.cpp mlog.cpp net_utils_base.cpp string_tools.cpp wipeable_string.cpp memwipe.c
     connection_basic.cpp network_throttle.cpp network_throttle-detail.cpp mlocker.cpp)
-if (USE_READLINE AND GNU_READLINE_FOUND)
+if (USE_READLINE)
   add_library(epee_readline STATIC readline_buffer.cpp)
 endif()
 

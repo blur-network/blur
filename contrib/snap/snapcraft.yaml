@@ -37,8 +37,9 @@ parts:
         disable-parallel: true
         configflags:
             - -DCMAKE_BUILD_TYPE=Release
-            - -DMANUAL_SUBMODULES=1
             - -DBUILD_TESTS=OFF
+            - -DSTATIC=ON
+            - -DBUILD_SHARED_LIBS=OFF
         source: .
         build-packages:
             - gcc
@@ -49,6 +50,7 @@ parts:
             - git
             - libunwind-dev
             - libreadline-dev
+            - libtinfo5
         stage-packages:
             - libboost-date-time1.62.0
             - libboost-serialization1.62.0
@@ -64,8 +66,9 @@ parts:
             - libsodium18
             - libstdc++6
             - libgcc1
-            - libreadline-dev
+            - libreadline7
             - libunwind-dev
+            - libtinfo5
         prime:
             - bin
             - usr/lib/
