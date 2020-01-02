@@ -39,7 +39,6 @@ parts:
             - -DCMAKE_BUILD_TYPE=Release
             - -DBUILD_TESTS=OFF
             - -DSTATIC=ON
-            - -DBUILD_SHARED_LIBS=OFF
         source: .
         build-packages:
             - gcc
@@ -49,7 +48,7 @@ parts:
             - libsodium-dev
             - git
             - libunwind-dev
-            - libreadline-dev
+            - libreadline7
             - libtinfo5
         stage-packages:
             - libboost-date-time1.62.0
@@ -81,3 +80,6 @@ parts:
         organize:
             contrib/snap/blurd.conf: etc/blurd.conf
             contrib/snap/blurd-wrapper: bin/blurd-wrapper
+        prime:
+            - etc
+            - bin

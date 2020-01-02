@@ -69,7 +69,7 @@
 #include <boost/filesystem.hpp>
 #endif
 
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
 #include "readline_buffer.h"
 #endif
 
@@ -140,7 +140,7 @@ namespace
 
   std::string input_line(const std::string& prompt)
   {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
     rdln::suspend_readline pause_readline;
 #endif
     std::cout << prompt;
@@ -157,7 +157,7 @@ namespace
 
   boost::optional<tools::password_container> password_prompter(const char *prompt, bool verify)
   {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
     rdln::suspend_readline pause_readline;
 #endif
     auto pwd_container = tools::password_container::prompt(verify, prompt);
@@ -3679,16 +3679,13 @@ void simple_wallet::on_money_received(uint64_t height, const crypto::hash &txid,
     print_money(amount) << ", " <<
     tr("idx ") << subaddr_index;
 
-  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1 : m_wallet->nettype() == STAGENET ? 1 : 380000;
+  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1 : m_wallet->nettype() == STAGENET ? 1 : 1;
   if (height >= warn_height)
   {
     std::vector<tx_extra_field> tx_extra_fields;
     parse_tx_extra(tx.extra, tx_extra_fields); // failure ok
     tx_extra_nonce extra_nonce;
   }
-  if (m_auto_refresh_refreshing)
-    m_cmd_binder.print_prompt();
-  else
     m_refresh_progress_reporter.update(height, true);
 }
 //----------------------------------------------------------------------------------------------------
@@ -3704,9 +3701,6 @@ void simple_wallet::on_money_spent(uint64_t height, const crypto::hash &txid, co
     tr("txid ") << txid << ", " <<
     tr("spent ") << print_money(amount) << ", " <<
     tr("idx ") << subaddr_index;
-  if (m_auto_refresh_refreshing)
-    m_cmd_binder.print_prompt();
-  else
     m_refresh_progress_reporter.update(height, true);
 }
 //----------------------------------------------------------------------------------------------------
@@ -3724,7 +3718,7 @@ bool simple_wallet::refresh_main(uint64_t start_height, bool reset, bool is_init
   if (reset)
     m_wallet->rescan_blockchain(false);
 
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
   rdln::suspend_readline pause_readline;
 #endif
 

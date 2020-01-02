@@ -41,7 +41,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
   #include "readline_buffer.h"
 #endif
 
@@ -55,7 +55,7 @@ namespace epee
       , m_has_read_request(false)
       , m_read_status(state_init)
     {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
       m_readline_buffer.start();
 #endif
       m_reader_thread = boost::thread(std::bind(&async_stdin_reader::reader_thread_func, this));
@@ -64,10 +64,10 @@ namespace epee
     ~async_stdin_reader()
     {
       try { stop(); }
-      catch (...) { /* ignore */ }
+      catch (std::exception& e) { LOG_ERROR("Exception in async_stdin_reader destructor: \n"); LOG_ERROR(e.what()); }
     }
 
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
     rdln::readline_buffer& get_readline_buffer()
     {
       return m_readline_buffer;
@@ -116,7 +116,7 @@ namespace epee
 
         m_request_cv.notify_one();
         m_reader_thread.join();
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
         m_readline_buffer.stop();
 #endif
       }
@@ -204,14 +204,14 @@ namespace epee
 
         std::string line;
         bool read_ok = true;
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
 reread:
 #endif
         if (wait_stdin_data())
         {
           if (m_run.load(std::memory_order_relaxed))
           {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
             switch (m_readline_buffer.get_line(line))
             {
             case rdln::empty:   goto eof;
@@ -229,7 +229,7 @@ reread:
           read_ok = false;
         }
         if (std::cin.eof()) {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
 eof:
 #endif
           m_read_status = state_eos;
@@ -265,7 +265,7 @@ eof:
   private:
     boost::thread m_reader_thread;
     std::atomic<bool> m_run;
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
     rdln::readline_buffer m_readline_buffer;
 #endif
 
@@ -317,7 +317,7 @@ eof:
       std::string prompt = m_prompt();
       if (!prompt.empty())
       {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
         std::string color_prompt = "\001\033[1;33m\002" + prompt;
         if (' ' != prompt.back())
           color_prompt += " ";
@@ -380,7 +380,7 @@ eof:
           }
           else
           {
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
             rdln::suspend_readline pause_readline;
 #endif
             std::cout << "unknown command: " << command << std::endl;
@@ -510,7 +510,7 @@ eof:
       vt.first = hndlr;
       vt.second.first = description.empty() ? cmd : usage;
       vt.second.second = description.empty() ? usage : description;
-#ifdef HAVE_READLINE
+#ifdef EPEE_READLINE
       rdln::readline_buffer::add_completion(cmd);
 #endif
     }
