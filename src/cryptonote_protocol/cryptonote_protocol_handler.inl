@@ -1086,22 +1086,21 @@ namespace cryptonote
             }
             if(bvc.m_marked_as_orphaned)
             {
-              if (!m_p2p->for_connection(span_connection_id, [&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t f)->bool{
-                LOG_PRINT_CCONTEXT_L1("Block received at sync phase was marked as orphaned, dropping connection");
-                drop_connection(context, true, true);
-                return 1;
+              if (!m_p2p->for_connection(span_connection_id, [&context](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t f)->bool{
+                LOG_ERROR_CCONTEXT("Block received at sync phase was marked as orphaned!");
+                return true;
               }))
-                LOG_ERROR_CCONTEXT("span connection id not found");
-
-              if (!m_core.cleanup_handle_incoming_blocks())
+              
+              drop_connection(context, true, false);
+              
+  /*            if (!m_core.cleanup_handle_incoming_blocks())
               {
-                LOG_PRINT_CCONTEXT_L0("Failure in cleanup_handle_incoming_blocks");
+                LOG_ERROR_CCONTEXT("Failure in cleanup_handle_incoming_blocks");
                 return 1;
-              }
+              }*/
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
-              m_block_queue.remove_spans(span_connection_id, start_height);
-              return 1;
+              break;
             }
 
             TIME_MEASURE_FINISH(block_process_time);
