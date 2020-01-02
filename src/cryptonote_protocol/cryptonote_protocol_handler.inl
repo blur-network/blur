@@ -309,6 +309,7 @@ namespace cryptonote
       << " [Your node is " << abs_diff << " blocks (" << (abs(diff) / (24 * 60 * 60 / DIFFICULTY_TARGET))  << " days) "
       << (0 <= diff ? std::string("behind") : std::string("ahead"))
       << "] " << ENDL << "SYNCHRONIZATION started");
+    m_core.safesyncmode(false);
     }
     LOG_PRINT_L1("Remote blockchain height: " << hshd.current_height << ", id: " << hshd.top_id);
     context.m_state = cryptonote_connection_context::state_synchronizing;
@@ -970,10 +971,12 @@ namespace cryptonote
   int t_cryptonote_protocol_handler<t_core>::try_add_next_blocks(cryptonote_connection_context& context)
   {
     {
+//      m_sync_lock.lock(); 
       {
+        MDEBUG(context << " lock m_sync_lock, adding blocks to chain...");
         m_core.pause_mine();
         epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler(
-          boost::bind(&t_core::resume_mine, &m_core));
+        boost::bind(&t_core::resume_mine, &m_core));
 
       std::list<cryptonote::block_complete_entry> blocks;
         while (1)
@@ -1092,11 +1095,11 @@ namespace cryptonote
                 return true;
               }))
               
-  /*            if (!m_core.cleanup_handle_incoming_blocks())
+              if (!m_core.cleanup_handle_incoming_blocks())
               {
                 LOG_ERROR_CCONTEXT("Failure in cleanup_handle_incoming_blocks");
                 return 1;
-              }*/
+              }
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
               m_block_queue.remove_spans(span_connection_id, start_height);

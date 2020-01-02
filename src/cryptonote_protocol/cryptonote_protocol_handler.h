@@ -140,7 +140,6 @@ namespace cryptonote
     std::atomic<uint32_t> m_syncronized_connections_count;
     std::atomic<bool> m_synchronized;
     std::atomic<bool> m_stopping;
-    boost::mutex m_sync_lock;
     block_queue m_block_queue;
     epee::math_helper::once_a_time_seconds<30> m_idle_peer_kicker;
     boost::mutex m_buffer_mutex;
