@@ -503,9 +503,6 @@ namespace nodetool
       _note("Thread monitor number of peers - done");
     })); // lambda
 
-    // thread count was previously fetched using boost::thread::get_hardware_concurrency()..
-    // but that change adversely affected hashrate
-    // TODO: look into "why?"
     int thrds_count = 20;
 
     m_net_server.add_idle_handler(boost::bind(&node_server<t_payload_net_handler>::idle_worker, this), 1000);

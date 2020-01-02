@@ -406,6 +406,7 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   m_async_work_idle = std::unique_ptr < boost::asio::io_service::work > (new boost::asio::io_service::work(m_async_service));
   // we only need 1
   m_async_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_async_service));
+  m_async_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_async_service));
 
 #if defined(PER_BLOCK_CHECKPOINT)
   if (m_nettype != FAKECHAIN)
@@ -2612,9 +2613,9 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
   std::vector < uint64_t > results;
   results.resize(tx.vin.size(), 0);
 
-  tools::threadpool& tpool = tools::threadpool::getInstance();
+/*  tools::threadpool& tpool = tools::threadpool::getInstance();
   tools::threadpool::waiter waiter;
-  int threads = tpool.get_max_concurrency();
+  int threads = tpool.get_max_concurrency();*/
 
   for (const auto& txin : tx.vin)
   {
@@ -3136,6 +3137,8 @@ bool Blockchain::handle_block_to_main_chain(const block& bl, const crypto::hash&
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
   TIME_MEASURE_START(t1);
 
+  m_tx_pool.lock();
+
   static bool seen_future_version = false;
 
   m_db->block_txn_start(true);
@@ -3143,7 +3146,6 @@ bool Blockchain::handle_block_to_main_chain(const block& bl, const crypto::hash&
   {
     MERROR_VER("Block with id: " << id << std::endl << "has wrong prev_id: " << bl.prev_id << std::endl << "expected: " << get_tail_id());
     bvc.m_verifivation_failed = true;
-leave:
     m_db->block_txn_stop();
     return false;
   }
@@ -3165,7 +3167,8 @@ leave:
   {
     MERROR_VER("Block with id: " << id << std::endl << "has old version: " << (unsigned)bl.major_version << std::endl << "current: " << (unsigned)m_hardfork->get_current_version());
     bvc.m_verifivation_failed = true;
-    goto leave;
+    m_db->block_txn_stop();
+    return false;
   }
 
   TIME_MEASURE_FINISH(t1);
@@ -3177,7 +3180,8 @@ leave:
   {
     MERROR_VER("Block with id: " << id << std::endl << "has invalid timestamp: " << bl.timestamp);
     bvc.m_verifivation_failed = true;
-    goto leave;
+    m_db->block_txn_stop();
+    return false;
   }
 
   TIME_MEASURE_FINISH(t2);
@@ -3220,7 +3224,8 @@ leave:
       {
         MERROR_VER("Block with id is INVALID: " << id);
         bvc.m_verifivation_failed = true;
-        goto leave;
+        m_db->block_txn_stop();
+        return false;
       }
       fast_check = true;
     }
@@ -3246,7 +3251,8 @@ leave:
     {
       MERROR_VER("Block with id: " << id << std::endl << "does not have enough proof of work: " << proof_of_work << std::endl << "unexpected difficulty: " << current_diffic);
       bvc.m_verifivation_failed = true;
-      goto leave;
+      m_db->block_txn_stop();
+      return false;
     }
   }
 
@@ -3258,7 +3264,8 @@ leave:
     {
       LOG_ERROR("CHECKPOINT VALIDATION FAILED");
       bvc.m_verifivation_failed = true;
-      goto leave;
+      m_db->block_txn_stop();
+      return false;
     }
   }
 
@@ -3273,7 +3280,8 @@ leave:
   {
     MERROR_VER("Block with id: " << id << " failed to pass prevalidation");
     bvc.m_verifivation_failed = true;
-    goto leave;
+    m_db->block_txn_stop();
+    return false;
   }
 
   size_t coinbase_blob_size = get_object_blobsize(bl.miner_tx);
@@ -3309,7 +3317,8 @@ leave:
       MERROR("Block with id: " << id << " attempting to add transaction already in blockchain with id: " << tx_id);
       bvc.m_verifivation_failed = true;
       return_tx_to_pool(txs);
-      goto leave;
+      m_db->block_txn_stop();
+      return false;
     }
 
     TIME_MEASURE_FINISH(aa);
@@ -3322,7 +3331,8 @@ leave:
       MERROR_VER("Block with id: " << id  << " has at least one unknown transaction with id: " << tx_id);
       bvc.m_verifivation_failed = true;
       return_tx_to_pool(txs);
-      goto leave;
+      m_db->block_txn_stop();
+      return false;
     }
 
     TIME_MEASURE_FINISH(bb);
@@ -3365,7 +3375,8 @@ leave:
         MERROR_VER("Block with id " << id << " added as invalid because of wrong inputs in transactions");
         bvc.m_verifivation_failed = true;
         return_tx_to_pool(txs);
-        goto leave;
+        m_db->block_txn_stop();
+        return false;
       }
     }
 #if defined(PER_BLOCK_CHECKPOINT)
@@ -3381,7 +3392,8 @@ leave:
         MERROR_VER("Block with id " << id << " added as invalid because of wrong inputs in transactions");
         bvc.m_verifivation_failed = true;
         return_tx_to_pool(txs);
-        goto leave;
+        m_db->block_txn_stop();
+       return false;
       }
     }
 #endif
@@ -3401,7 +3413,8 @@ leave:
     MERROR_VER("Block with id: " << id << " has incorrect miner transaction");
     bvc.m_verifivation_failed = true;
     return_tx_to_pool(txs);
-    goto leave;
+    m_db->block_txn_stop();
+    return false;
   }
 
   TIME_MEASURE_FINISH(vmt);
@@ -3437,6 +3450,7 @@ leave:
       LOG_ERROR("Error adding block with hash: " << id << " to blockchain, what = " << e.what());
       bvc.m_verifivation_failed = true;
       return_tx_to_pool(txs);
+      m_db->block_txn_stop();
       return false;
     }
     catch (const std::exception& e)
@@ -3445,6 +3459,7 @@ leave:
       LOG_ERROR("Error adding block with hash: " << id << " to blockchain, what = " << e.what());
       bvc.m_verifivation_failed = true;
       return_tx_to_pool(txs);
+      m_db->block_txn_stop();
       return false;
     }
   }
@@ -3470,10 +3485,10 @@ leave:
 
   bvc.m_added_to_main_chain = true;
   ++m_sync_counter;
-
+   m_tx_pool.unlock();
   // appears to be a NOP *and* is called elsewhere.  wat?
-  m_tx_pool.on_blockchain_inc(new_height, id);
-
+//  m_tx_pool.on_blockchain_inc(new_height, id);
+  m_db->block_txn_stop();
   return true;
 }
 //------------------------------------------------------------------
@@ -3600,7 +3615,7 @@ void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block>
 //------------------------------------------------------------------
 bool Blockchain::cleanup_handle_incoming_blocks(bool force_sync)
 {
-  bool success = false;
+ // bool success = false;
 
   MTRACE("Blockchain::" << __func__);
   CRITICAL_REGION_BEGIN(m_blockchain_lock);
@@ -3609,14 +3624,14 @@ bool Blockchain::cleanup_handle_incoming_blocks(bool force_sync)
   try
   {
     m_db->batch_stop();
-    success = true;
+   // success = true;
   }
   catch (const std::exception &e)
   {
     MERROR("Exception in cleanup_handle_incoming_blocks: " << e.what());
   }
 
-  if (success && m_sync_counter > 0)
+/*  if (success && m_sync_counter > 0)
   {
     if (force_sync)
     {
@@ -3624,11 +3639,13 @@ bool Blockchain::cleanup_handle_incoming_blocks(bool force_sync)
         store_blockchain();
       m_sync_counter = 0;
     }
-    else if (m_db_blocks_per_sync && m_sync_counter >= m_db_blocks_per_sync)
-    {
+  }*/
+   // if (m_db_blocks_per_sync && m_sync_counter >= m_db_blocks_per_sync)
+   // {
       if(m_db_sync_mode == db_async)
       {
-        m_sync_counter = 0;
+        //m_sync_counter = 0;
+    //    m_async_pool.join_all();
         m_async_service.dispatch(boost::bind(&Blockchain::store_blockchain, this));
       }
       else if(m_db_sync_mode == db_sync)
@@ -3639,8 +3656,7 @@ bool Blockchain::cleanup_handle_incoming_blocks(bool force_sync)
       {
         // DO NOTHING, not required to call sync.
       }
-    }
-  }
+   // }
 
   TIME_MEASURE_FINISH(t1);
   m_blocks_longhash_table.clear();
@@ -3659,7 +3675,7 @@ bool Blockchain::cleanup_handle_incoming_blocks(bool force_sync)
   CRITICAL_REGION_END();
   m_tx_pool.unlock();
 
-  return success;
+  return true;
 }
 
 //------------------------------------------------------------------
@@ -3787,7 +3803,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
 {
   MTRACE("Blockchain::" << __func__);
   TIME_MEASURE_START(prepare);
-  bool stop_batch;
+//  bool stop_batch;
   uint64_t bytes = 0;
 
   // Order of locking must be:
@@ -3818,8 +3834,8 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
       bytes += tx_blob.size();
     }
   }
-  while (!(stop_batch = m_db->batch_start(blocks_entry.size(), bytes))) {
-    m_blockchain_lock.unlock();
+   m_db->batch_start(blocks_entry.size(), bytes);
+   /* m_blockchain_lock.unlock();
     m_tx_pool.unlock();
     epee::misc_utils::sleep_no_w(1000);
     m_tx_pool.lock();
@@ -3922,16 +3938,16 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
       }
     }
   }
-
+*/
   if (m_cancel)
     return false;
-
+/*
   if (blocks_exist)
   {
     MDEBUG("Skipping prepare blocks. Blocks exist.");
     return true;
   }
-
+*/
   m_fake_scan_time = 0;
   m_fake_pow_calc_time = 0;
 
@@ -3941,7 +3957,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
   TIME_MEASURE_FINISH(prepare);
   m_fake_pow_calc_time = prepare / blocks_entry.size();
 
-  if (blocks_entry.size() > 1 && threads > 1 && m_show_time_stats)
+  if (blocks_entry.size() > 1 && m_show_time_stats)
     MDEBUG("Prepare blocks took: " << prepare << " ms");
 
   TIME_MEASURE_START(scantable);
@@ -4035,7 +4051,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
   // [output] stores all transactions for each tx_out_index::hash found
   std::vector<std::unordered_map<crypto::hash, cryptonote::transaction>> transactions(amounts.size());
 
-  threads = tpool.get_max_concurrency();
+  /*threads = tpool.get_max_concurrency();
   if (!m_db->can_thread_bulk_indices())
     threads = 1;
 
@@ -4051,13 +4067,13 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
     waiter.wait();
   }
   else
-  {
+  {*/
     for (size_t i = 0; i < amounts.size(); i++)
     {
       uint64_t amount = amounts[i];
       output_scan_worker(amount, offset_map[amount], tx_map[amount], transactions[i]);
     }
-  }
+ // }
 
   int total_txs = 0;
 
@@ -4180,14 +4196,14 @@ void Blockchain::set_user_options(uint64_t maxthreads, uint64_t blocks_per_sync,
 
 void Blockchain::safesyncmode(const bool onoff)
 {
-  /* all of this is no-op'd if the user set a specific
+/*   all of this is no-op'd if the user set a specific
    * --db-sync-mode at startup.
-   */
+
   if (m_db_default_sync)
   {
     m_db->safesyncmode(onoff);
     m_db_sync_mode = onoff ? db_nosync : db_async;
-  }
+  }*/
 }
 
 HardFork::State Blockchain::get_hard_fork_state() const

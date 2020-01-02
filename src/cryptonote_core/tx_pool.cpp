@@ -1171,10 +1171,10 @@ namespace cryptonote
         LOG_PRINT_L1("Transaction " << txid << " is too big (" << meta.blob_size << " bytes), removing it from pool");
         remove.insert(txid);
       }
-      else if (m_blockchain.have_tx(txid)) {
+      /*else if (m_blockchain.have_tx(txid)) {
         LOG_PRINT_L1("Transaction " << txid << " is in the blockchain, removing it from pool");
         remove.insert(txid);
-      }
+      }*/
       return true;
     }, false);
 

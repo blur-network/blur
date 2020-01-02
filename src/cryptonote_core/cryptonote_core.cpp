@@ -675,11 +675,11 @@ namespace cryptonote
         LOG_PRINT_L2("tx " << results[i].hash << "already have transaction in tx_pool");
         already_have[i] = true;
       }
-      else if(m_blockchain_storage.have_tx(results[i].hash))
+/*      else if(m_blockchain_storage.have_tx(results[i].hash))
       {
         LOG_PRINT_L2("tx " << results[i].hash << " already have transaction in blockchain");
         already_have[i] = true;
-      }
+      }*/
       else
       {
         m_threadpool.submit(&waiter, [&, i, it] {
@@ -957,11 +957,11 @@ namespace cryptonote
       return true;
     }
 
-    if(m_blockchain_storage.have_tx(tx_hash))
+/*    if(m_blockchain_storage.have_tx(tx_hash))
     {
       LOG_PRINT_L2("tx " << tx_hash << " already have transaction in blockchain");
       return true;
-    }
+    }*/
 
     uint8_t version = m_blockchain_storage.get_current_hard_fork_version();
     return m_mempool.add_tx(tx, tx_prefix_hash, tx_hash, blob_size, tvc, keeped_by_block, relayed, do_not_relay, version);
