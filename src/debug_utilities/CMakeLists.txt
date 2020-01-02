@@ -64,7 +64,8 @@ target_link_libraries(object_sizes
     blockchain_db
     p2p
     epee
-    ${CMAKE_THREAD_LIBS_INIT})
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES})
 
 set_property(TARGET object_sizes
 	PROPERTY
