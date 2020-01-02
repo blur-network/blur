@@ -28,16 +28,18 @@
 
 set(cryptonote_protocol_sources
   block_queue.cpp
-  cryptonote_protocol_handler-base.cpp)
+  cryptonote_protocol_handler-base.cpp
+  cryptonote_protocol_handler.inl
+)
 
 set(cryptonote_protocol_headers)
 
 set(cryptonote_protocol_private_headers
   block_queue.h
   cryptonote_protocol_defs.h
-  cryptonote_protocol_handler.inl
   cryptonote_protocol_handler.h
-  cryptonote_protocol_handler_common.h)
+  cryptonote_protocol_handler_common.h
+  sync_lock.h)
 
 monero_private_headers(cryptonote_protocol
   ${cryptonote_protocol_private_headers})

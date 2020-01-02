@@ -96,6 +96,4 @@ namespace cryptonote
     block_map blocks;
     mutable boost::recursive_mutex mutex;
   };
-  boost::unique_lock<boost::recursive_mutex> m_sync_lock;
-
 }

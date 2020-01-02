@@ -1,7 +1,4 @@
-/// @file
-/// @author rfree (current maintainer/user in monero.cc project - most of code is from CryptoNote)
-/// @brief This is the original cryptonote protocol network-events handler, modified by us
-
+// Copyright (c) 2018-2020, Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 //
@@ -971,9 +968,7 @@ namespace cryptonote
   int t_cryptonote_protocol_handler<t_core>::try_add_next_blocks(cryptonote_connection_context& context)
   {
     {
-//      m_sync_lock.lock(); 
       {
-        MDEBUG(context << " lock m_sync_lock, adding blocks to chain...");
         m_core.pause_mine();
         epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler(
         boost::bind(&t_core::resume_mine, &m_core));
