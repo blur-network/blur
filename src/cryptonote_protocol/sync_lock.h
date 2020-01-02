@@ -28,4 +28,5 @@
 
 #pragma once
 
-boost::unique_lock<boost::recursive_mutex> m_sync_lock;
+boost::recursive_mutex sync_mutex;
+boost::unique_lock<boost::recursive_mutex> m_sync_lock(sync_mutex);

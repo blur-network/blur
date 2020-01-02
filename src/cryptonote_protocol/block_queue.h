@@ -94,6 +94,5 @@ namespace cryptonote
 
   private:
     block_map blocks;
-    mutable boost::recursive_mutex mutex;
   };
 }
