@@ -255,13 +255,13 @@ namespace
 
   const struct
   {
-    const char *name;
+    char const* name;
     tools::wallet2::RefreshType refresh_type;
   } refresh_type_names[] =
   {
     { "full", tools::wallet2::RefreshFull },
     { "no-coinbase", tools::wallet2::RefreshNoCoinbase },
-    { "default", tools::wallet2::RefreshDefault },
+    { "default", tools::wallet2::RefreshDefault }
   };
 
   bool parse_refresh_type(const std::string &s, tools::wallet2::RefreshType &refresh_type)
