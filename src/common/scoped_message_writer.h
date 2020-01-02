@@ -31,7 +31,7 @@
 #include "misc_log_ex.h"
 #include <iostream>
 
-#ifdef EPEE_READLINE
+#ifdef USE_READLINE
   #include "readline_buffer.h"
   #define PAUSE_READLINE() \
     rdln::suspend_readline pause_readline; 

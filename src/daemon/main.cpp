@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
         {
           login = tools::login::parse(
             command_line::get_arg(vm, arg.rpc_login), false, [](bool verify) {
-#ifdef EPEE_READLINE
+#ifdef USE_READLINE
         rdln::suspend_readline pause_readline;
 #endif
               return tools::password_container::prompt(verify, "Daemon client password");
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-#ifdef EPEE_READLINE
+#ifdef USE_READLINE
           rdln::suspend_readline pause_readline;
 #endif
           std::cerr << "Unknown command: " << command.front() << std::endl;

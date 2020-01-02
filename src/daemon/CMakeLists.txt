@@ -57,21 +57,21 @@ set(daemon_private_headers
   p2p.h
   protocol.h
   rpc.h
-  rpc_command_executor.h
+  rpc_command_executor.h)
 
   # cryptonote_protocol
-  ../cryptonote_protocol/cryptonote_protocol_defs.h
-  ../cryptonote_protocol/cryptonote_protocol_handler.h
-  ../cryptonote_protocol/cryptonote_protocol_handler.inl
-  ../cryptonote_protocol/cryptonote_protocol_handler_common.h
+#  ../cryptonote_protocol/cryptonote_protocol_defs.h
+#  ../cryptonote_protocol/cryptonote_protocol_handler.h
+#  ../cryptonote_protocol/cryptonote_protocol_handler.inl
+#  ../cryptonote_protocol/cryptonote_protocol_handler_common.h
 
   # p2p
-  ../p2p/net_node.h
-  ../p2p/net_node_common.h
-  ../p2p/net_peerlist.h
-  ../p2p/net_peerlist_boost_serialization.h
-  ../p2p/p2p_protocol_defs.h
-  ../p2p/stdafx.h)
+#  ../p2p/net_node.h
+#  ../p2p/net_node_common.h
+#  ../p2p/net_peerlist.h
+#  ../p2p/net_peerlist_boost_serialization.h
+#  ../p2p/p2p_protocol_defs.h
+#  ../p2p/stdafx.h)
 
 monero_private_headers(daemon
   ${daemon_private_headers})
@@ -104,7 +104,7 @@ target_link_libraries(daemon
     ${Boost_REGEX_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${GNU_READLINE_LIBRARY}
+    ${READLINE_LIBRARIES}
     ${SODIUM_LIBRARY}
     ${EXTRA_LIBRARIES})
 else()
@@ -134,7 +134,7 @@ target_link_libraries(daemon
     ${Boost_REGEX_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${GNU_READLINE_LIBRARY}
+    ${READLINE_LIBRARIES}
     ${SODIUM_LIBRARY}
     ${EXTRA_LIBRARIES})
 endif()

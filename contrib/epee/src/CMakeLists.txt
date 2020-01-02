@@ -26,11 +26,21 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-add_library(epee STATIC hex.cpp http_auth.cpp mlog.cpp net_utils_base.cpp string_tools.cpp wipeable_string.cpp memwipe.c
-    connection_basic.cpp network_throttle.cpp network_throttle-detail.cpp mlocker.cpp)
-#if (USE_READLINE)
-  add_library(epee_readline STATIC readline_buffer.cpp)
-#endif()
+
+if(STATIC)
+  add_library(epee STATIC hex.cpp http_auth.cpp mlog.cpp net_utils_base.cpp string_tools.cpp wipeable_string.cpp memwipe.c connection_basic.cpp network_throttle.cpp network_throttle-detail.cpp mlocker.cpp)
+else()
+  add_library(epee SHARED hex.cpp http_auth.cpp mlog.cpp net_utils_base.cpp string_tools.cpp wipeable_string.cpp memwipe.c connection_basic.cpp network_throttle.cpp network_throttle-detail.cpp mlocker.cpp)
+endif()
+
+if(USE_READLINE)
+  if (STATIC)
+    add_library(epee_readline STATIC readline_buffer.cpp)
+  else()
+    add_library(epee_readline SHARED readline_buffer.cpp)
+  endif()
+  set(EPEE_READLINE epee_readline)
+endif()
 
 if(HAVE_C11)
 SET_PROPERTY(SOURCE memwipe.c PROPERTY COMPILE_FLAGS -std=c11)
@@ -61,10 +71,10 @@ target_link_libraries(epee
     ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 
-#if (USE_READLINE)
+if (USE_READLINE)
   target_link_libraries(epee_readline
     PUBLIC
       easylogging
     PRIVATE
     ${READLINE_LIBRARIES})
-#endif()
+endif()
