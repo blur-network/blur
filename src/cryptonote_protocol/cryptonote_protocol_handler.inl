@@ -306,7 +306,7 @@ namespace cryptonote
       << " [Your node is " << abs_diff << " blocks (" << (abs(diff) / (24 * 60 * 60 / DIFFICULTY_TARGET))  << " days) "
       << (0 <= diff ? std::string("behind") : std::string("ahead"))
       << "] " << ENDL << "SYNCHRONIZATION started");
-    m_core.safesyncmode(false);
+//    m_core.safesyncmode(false);
     }
     LOG_PRINT_L1("Remote blockchain height: " << hshd.current_height << ", id: " << hshd.top_id);
     context.m_state = cryptonote_connection_context::state_synchronizing;
@@ -952,15 +952,12 @@ namespace cryptonote
       const boost::posix_time::time_duration dt = now - context.m_last_request_time;
       const float rate = size * 1e6 / (dt.total_microseconds() + 1);
       MDEBUG(context << " adding span: " << arg.blocks.size() << " at height " << start_height << ", " << dt.total_microseconds()/1e6 << " seconds, " << (rate/1e3) << " kB/s, size now " << (m_block_queue.get_data_size() + blocks_size) / 1048576.f << " MB");
-      m_block_queue.add_blocks(start_height, arg.blocks, context.m_connection_id, rate, blocks_size);
+      if (m_block_queue.add_blocks(start_height, arg.blocks, context.m_connection_id, rate, blocks_size)) {
 
-      context.m_last_known_hash = last_block_hash;
-
-      if (!m_core.get_test_drop_download() || !m_core.get_test_drop_download_height()) { // DISCARD BLOCKS for testing
-        return 1;
+        context.m_last_known_hash = last_block_hash;
+        try_add_next_blocks(context);
       }
     }
-    try_add_next_blocks(context);
     return 1;
   }
 
@@ -971,7 +968,7 @@ namespace cryptonote
       {
         m_core.pause_mine();
         epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler(
-        boost::bind(&t_core::resume_mine, &m_core));
+          boost::bind(&t_core::resume_mine, &m_core));
 
       std::list<cryptonote::block_complete_entry> blocks;
         while (1)
@@ -1098,7 +1095,7 @@ namespace cryptonote
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
               m_block_queue.remove_spans(span_connection_id, start_height);
-              break;
+              return 1;
             }
 
             TIME_MEASURE_FINISH(block_process_time);
@@ -1113,8 +1110,8 @@ namespace cryptonote
             LOG_PRINT_CCONTEXT_L0("Failure in cleanup_handle_incoming_blocks");
             return 1;
           }
-
-          m_block_queue.remove_spans(span_connection_id, start_height);
+         // const boost::posix_time::ptime add_time = boost::posix_time::microsec_clock::universal_time();
+         // m_block_queue.add_blocks(start_height, blocks.size(), context.m_connection_id, add_time);
 
           if (m_core.get_current_blockchain_height() > previous_height)
           {
@@ -1128,6 +1125,10 @@ namespace cryptonote
               timing_message += std::string(": ") + m_block_queue.get_overview();
             MGINFO_YELLOW(context << " Synced " << m_core.get_current_blockchain_height() << "/" << m_core.get_target_blockchain_height()
                 << timing_message);
+            if (!request_missing_objects(context, true))
+            {
+              LOG_ERROR_CCONTEXT("Failed to request missing objects, dropping connection");
+            }
           }
         }
       }
@@ -1139,10 +1140,6 @@ namespace cryptonote
       }
     }
 
-    if (!request_missing_objects(context, true))
-    {
-      LOG_ERROR_CCONTEXT("Failed to request missing objects, dropping connection");
-    }
     return 1;
   }
   //------------------------------------------------------------------------------------------------------------------------
@@ -1359,7 +1356,6 @@ namespace cryptonote
           MERROR(context << " ERROR: inconsistent context: lrh " << context.m_last_response_height << ", nos " << context.m_needed_objects.size());
           context.m_needed_objects.clear();
           context.m_last_response_height = 0;
-          goto skip;
         }
         // take out blocks we already have
         while (!context.m_needed_objects.empty() && m_core.have_block(context.m_needed_objects.front()))
@@ -1437,7 +1433,6 @@ namespace cryptonote
       }
     }
 
-skip:
     context.m_needed_objects.clear();
     if(context.m_last_response_height < context.m_remote_blockchain_height-1)
     {//we have to fetch more objects ids, request blockchain entry

@@ -67,7 +67,9 @@ namespace cryptonote
     typedef std::set<span> block_map;
 
   public:
-    void add_blocks(uint64_t height, std::list<cryptonote::block_complete_entry> bcel, const boost::uuids::uuid &connection_id, float rate, size_t size);
+    bool acquire_lock(boost::unique_lock<boost::mutex>& mu);
+    void unlock(boost::unique_lock<boost::mutex>& mu);
+    bool add_blocks(uint64_t height, std::list<cryptonote::block_complete_entry> bcel, const boost::uuids::uuid &connection_id, float rate, size_t size);
     void add_blocks(uint64_t height, uint64_t nblocks, const boost::uuids::uuid &connection_id, boost::posix_time::ptime time = boost::date_time::min_date_time);
     void flush_spans(const boost::uuids::uuid &connection_id, bool all = false);
     void flush_stale_spans(const std::set<boost::uuids::uuid> &live_connections);
@@ -91,7 +93,7 @@ namespace cryptonote
     float get_speed(const boost::uuids::uuid &connection_id) const;
     bool foreach(std::function<bool(const span&)> f, bool include_blockchain_placeholder = false) const;
     bool requested(const crypto::hash &hash) const;
-
+    mutable boost::mutex m_sync_mutex;
   private:
     block_map blocks;
   };

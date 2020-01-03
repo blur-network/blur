@@ -52,39 +52,48 @@ function (monero_install_headers subdir)
     COMPONENT   development)
 endfunction ()
 
-function (monero_add_executable name)
-  source_group("${name}"
-    FILES
-      ${ARGN})
-
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
-  add_executable("${name}"
-    ${ARGN}
-    ${BACKWARD_ENABLE})
-  add_backward("${name}")
-  add_dependencies("${name}" check_git_repository)
-  target_link_libraries("${name}"
-    PRIVATE
-      ${EXTRA_LIBRARIES}
-      ${BACKWARD_LIBRARIES}
-    PUBLIC
-      Backward::Backward)
+  function (monero_add_executable name)
+    source_group("${name}"
+      FILES
+        ${ARGN}
+        ${BACKWARD_ENABLE})
+    add_executable("${name}"
+      ${ARGN})
+    add_backward("${name}")
+    add_dependencies("${name}" check_git_repository)
+    target_link_libraries("${name}"
+      PRIVATE
+        ${EXTRA_LIBRARIES}
+        ${BACKWARD_LIBRARIES}
+      PUBLIC
+        Backward::Backward)
+    set_property(TARGET "${name}"
+      PROPERTY
+        FOLDER "prog")
+    set_property(TARGET "${name}"
+      PROPERTY
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+  endfunction ()
 else()
-  add_executable("${name}"
-    ${ARGN})
-  add_dependencies("${name}" check_git_repository)
-  target_link_libraries("${name}"
-    PRIVATE
-      ${EXTRA_LIBRARIES})
+  function (monero_add_executable name)
+    source_group("${name}"
+      FILES
+        ${ARGN})
+    add_executable("${name}"
+      ${ARGN})
+    add_dependencies("${name}" check_git_repository)
+    target_link_libraries("${name}"
+      PRIVATE
+        ${EXTRA_LIBRARIES})
+    set_property(TARGET "${name}"
+      PROPERTY
+        FOLDER "prog")
+    set_property(TARGET "${name}"
+      PROPERTY
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+  endfunction ()
 endif()
-
-  set_property(TARGET "${name}"
-    PROPERTY
-      FOLDER "prog")
-  set_property(TARGET "${name}"
-    PROPERTY
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-endfunction ()
 
 function (monero_add_library name)
     monero_add_library_with_deps(NAME "${name}" SOURCES ${ARGN})
