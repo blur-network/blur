@@ -436,7 +436,7 @@ struct Wallet
      * \param daemon_password
      * \return  - true on success
      */
-    virtual bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "", bool use_ssl = false) = 0;
+    virtual bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "") = 0;
 
    /*!
     * \brief createWatchOnly - Creates a watch only wallet

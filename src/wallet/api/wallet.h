@@ -95,7 +95,7 @@ public:
     bool store(const std::string &path);
     std::string filename() const;
     std::string keysFilename() const;
-    bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "", bool use_ssl = false);
+    bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "");
     bool connectToDaemon();
     ConnectionStatus connected() const;
     void setTrustedDaemon(bool arg);
@@ -178,7 +178,7 @@ private:
     bool daemonSynced() const;
     void stopRefresh();
     bool isNewWallet() const;
-    bool doInit(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, bool ssl = false);
+    bool doInit(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0);
 
 private:
     friend class PendingTransactionImpl;

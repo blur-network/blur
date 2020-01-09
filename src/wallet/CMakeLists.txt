@@ -93,7 +93,6 @@ target_link_libraries(wallet_rpc_server
     mnemonics
     cncrypto
     common
-    ${OPENSSL_LIBRARIES}
     ${Boost_CHRONO_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}

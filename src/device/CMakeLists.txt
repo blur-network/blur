@@ -68,7 +68,6 @@ target_link_libraries(device
     ${PCSC_LIBRARIES}
     cncrypto
     ringct_basic
-    ${OPENSSL_CRYPTO_LIBRARIES}
     ${Boost_SERIALIZATION_LIBRARY}
   PRIVATE
     ${Blocks}

@@ -51,7 +51,6 @@ target_link_libraries(simplewallet
     mnemonics
     ${EPEE_READLINE}
     ${READLINE_LIBRARIES}
-    ${OPENSSL_LIBRARIES}
     ${Boost_CHRONO_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}

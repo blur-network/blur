@@ -744,7 +744,7 @@ std::unique_ptr<wallet2> wallet2::make_dummy(const boost::program_options::varia
 }
 
 //----------------------------------------------------------------------------------------------------
-bool wallet2::init(std::string daemon_address, boost::optional<epee::net_utils::http::login> daemon_login, uint64_t upper_transaction_size_limit, bool ssl)
+bool wallet2::init(std::string daemon_address, boost::optional<epee::net_utils::http::login> daemon_login, uint64_t upper_transaction_size_limit)
 {
   m_checkpoints.init_default_checkpoints(m_nettype);
   if(m_http_client.is_connected())
@@ -754,7 +754,7 @@ bool wallet2::init(std::string daemon_address, boost::optional<epee::net_utils::
   m_daemon_address = std::move(daemon_address);
   m_daemon_login = std::move(daemon_login);
   // When switching from light wallet to full wallet, we need to reset the height we got from lw node.
-  return m_http_client.set_server(get_daemon_address(), get_daemon_login(), ssl);
+  return m_http_client.set_server(get_daemon_address(), get_daemon_login());
 }
 //----------------------------------------------------------------------------------------------------
 bool wallet2::is_deterministic() const

@@ -106,7 +106,6 @@ target_link_libraries(daemon
     ${CMAKE_THREAD_LIBS_INIT}
     ${READLINE_LIBRARIES}
     ${SODIUM_LIBRARY}
-    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 else()
 monero_add_executable(daemon

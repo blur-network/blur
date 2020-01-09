@@ -39,7 +39,6 @@ target_link_libraries(gen_multisig
     cncrypto
     common
     epee
-    ${OPENSSL_LIBRARIES}
     ${EPEE_READLINE}
     ${READLINE_LIBRARIES} 
     ${Boost_CHRONO_LIBRARY}
