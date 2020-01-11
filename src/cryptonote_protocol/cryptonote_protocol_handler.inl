@@ -925,14 +925,6 @@ namespace cryptonote
       block_hashes.push_back(block_hash);
     }
 
-/*    if(context.m_requested_objects.size())
-    {
-      MERROR("returned not all requested objects (context.m_requested_objects.size()="
-        << context.m_requested_objects.size() << "), dropping connection");
-      drop_connection(context, false, false);
-      return 1;
-    }*/
-
     // get the last parsed block, which should be the highest one
     const crypto::hash last_block_hash = cryptonote::get_block_hash(b);
     if(m_core.have_block(last_block_hash))
@@ -955,12 +947,9 @@ namespace cryptonote
       m_block_queue.add_blocks(start_height, arg.blocks, context.m_connection_id, rate, blocks_size);
 
       context.m_last_known_hash = last_block_hash;
+      try_add_next_blocks(context);
 
-      if (!m_core.get_test_drop_download() || !m_core.get_test_drop_download_height()) { // DISCARD BLOCKS for testing
-        return 1;
-      }
     }
-    try_add_next_blocks(context);
     return 1;
   }
 
@@ -1090,15 +1079,15 @@ namespace cryptonote
                 return true;
               }))
               
-  /*            if (!m_core.cleanup_handle_incoming_blocks())
+              if (!m_core.cleanup_handle_incoming_blocks())
               {
                 LOG_ERROR_CCONTEXT("Failure in cleanup_handle_incoming_blocks");
                 return 1;
-              }*/
+              }
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
               m_block_queue.remove_spans(span_connection_id, start_height);
-              break;
+              return 1;
             }
 
             TIME_MEASURE_FINISH(block_process_time);
@@ -1128,6 +1117,10 @@ namespace cryptonote
               timing_message += std::string(": ") + m_block_queue.get_overview();
             MGINFO_YELLOW(context << " Synced " << m_core.get_current_blockchain_height() << "/" << m_core.get_target_blockchain_height()
                 << timing_message);
+            if (!request_missing_objects(context, true))
+            {
+               LOG_ERROR_CCONTEXT("Failed to request missing objects, dropping connection");
+            }
           }
         }
       }
@@ -1342,7 +1335,6 @@ namespace cryptonote
           MERROR(context << " ERROR: inconsistent context: lrh " << context.m_last_response_height << ", nos " << context.m_needed_objects.size());
           context.m_needed_objects.clear();
           context.m_last_response_height = 0;
-          goto skip;
         }
         // take out blocks we already have
         while (!context.m_needed_objects.empty() && m_core.have_block(context.m_needed_objects.front()))
@@ -1420,7 +1412,6 @@ namespace cryptonote
       }
     }
 
-skip:
     context.m_needed_objects.clear();
     if(context.m_last_response_height < context.m_remote_blockchain_height-1)
     {//we have to fetch more objects ids, request blockchain entry
