@@ -64,11 +64,15 @@ namespace cryptonote
 
   //-----------------------------------------------------------------------------------------------------------------------
   template<class t_core>
-    t_cryptonote_protocol_handler<t_core>::t_cryptonote_protocol_handler(t_core& rcore, nodetool::i_p2p_endpoint<connection_context>* p_net_layout, bool offline):m_core(rcore),
-                                                                                                              m_p2p(p_net_layout),
-                                                                                                              m_syncronized_connections_count(0),
-                                                                                                              m_synchronized(offline),
-                                                                                                              m_stopping(false)
+    t_cryptonote_protocol_handler<t_core>::t_cryptonote_protocol_handler(
+       t_core& rcore,
+       nodetool::i_p2p_endpoint<connection_context>* p_net_layout,
+       bool offline):
+       m_core(rcore),
+       m_p2p(p_net_layout),
+       m_syncronized_connections_count(0),
+       m_synchronized(offline),
+       m_stopping(false)
 
   {
     if(!m_p2p)
@@ -164,7 +168,7 @@ namespace cryptonote
         << std::setw(10) << std::fixed << (connection_time == 0 ? 0.0 : cntxt.m_send_cnt / connection_time / 1024)
         << std::setw(13) << std::fixed << cntxt.m_current_speed_up / 1024
         << (local_ip ? "[LAN]" : "")
-        << std::left << (cntxt.m_remote_address.is_loopback() ? "[LOCALHOST]" : "") // 127.0.0.1
+        << std::left << (cntxt.m_remote_address.is_loopback() ? "[LOCALHOST]" : "")  /*127.0.0.1*/
         << ENDL;
 
       if (connection_time > 1)
@@ -262,12 +266,6 @@ namespace cryptonote
   template<class t_core>
   bool t_cryptonote_protocol_handler<t_core>::process_payload_sync_data(const CORE_SYNC_DATA& hshd, cryptonote_connection_context& context, bool is_inital)
   {
-    if(context.m_state == cryptonote_connection_context::state_before_handshake && !is_inital)
-      return true;
-
-    if(context.m_state == cryptonote_connection_context::state_synchronizing)
-      return true;
-
     // from v6, if the peer advertises a top block version, reject if it's not what it should be (will only work if no voting)
     if (hshd.current_height > 0)
     {
@@ -927,13 +925,13 @@ namespace cryptonote
       block_hashes.push_back(block_hash);
     }
 
-    if(context.m_requested_objects.size())
+/*    if(context.m_requested_objects.size())
     {
       MERROR("returned not all requested objects (context.m_requested_objects.size()="
         << context.m_requested_objects.size() << "), dropping connection");
       drop_connection(context, false, false);
       return 1;
-    }
+    }*/
 
     // get the last parsed block, which should be the highest one
     const crypto::hash last_block_hash = cryptonote::get_block_hash(b);
@@ -1160,22 +1158,6 @@ namespace cryptonote
   {
     MTRACE("Checking for idle peers...");
     std::vector<boost::uuids::uuid> kick_connections;
-    m_p2p->for_each_connection([&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t support_flags)->bool
-    {
-      if (context.m_state == cryptonote_connection_context::state_synchronizing || context.m_state == cryptonote_connection_context::state_before_handshake)
-      {
-        const bool passive = context.m_state == cryptonote_connection_context::state_before_handshake;
-        const boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
-        const boost::posix_time::time_duration dt = now - context.m_last_request_time;
-        const int64_t threshold = passive ? PASSIVE_PEER_KICK_TIME : IDLE_PEER_KICK_TIME;
-        if (dt.total_microseconds() > threshold)
-        {
-          MINFO(context << " kicking " << (passive ? "passive" : "idle") << " peer");
-          kick_connections.push_back(context.m_connection_id);
-        }
-      }
-      return true;
-    });
     for (const boost::uuids::uuid &conn_id: kick_connections)
     {
       m_p2p->for_connection(conn_id, [this](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t support_flags) {
@@ -1275,7 +1257,6 @@ namespace cryptonote
       return true;
     });
     m_block_queue.flush_stale_spans(live_connections);
-
    bool first = true;
       while (1)
       {
