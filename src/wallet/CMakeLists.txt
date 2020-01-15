@@ -64,6 +64,7 @@ target_link_libraries(wallet
     ${Boost_SERIALIZATION_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
+    ${OPENSSL_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
     ${EXTRA_LIBRARIES})
@@ -98,6 +99,7 @@ target_link_libraries(wallet_rpc_server
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 set_property(TARGET wallet_rpc_server
   PROPERTY

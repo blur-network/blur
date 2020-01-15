@@ -41,6 +41,7 @@ target_link_libraries(core_proxy
     cryptonote_protocol
     p2p
     epee
+    ${OPENSSL_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${EXTRA_LIBRARIES})
 set_property(TARGET core_proxy

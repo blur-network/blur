@@ -104,6 +104,7 @@ target_link_libraries(daemon
     ${Boost_REGEX_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${READLINE_LIBRARIES}
     ${SODIUM_LIBRARY}
     ${EXTRA_LIBRARIES})
@@ -135,6 +136,7 @@ target_link_libraries(daemon
     ${Boost_SYSTEM_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
     ${READLINE_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
     ${SODIUM_LIBRARY}
     ${EXTRA_LIBRARIES})
 endif()

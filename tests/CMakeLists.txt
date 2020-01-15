@@ -67,7 +67,7 @@ else ()
   # Emulate the FindGTest module's variable.
   set(GTEST_LIBRARIES gtest gtest_main)
   include_directories(SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/gtest/include")
-endif (GTest_FOUND)
+endif()
 
 file(COPY
   data/wallet_9svHk1.keys

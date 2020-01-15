@@ -52,6 +52,7 @@ target_link_libraries(libwallet_api_tests
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_LOCALE_LIBRARY}
     ${ICU_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
     ${GTEST_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${EXTRA_LIBRARIES})

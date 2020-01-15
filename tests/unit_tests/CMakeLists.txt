@@ -85,6 +85,7 @@ target_link_libraries(unit_tests
     ${Boost_CHRONO_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${GTEST_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${EXTRA_LIBRARIES})
 set_property(TARGET unit_tests

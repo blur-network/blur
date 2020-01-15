@@ -59,6 +59,7 @@ target_link_libraries(mnemonics
   PUBLIC
     epee
     easylogging
+    ${OPENSSL_LIBRARIES}
     ${Boost_SYSTEM_LIBRARY}
   PRIVATE
     ${EXTRA_LIBRARIES})
