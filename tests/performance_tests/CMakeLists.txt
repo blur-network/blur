@@ -61,6 +61,7 @@ target_link_libraries(performance_tests
     epee
     ${Boost_CHRONO_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 set_property(TARGET performance_tests
   PROPERTY

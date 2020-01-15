@@ -71,6 +71,7 @@ target_link_libraries(core_tests
     epee
     device
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 set_property(TARGET core_tests
   PROPERTY

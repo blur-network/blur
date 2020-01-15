@@ -48,6 +48,7 @@ target_link_libraries(functional_tests
     ${Boost_REGEX_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 set_property(TARGET functional_tests
   PROPERTY
