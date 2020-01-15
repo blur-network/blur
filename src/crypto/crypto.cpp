@@ -70,8 +70,10 @@ namespace crypto {
 #include "random.h"
   }
 
-  const crypto::public_key null_pkey = crypto::public_key{};
-  const crypto::secret_key null_skey = crypto::secret_key{};
+  unsigned char const np[32] = { 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254 };
+  unsigned char const ns[32] = { 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254 };
+  crypto::public_key const null_pkey = *reinterpret_cast<const public_key*>(np);
+  crypto::secret_key const null_skey = *reinterpret_cast<const secret_key*>(ns);
 
   static inline unsigned char *operator &(ec_point &point) {
     return &reinterpret_cast<unsigned char &>(point);

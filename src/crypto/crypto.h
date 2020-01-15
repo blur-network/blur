@@ -278,8 +278,8 @@ namespace crypto {
     epee::to_hex::formatted(o, epee::as_byte_span(v)); return o;
   }
 
-  const extern crypto::public_key null_pkey;
-  const extern crypto::secret_key null_skey;
+  extern crypto::public_key const null_pkey;
+  extern crypto::secret_key const null_skey;
 }
 
 CRYPTO_MAKE_HASHABLE(public_key)
