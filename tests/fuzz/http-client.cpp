@@ -30,6 +30,12 @@
 #include "file_io_utils.h"
 #include "net/http_client.h"
 #include "fuzzer.h"
+#include <openssl/sha.h>
+#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/asio.hpp>
 
 class dummy_client
 {

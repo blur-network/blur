@@ -61,6 +61,7 @@ target_link_libraries(signature_fuzz_tests
     epee
     device
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 set_property(TARGET signature_fuzz_tests
   PROPERTY
@@ -125,6 +126,7 @@ target_link_libraries(http-client_fuzz_tests
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 set_property(TARGET http-client_fuzz_tests
   PROPERTY
