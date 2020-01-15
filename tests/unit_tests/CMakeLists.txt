@@ -49,7 +49,7 @@ set(unit_tests_sources
   http.cpp
   main.cpp
   memwipe.cpp
-  mnemonics.cpp
+#  mnemonics.cpp
   mul_div.cpp
   multisig.cpp
   parse_amount.cpp
