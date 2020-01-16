@@ -48,17 +48,12 @@ namespace {
   static void local_abort(const char *msg)
   {
     fprintf(stderr, "%s\n", msg);
-#ifdef NDEBUG
-    _exit(1);
-#else
-    abort();
-#endif
+    std::abort();
   }
 }
 
 namespace crypto {
 
-  using std::abort;
   using std::int32_t;
   using std::int64_t;
   using std::size_t;
@@ -70,10 +65,9 @@ namespace crypto {
 #include "random.h"
   }
 
-  unsigned char const np[32] = { 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254 };
-  unsigned char const ns[32] = { 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254 };
-  crypto::public_key const null_pkey = *reinterpret_cast<const public_key*>(np);
-  crypto::secret_key const null_skey = *reinterpret_cast<const secret_key*>(ns);
+
+  crypto::public_key const null_pkey = crypto::public_key{};
+  crypto::secret_key const null_skey = crypto::secret_key{};
 
   static inline unsigned char *operator &(ec_point &point) {
     return &reinterpret_cast<unsigned char &>(point);
