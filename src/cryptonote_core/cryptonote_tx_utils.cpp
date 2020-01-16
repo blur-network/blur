@@ -565,13 +565,13 @@ namespace cryptonote
      return construct_tx_and_get_tx_key(sender_account_keys, subaddresses, sources, destinations_copy, change_addr, extra, tx, unlock_time, tx_key, additional_tx_keys, false, false, NULL);
   }
   //---------------------------------------------------------------
-  bool generate_genesis_block(block& bl)
+  bool generate_genesis_block(block& bl, network_type nettype)
   {
     //genesis block
     bl = boost::value_initialized<block>();
 
     blobdata tx_bl;
-    bool r = string_tools::parse_hexstr_to_binbuff(config::GENESIS_TX, tx_bl);
+    bool r = string_tools::parse_hexstr_to_binbuff(nettype == cryptonote::MAINNET ? config::GENESIS_TX : config::testnet::GENESIS_TX, tx_bl);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
     r = parse_and_validate_tx_from_blob(tx_bl, bl.miner_tx);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");

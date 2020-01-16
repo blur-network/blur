@@ -3003,7 +3003,7 @@ void wallet2::generate(const std::string& wallet_, const epee::wipeable_string& 
   }
 
   cryptonote::block b;
-  generate_genesis(b);
+  generate_genesis(b, m_nettype);
   m_blockchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
@@ -3062,7 +3062,7 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
   }
 
   cryptonote::block b;
-  generate_genesis(b);
+  generate_genesis(b, m_nettype);
   m_blockchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
@@ -3127,7 +3127,7 @@ void wallet2::generate(const std::string& wallet_, const epee::wipeable_string& 
   }
 
   cryptonote::block b;
-  generate_genesis(b);
+  generate_genesis(b, m_nettype);
   m_blockchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
@@ -3177,7 +3177,7 @@ void wallet2::generate(const std::string& wallet_, const epee::wipeable_string& 
   }
 
   cryptonote::block b;
-  generate_genesis(b);
+  generate_genesis(b, m_nettype);
   m_blockchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
@@ -3217,7 +3217,7 @@ void wallet2::restore(const std::string& wallet_, const epee::wipeable_string& p
     if(!r) MERROR("String with address text not saved");
   }
   cryptonote::block b;
-  generate_genesis(b);
+  generate_genesis(b, m_nettype);
   m_blockchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
   if (!wallet_.empty()) {
@@ -3313,7 +3313,7 @@ std::string wallet2::make_multisig(const epee::wipeable_string &password,
   }
 
   cryptonote::block b;
-  generate_genesis(b);
+  generate_genesis(b, m_nettype);
   m_blockchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
@@ -3796,7 +3796,7 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
   }
 
   cryptonote::block genesis;
-  generate_genesis(genesis);
+  generate_genesis(genesis, m_nettype);
   crypto::hash genesis_hash = get_block_hash(genesis);
 
   if (m_blockchain.empty())
@@ -4184,7 +4184,7 @@ void wallet2::rescan_blockchain(bool refresh)
   clear();
 
   cryptonote::block genesis;
-  generate_genesis(genesis);
+  generate_genesis(genesis, m_nettype);
   crypto::hash genesis_hash = get_block_hash(genesis);
   m_blockchain.push_back(genesis_hash);
   add_subaddress_account(tr("Primary account"));
@@ -5414,7 +5414,7 @@ bool wallet2::set_ring_database(const std::string &filename)
     try
     {
       cryptonote::block b;
-      generate_genesis(b);
+      generate_genesis(b, m_nettype);
       m_ringdb.reset(new tools::ringdb(m_ring_database, epee::string_tools::pod_to_hex(get_block_hash(b))));
     }
     catch (const std::exception &e)
@@ -8963,7 +8963,7 @@ void wallet2::import_blockchain(const std::tuple<size_t, crypto::hash, std::vect
     m_blockchain.push_back(b);
   }
   cryptonote::block genesis;
-  generate_genesis(genesis);
+  generate_genesis(genesis, m_nettype);
   crypto::hash genesis_hash = get_block_hash(genesis);
   check_genesis(genesis_hash);
   m_local_bc_height = m_blockchain.size();
@@ -9676,7 +9676,7 @@ uint64_t wallet2::get_segregation_fork_height() const
   return SEGREGATION_FORK_HEIGHT;
 }
 //----------------------------------------------------------------------------------------------------
-void wallet2::generate_genesis(cryptonote::block& b) const {
-  cryptonote::generate_genesis_block(b);
+void wallet2::generate_genesis(cryptonote::block& b, cryptonote::network_type const& m_nettype) const {
+  cryptonote::generate_genesis_block(b, m_nettype);
 }
 }

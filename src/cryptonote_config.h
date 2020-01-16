@@ -100,7 +100,7 @@
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
 
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  /* by default, blocks ids count in synchronizing */
-#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              20     /* by default, blocks count in blocks downloading */
+#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              100     /* by default, blocks count in blocks downloading */
 
 #define CRYPTONOTE_MEMPOOL_TX_LIVETIME                    (86400*3) /* seconds, three days */
 #define CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME     604800 /* seconds, one week */
@@ -173,6 +173,8 @@ namespace config
     boost::uuids::uuid const NETWORK_ID = { {
         0x22 ,0x36, 0xF1, 0x22 , 0x54, 0x86 , 0x37, 0xFF, 0xAB, 0x89, 0x01, 0x92, 0xAA, 0xBC, 0x2F, 0x16
       } };
+    std::string const GENESIS_TX = "011901ff0001ffffffffffff0102bca7c97f7074ea888eac572fda0964cc864baf7bc07d6cecc052728039009d7621017133140c2abc1825f8d411db7bee4379a2a0f21b7af60e44ed7f07f9e66ccd8800";
+    uint32_t const GENESIS_NONCE = 10001;
   }
 
   namespace stagenet
