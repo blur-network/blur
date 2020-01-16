@@ -45,10 +45,10 @@
 #include "hash.h"
 
 namespace {
-  static void local_abort(const char *msg)
+  static void local_abort(std::string const& msg)
   {
-    fprintf(stderr, "%s\n", msg);
-    std::abort();
+    fprintf(stderr, "%s\n", msg.c_str());
+    exit(1);
   }
 }
 
