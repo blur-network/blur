@@ -173,7 +173,7 @@ namespace crypto {
   bool crypto_ops::generate_key_derivation(const public_key &key1, const secret_key &key2, key_derivation &derivation) {
     const std::string identity = epee::string_tools::pod_to_hex(rct::identity());
     std::string bin_identity;
-    if (epee::string_tools::parse_hexstr_to_binbuff(identity, bin_identity)) {
+    if (!epee::string_tools::parse_hexstr_to_binbuff(identity, bin_identity)) {
       MERROR("Couldn't parse identity to binbuff!");
       return false;
     }
