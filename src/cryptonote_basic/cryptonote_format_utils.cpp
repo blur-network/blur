@@ -214,16 +214,6 @@ namespace cryptonote
   bool generate_key_image_helper(const account_keys& ack, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, const crypto::public_key& out_key, const crypto::public_key& tx_public_key, const std::vector<crypto::public_key>& additional_tx_public_keys, size_t real_output_index, keypair& in_ephemeral, crypto::key_image& ki, hw::device &hwdev)
   {
     crypto::key_derivation recv_derivation = AUTO_VAL_INIT(recv_derivation);
-    const blobdata identity = epee::string_tools::pod_to_hex(rct::identity());
-    std::string bin_identity;
-    if (epee::string_tools::parse_hexstr_to_binbuff(identity, bin_identity)) {
-      MERROR("Couldn't parse identity to binbuff!");
-      return false;
-    }
-    const crypto::secret_key identikey = *reinterpret_cast<const crypto::secret_key*>(bin_identity.data());
-    if ((tx_public_key == crypto::null_pkey) || (ack.m_view_secret_key == crypto::null_skey) || (ack.m_view_secret_key == identikey)) {
-      return false;
-    }
     bool r = hwdev.generate_key_derivation(tx_public_key, ack.m_view_secret_key, recv_derivation);
     if (!r)
     {

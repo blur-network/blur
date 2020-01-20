@@ -43,6 +43,9 @@
 #include "warnings.h"
 #include "crypto.h"
 #include "hash.h"
+#include "string_tools.h"
+#include "misc_log_ex.h"
+#include "ringct/rctSigs.h"
 
 namespace {
   static void local_abort(std::string const& msg)
@@ -168,6 +171,16 @@ namespace crypto {
   }
 
   bool crypto_ops::generate_key_derivation(const public_key &key1, const secret_key &key2, key_derivation &derivation) {
+    const std::string identity = epee::string_tools::pod_to_hex(rct::identity());
+    std::string bin_identity;
+    if (epee::string_tools::parse_hexstr_to_binbuff(identity, bin_identity)) {
+      MERROR("Couldn't parse identity to binbuff!");
+      return false;
+    }
+    const crypto::secret_key identikey = *reinterpret_cast<const crypto::secret_key*>(bin_identity.data());
+    if ((key1 == crypto::null_pkey) || (key2 == crypto::null_skey) || (key2 == identikey)) {
+      return false;
+    }
     ge_p3 point;
     ge_p2 point2;
     ge_p1p1 point3;
