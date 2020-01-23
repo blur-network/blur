@@ -47,16 +47,8 @@
 #define MONERO_DEFAULT_LOG_CATEGORY "blockchain.db.lmdb"
 
 
-#if defined(__i386) || defined(__x86_64)
-#define MISALIGNED_OK	1
-#endif
-
 using epee::string_tools::pod_to_hex;
 using namespace crypto;
-
-// Increase when the DB changes in a non backward compatible way, and there
-// is no automatic conversion, so that a full resync is needed.
-#define VERSION 1
 
 namespace
 {
@@ -1111,63 +1103,6 @@ void BlockchainLMDB::open(const std::string& filename, const int db_flags)
   MDB_val_copy<const char*> k("version");
   MDB_val v;
   auto get_result = mdb_get(txn, m_properties, &k, &v);
-  if(get_result == MDB_SUCCESS)
-  {
-    if (*(const uint32_t*)v.mv_data > VERSION)
-    {
-      MWARNING("Existing lmdb database was made by a later version. We don't know how it will change yet.");
-      compatible = false;
-    }
-#if VERSION > 0
-    else if (*(const uint32_t*)v.mv_data < VERSION)
-    {
-      // Note that there was a schema change within version 0 as well.
-      // See commit e5d2680094ee15889934fe28901e4e133cda56f2 2015/07/10
-      // We don't handle the old format previous to that commit.
-      txn.commit();
-      m_open = true;
-      migrate(*(const uint32_t *)v.mv_data);
-      return;
-    }
-#endif
-  }
-  else
-  {
-    // if not found, and the DB is non-empty, this is probably
-    // an "old" version 0, which we don't handle. If the DB is
-    // empty it's fine.
-    if (VERSION > 0 && m_height > 0)
-      compatible = false;
-  }
-
-  if (!compatible)
-  {
-    txn.abort();
-    mdb_env_close(m_env);
-    m_open = false;
-    MFATAL("Existing lmdb database is incompatible with this version.");
-    MFATAL("Please delete the existing database and resync.");
-    return;
-  }
-
-  if (!(mdb_flags & MDB_RDONLY))
-  {
-    // only write version on an empty DB
-    if (m_height == 0)
-    {
-      MDB_val_copy<const char*> k("version");
-      MDB_val_copy<uint32_t> v(VERSION);
-      auto put_result = mdb_put(txn, m_properties, &k, &v, 0);
-      if (put_result != MDB_SUCCESS)
-      {
-        txn.abort();
-        mdb_env_close(m_env);
-        m_open = false;
-        MERROR("Failed to write version to database.");
-        return;
-      }
-    }
-  }
 
   // commit the transaction
   txn.commit();
@@ -1242,12 +1177,6 @@ void BlockchainLMDB::reset()
     throw0(DB_ERROR(lmdb_error("Failed to drop m_hf_versions: ", result).c_str()));
   if (auto result = mdb_drop(txn, m_properties, 0))
     throw0(DB_ERROR(lmdb_error("Failed to drop m_properties: ", result).c_str()));
-
-  // init with current version
-  MDB_val_copy<const char*> k("version");
-  MDB_val_copy<uint32_t> v(VERSION);
-  if (auto result = mdb_put(txn, m_properties, &k, &v, 0))
-    throw0(DB_ERROR(lmdb_error("Failed to write version to database: ", result).c_str()));
 
   txn.commit();
   m_cum_size = 0;
