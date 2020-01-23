@@ -28,13 +28,12 @@
 //
 
 
-
-
 #include "device_default.hpp"
 #include "common/int-util.h"
 #include "cryptonote_basic/account.h"
 #include "cryptonote_basic/subaddress_index.h"
 #include "ringct/rctOps.h"
+#include "string_tools.h"
 
 #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
 #define CHACHA8_KEY_TAIL 0x8c
@@ -238,7 +237,17 @@ namespace hw {
         }
 
         bool device_default::generate_key_derivation(const crypto::public_key &key1, const crypto::secret_key &key2, crypto::key_derivation &derivation) {
-            return crypto::generate_key_derivation(key1, key2, derivation);
+          const std::string identity = epee::string_tools::pod_to_hex(rct::identity());
+          std::string bin_identity;
+          if (!epee::string_tools::parse_hexstr_to_binbuff(identity, bin_identity)) {
+            MERROR("Couldn't parse identity to binbuff!");
+            return false;
+          }
+          const crypto::secret_key identikey = *reinterpret_cast<const crypto::secret_key*>(bin_identity.data());
+          if ((key1 == crypto::null_pkey) || (key2 == crypto::null_skey) || (key2 == identikey)) {
+            return false;
+          }
+          return crypto::generate_key_derivation(key1, key2, derivation);
         }
 
         bool device_default::derivation_to_scalar(const crypto::key_derivation &derivation, const size_t output_index, crypto::ec_scalar &res){
