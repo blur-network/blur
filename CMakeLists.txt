@@ -396,7 +396,7 @@ endif()
 find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
 include_directories(OPENSSL_INCLUDE_DIR ${OPENSSL_INCLUDE_DIR})
-set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_DL_LIBS};${CMAKE_THREAD_LIBS_INIT}")
+set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_THREAD_LIBS_INIT}")
 
 add_definition_if_library_exists(c memset_s "string.h" HAVE_MEMSET_S)
 add_definition_if_library_exists(c explicit_bzero "strings.h" HAVE_EXPLICIT_BZERO)
