@@ -433,9 +433,16 @@ if (BERKELEY_DB)
   include_directories(${BDB_INCLUDE})
 endif()
 
-# Final setup for libunwind
-include_directories(${LIBUNWIND_INCLUDE})
-link_directories(${LIBUNWIND_LIBRARY_DIRS})
+find_package(Libunwind)
+if(Libunwind_FOUND)
+  message(STATUS "Using Libunwind located at: ${LIBUNWIND_LIBRARIES}.")
+  include_directories(LIBUNWIND_INCLUDE_DIRS ${LIBUNWIND_INCLUDE_DIRS})
+  link_directories(LIBUNWIND_LIBRARIES ${LIBUNWIND_LIBRARIES})
+set(BACKWARD_HAS_UNWIND 1)
+else()
+  message(STATUS "Could not find libunwind... continuing without it.")
+endif()
+
 
 if(MSVC)
   add_definitions("/bigobj /MP /W3 /GS- /D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4345 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /DGTEST_HAS_TR1_TUPLE=0 /FIinline_c.h /D__SSE4_1__")
@@ -725,11 +732,10 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -DGTEST_HAS_TR1_TUPLE=0")
   endif()
 
-  set(DEBUG_FLAGS "-g3")
   if(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT (CMAKE_C_COMPILER_VERSION VERSION_LESS 4.8))
     set(DEBUG_FLAGS "${DEBUG_FLAGS} -Og ")
   else()
-    set(DEBUG_FLAGS "${DEBUG_FLAGS} -O0 ")
+    set(DEBUG_FLAGS "${DEBUG_FLAGS} -Og ")
   endif()
 
   # At least some CLANGs default to not enough for monero
@@ -869,7 +875,14 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND ARCH_WIDTH EQUAL "32" AND NOT IOS AN
   endif()
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BUILD_SHARED_LIBRARIES)
+find_library(ELF_LIBRARY elf)
+if(ELF_LIBRARY)
+  set(ELF_LIBRARY ${ELF_LIBRARY})
+  message(STATUS "Using libelf located at: ${ELF_LIBRARY}")
+endif()
+
+find_package(DWARF)
   if(LIBDWARF_LIBRARIES AND BACKWARD_HAS_DWARF)
     set(LIBDWARF_LIBRARIES "${LIBDWARF_LIBRARIES}")
     message(STATUS "Using LIBDWARF_LIBRARIES located at ${LIBDWARF_LIBRARIES}")
@@ -898,8 +911,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BACKWARD_LIBRARIES "${BACKWARD_LIBRARIES} ${LIBDW_LIBRARIES}")
   endif()
 
-  include_directories(${BACKWARD_INCLUDE_DIRS})
-  link_directories(${BACKWARD_LIBRARIES})
+
+include_directories(BACKWARD_INCLUDE_DIRS ${BACKWARD_INCLUDE_DIRS})
+link_directories(BACKWARD_LIBRARIES ${BACKWARD_LIBRARIES})
+
 endif()
 
 find_library(SODIUM_LIBRARY sodium)
