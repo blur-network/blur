@@ -350,13 +350,7 @@ add_definitions("-DBLOCKCHAIN_DB=${BLOCKCHAIN_DB}")
 # Can't install hook in static build on OSX, because OSX linker does not support --wrap
 # On ARM, having libunwind package (with .so's only) installed breaks static link.
 # When possible, avoid stack tracing using libunwind in favor of using easylogging++.
-if (APPLE)
-  set(LIBUNWIND_LIBRARIES "")
-elseif (DEPENDS AND NOT LINUX)
-  set(LIBUNWIND_LIBRARIES "")
-elseif (ARM AND STATIC)
-  set(LIBUNWIND_LIBRARIES "")
-else()
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   find_library(UNWIND_LIBRARY unwind)
   if(UNWIND_LIBRARY)
     set(UNWIND_LIBRARY ${UNWIND_LIBRARY})
