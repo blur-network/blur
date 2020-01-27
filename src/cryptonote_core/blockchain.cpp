@@ -100,10 +100,6 @@ static const struct {
   {  8, 185000, 0 },
   {  9, 211000, 0 },
   { 10, 342000, 0 }
-//  { 11, 450000, 0, 1557532800 }
-  //      Set hardfork v11 block for 450,000 - height takes precendence over timestamp
-  //      But lets make sure we definitely have enough time afterward... if its too early, things stall.
-
 };
 
 static const struct {
