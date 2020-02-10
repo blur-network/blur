@@ -42,14 +42,14 @@ namespace epee
     critical_section& get_lock()const {return regexp_lock;}
   };
 
-  const static global_regexp_critical_section gregexplock;
+  global_regexp_critical_section const gregexplock;
 
 #define STATIC_REGEXP_EXPR_1(var_name, xpr_text, reg_exp_flags) \
-	static volatile uint32_t regexp_initialized_1 = 0;\
+        volatile uint32_t regexp_initialized_1 = 0;\
 	volatile uint32_t local_is_initialized_1 = regexp_initialized_1;\
 	if(!local_is_initialized_1)\
 	gregexplock.get_lock().lock();\
-	static const boost::regex	var_name(xpr_text , reg_exp_flags);\
+	boost::regex const	var_name(xpr_text , reg_exp_flags);\
 	if(!local_is_initialized_1)\
 {\
 	boost::interprocess::ipcdetail::atomic_write32(&regexp_initialized_1, 1);\
