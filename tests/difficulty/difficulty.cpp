@@ -34,14 +34,13 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <stdexcept>
 
 #include "cryptonote_config.h"
 #include "cryptonote_basic/difficulty.h"
 
 using namespace std;
 
-#define DEFAULT_TEST_DIFFICULTY_TARGET        60
+#define DEFAULT_TEST_DIFFICULTY_TARGET        120
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
