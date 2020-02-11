@@ -3426,6 +3426,7 @@ leave:
   {
     try
     {
+      MWARNING(epee::string_tools::buff_to_hex_nodelimer(block_to_blob(bl)));
       new_height = m_db->add_block(bl, block_size, cumulative_difficulty, already_generated_coins, txs);
     }
     catch (const KEY_IMAGE_EXISTS& e)

@@ -71,8 +71,8 @@
 
 #define DEFAULT_MIXIN                                   4
 #define DEFAULT_RINGSIZE                                DEFAULT_MIXIN + 1
-#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)400000000)
-#define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)9000000000000) /* 9 * pow(10,12) */
+#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)2000000000)
+#define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)10000000000000) /* 10 * pow(10,12) */
 
 #define DIFFICULTY_TARGET                               60  /* seconds */
 #define DIFFICULTY_WINDOW                               720 /* blocks */
