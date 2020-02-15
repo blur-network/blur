@@ -3299,14 +3299,15 @@ leave:
     bool relayed = false, do_not_relay = false, double_spend_seen = false;
     TIME_MEASURE_START(aa);
 
-// XXX old code does not check whether tx exists
-    if (m_db->tx_exists(tx_id))
+    // tx_index addition should fail if duplicate key is added.
+
+/*    if (m_db->tx_exists(tx_id))
     {
       MERROR("Block with id: " << id << " attempting to add transaction already in blockchain with id: " << tx_id);
       bvc.m_verifivation_failed = true;
       return_tx_to_pool(txs);
       goto leave;
-    }
+    }*/
 
     TIME_MEASURE_FINISH(aa);
     t_exists += aa;

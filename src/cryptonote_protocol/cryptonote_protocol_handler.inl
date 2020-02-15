@@ -349,7 +349,9 @@ namespace cryptonote
       LOG_DEBUG_CC(context, "Received new block while syncing, ignored");
       return 1;
     }
+
     m_core.pause_mine();
+
     std::list<block_complete_entry> blocks;
     blocks.push_back(arg.b);
     m_core.prepare_handle_incoming_blocks(blocks);
@@ -360,22 +362,22 @@ namespace cryptonote
       if(tvc.m_verifivation_failed)
       {
         LOG_PRINT_CCONTEXT_L1("Block verification failed: transaction verification failed, dropping connection");
-        drop_connection(context, false, false);
-        m_core.cleanup_handle_incoming_blocks();
-        m_core.resume_mine();
+        drop_connection(context, true, false);
         return 1;
       }
     }
 
     block_verification_context bvc = boost::value_initialized<block_verification_context>();
     m_core.handle_incoming_block(arg.b.block, bvc); // got block from handle_notify_new_block
-    if (!m_core.cleanup_handle_incoming_blocks(true))
+/*    if (!m_core.cleanup_handle_incoming_blocks(true))
     {
       LOG_PRINT_CCONTEXT_L0("Failure in cleanup_handle_incoming_blocks");
       m_core.resume_mine();
       return 1;
-    }
+    }*/
+
     m_core.resume_mine();
+
     if(bvc.m_verifivation_failed)
     {
       LOG_PRINT_CCONTEXT_L0("Block verification failed, dropping connection");
@@ -439,13 +441,7 @@ namespace cryptonote
 
       std::list<blobdata> have_tx;
 
-      // Instead of requesting missing transactions by hash like BTC,
-      // we do it by index (thanks to a suggestion from moneromooo) because
-      // we're way cooler .. and also because they're smaller than hashes.
-      //
-      // Also, remember to pepper some whitespace changes around to bother
-      // moneromooo ... only because I <3 him.
-      std::vector<uint64_t> need_tx_indices;
+      std::vector<std::pair<uint64_t,crypto::hash>> need_tx_indices;
 
       transaction tx;
       crypto::hash tx_hash;
@@ -469,7 +465,7 @@ namespace cryptonote
               return 1;
             }
           }
-          catch(...)
+          catch(std::exception& e)
           {
             LOG_PRINT_CCONTEXT_L1
             (
@@ -483,53 +479,18 @@ namespace cryptonote
             return 1;
           }
 
-          // hijacking m_requested objects in connection context to patch up
-          // a possible DOS vector pointed out by @monero-moo where peers keep
-          // sending (0...n-1) transactions.
-          // If requested objects is not empty, then we must have asked for
-          // some missing transacionts, make sure that they're all there.
-          //
-          // Can I safely re-use this field? I think so, but someone check me!
-          if(!context.m_requested_objects.empty())
-          {
-            auto req_tx_it = context.m_requested_objects.find(tx_hash);
-            if(req_tx_it == context.m_requested_objects.end())
-            {
-              LOG_ERROR_CCONTEXT
-              (
-                "Peer sent wrong transaction (NOTIFY_NEW_FLUFFY_BLOCK): "
-                << "transaction with id = " << tx_hash << " wasn't requested, "
-                << "dropping connection"
-              );
-
-              drop_connection(context, false, false);
-              m_core.resume_mine();
-              return 1;
-            }
-
-            context.m_requested_objects.erase(req_tx_it);
-          }
-
-          // we might already have the tx that the peer
-          // sent in our pool, so don't verify again..
           if(!m_core.pool_has_tx(tx_hash))
           {
             MDEBUG("Incoming tx " << tx_hash << " not in pool, adding");
             cryptonote::tx_verification_context tvc = AUTO_VAL_INIT(tvc);
-            if(!m_core.handle_incoming_tx(tx_blob, tvc, true, true, false) || tvc.m_verifivation_failed)
+            if(!m_core.handle_incoming_tx(tx_blob, tvc, false, false, false) || tvc.m_verifivation_failed)
             {
               LOG_PRINT_CCONTEXT_L1("Block verification failed: transaction verification failed, dropping connection");
-              drop_connection(context, false, false);
+              drop_connection(context, true, false);
               m_core.resume_mine();
               return 1;
             }
 
-            //
-            // future todo:
-            // tx should only not be added to pool if verification failed, but
-            // maybe in the future could not be added for other reasons
-            // according to monero-moo so keep track of these separately ..
-            //
           }
         }
         else
@@ -545,25 +506,6 @@ namespace cryptonote
           m_core.resume_mine();
           return 1;
         }
-      }
-
-      // The initial size equality check could have been fooled if the sender
-      // gave us the number of transactions we asked for, but not the right
-      // ones. This check make sure the transactions we asked for were the
-      // ones we received.
-      if(context.m_requested_objects.size())
-      {
-        MERROR
-        (
-          "NOTIFY_NEW_FLUFFY_BLOCK: peer sent the number of transaction requested"
-          << ", but not the actual transactions requested"
-          << ", context.m_requested_objects.size() = " << context.m_requested_objects.size()
-          << ", dropping connection"
-        );
-
-        drop_connection(context, false, false);
-        m_core.resume_mine();
-        return 1;
       }
 
       size_t tx_idx = 0;
@@ -596,28 +538,30 @@ namespace cryptonote
           else
           {
             MDEBUG("Tx " << tx_hash << " not found in pool");
-            need_tx_indices.push_back(tx_idx);
+            const auto each_ind = std::make_pair(tx_idx, tx_hash);
+            need_tx_indices.push_back(each_ind);
           }
         }
-
+        
         ++tx_idx;
       }
 
-      if(!need_tx_indices.empty()) // drats, we don't have everything..
+      if(!need_tx_indices.empty())
       {
         // request non-mempool txs
         MDEBUG("We are missing " << need_tx_indices.size() << " txes for this fluffy block");
         for (auto txidx: need_tx_indices)
-          MDEBUG("  tx " << new_block.tx_hashes[txidx]);
+          MDEBUG("  tx " << new_block.tx_hashes[txidx.first]);
         NOTIFY_REQUEST_FLUFFY_MISSING_TX::request missing_tx_req;
         missing_tx_req.block_hash = get_block_hash(new_block);
         missing_tx_req.current_blockchain_height = arg.current_blockchain_height;
-        missing_tx_req.missing_tx_indices = std::move(need_tx_indices);
-
+        for (const auto& each : need_tx_indices) {
+          missing_tx_req.missing_tx_indices.push_back(each.first);
+        }
         m_core.resume_mine();
         post_notify<NOTIFY_REQUEST_FLUFFY_MISSING_TX>(missing_tx_req, context);
       }
-      else // whoo-hoo we've got em all ..
+      else
       {
         MDEBUG("We have all needed txes for this fluffy block");
 
@@ -631,12 +575,6 @@ namespace cryptonote
 
         block_verification_context bvc = boost::value_initialized<block_verification_context>();
         m_core.handle_incoming_block(arg.b.block, bvc); // got block from handle_notify_new_block
-        if (!m_core.cleanup_handle_incoming_blocks(true))
-        {
-          LOG_PRINT_CCONTEXT_L0("Failure in cleanup_handle_incoming_blocks");
-          m_core.resume_mine();
-          return 1;
-        }
         m_core.resume_mine();
 
         if( bvc.m_verifivation_failed )
@@ -1069,7 +1007,7 @@ namespace cryptonote
             {
               if (!m_p2p->for_connection(span_connection_id, [&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t f)->bool{
                 LOG_PRINT_CCONTEXT_L1("Block verification failed, dropping connection");
-                drop_connection(context, true, true);
+                drop_connection(context, true, false);
                 return 1;
               }))
                 LOG_ERROR_CCONTEXT("span connection id not found");
