@@ -1,0 +1,21 @@
+name: Blur Development Branches
+
+on:
+  push:
+    branches:
+      - dev-*
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: submodules
+      run: git submodule update --init
+    - name: make
+      run: make release-cross-linux-x86_64
+      env:
+        HOST: x86_64-gnu-linux
+        BOOST_IGNORE_SYSTEM_PATHS: ON
