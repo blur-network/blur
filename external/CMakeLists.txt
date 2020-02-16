@@ -31,7 +31,7 @@
 
 add_subdirectory(db_drivers)
 add_subdirectory(easylogging++)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_subdirectory(backward)
-endif()
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#  add_subdirectory(backward)
+#endif()
 #add_subdirectory(libhydrogen)
