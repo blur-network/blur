@@ -2325,7 +2325,6 @@ bool Blockchain::check_for_double_spend(const transaction& tx, key_images_contai
 bool Blockchain::get_tx_outputs_gindexs(const crypto::hash& tx_id, std::vector<uint64_t>& indexs) const
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
-  CRITICAL_REGION_LOCAL(m_blockchain_lock);
   uint64_t tx_index;
   if (!m_db->tx_exists(tx_id, tx_index))
   {
