@@ -411,14 +411,16 @@ ExternalProject_Add(generate_translations_header
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/translations")
 add_subdirectory(external)
 
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
 include(ExternalProject)
 ExternalProject_Add(backward
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/backward
   CMAKE_ARGS -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_CURRENT_BINARY_DIR}/external/backward -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}/external/backward
   CONFIGURE_COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/external/backward ${CMAKE_CURRENT_BINARY_DIR}/external/
-  BUILD_COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cd ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cmake -DCMAKE_BUILD_TYPE=relwithdbg .. && make
+  BUILD_COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cd ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cmake -DCMAKE_BUILD_TYPE=debug .. && make
   INSTALL_COMMAND cmake -E echo ""
 )
+endif()
 
 set(BACKWARD_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/external/backward/build/libbackward.a)
 message(STATUS "Using BACKWARD_LIBRARIES for stack traces located at: ${BACKWARD_LIBRARIES}")

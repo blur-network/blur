@@ -50,7 +50,7 @@ namespace titi {
 struct foo {
 
   union bar {
-    NOINLINE static int trampoline(stacktrace_t &st, int level) {
+    __attribute__ ((noinline)) static int trampoline(stacktrace_t &st, int level) {
       return rec(st, level);
     }
   };

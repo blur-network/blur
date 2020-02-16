@@ -88,10 +88,9 @@ target_compile_definitions(backward PUBLIC ${BACKWARD_DEFINITIONS})
 target_include_directories(backward PUBLIC ${BACKWARD_INCLUDE_DIRS})
 
 ###############################################################################
-# TESTS
+# TEST000S
 ###############################################################################
 
-if(BACKWARD_TESTS)
 	enable_testing()
 
 	add_library(test_main SHARED test/_test_main.cpp)
@@ -127,7 +126,6 @@ if(BACKWARD_TESTS)
 	foreach(test ${TESTS})
 		backward_add_test(test/${test}.cpp ${BACKWARD_ENABLE})
 	endforeach()
-endif()
 
 install(
     FILES "backward.hpp"

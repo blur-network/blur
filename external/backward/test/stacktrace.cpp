@@ -45,7 +45,7 @@ void c(StackTrace &st) { return d(st); }
 
 void b(StackTrace &st) { return c(st); }
 
-NOINLINE void a(StackTrace &st) { return b(st); }
+__attribute__ ((noinline)) void a(StackTrace &st) { return b(st); }
 
 TEST(smalltrace) {
   Printer printer;
