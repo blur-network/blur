@@ -88,7 +88,7 @@ const std::vector<std::string> t_transactions =
 
 // if the return type (blobdata for now) of block_to_blob ever changes
 // from std::string, this might break.
-
+/*
 bool compare_blocks(const block& a, const block& b)
 {
   auto hash_a = pod_to_hex(get_block_hash(a));
@@ -97,7 +97,7 @@ bool compare_blocks(const block& a, const block& b)
   return hash_a == hash_b;
 }
 
-/*
+
 void print_block(const block& blk, const std::string& prefix = "")
 {
   std::cerr << prefix << ": " << std::endl
@@ -165,8 +165,8 @@ protected:
     for (auto& i : t_blocks)
     {
       block bl;
-      blobdata bd = h2b(i);
-      parse_and_validate_block_from_blob(bd, bl);
+  //    blobdata bd = h2b(i);
+ //     parse_and_validate_block_from_blob(bd, bl);
       m_blocks.push_back(bl);
     }
     for (auto& i : t_transactions)
@@ -175,8 +175,8 @@ protected:
       for (auto& j : i)
       {
         transaction tx;
-        blobdata bd = h2b(j);
-        parse_and_validate_tx_from_blob(bd, tx);
+//        blobdata bd = h2b(j);
+//        parse_and_validate_tx_from_blob(bd, tx);
         txs.push_back(tx);
       }
       m_txs.push_back(txs);
