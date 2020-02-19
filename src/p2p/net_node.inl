@@ -53,7 +53,7 @@
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
-#define MIN_WANTED_SEED_NODES 12
+#define MIN_WANTED_SEED_NODES 3
 
 namespace nodetool
 {
@@ -85,7 +85,46 @@ namespace nodetool
   {
 
     TRY_ENTRY();
-    make_default_config();
+    std::string state_file_path = m_config_folder + "/" + P2P_NET_DATA_FILENAME;
+    std::ifstream p2p_data;
+    p2p_data.open( state_file_path , std::ios_base::binary | std::ios_base::in);
+    if(!p2p_data.fail())
+    {
+      try
+      {
+        // first try reading in portable mode
+        boost::archive::portable_binary_iarchive a(p2p_data);
+        a >> *this;
+      }
+      catch (...)
+      {
+        // if failed, try reading in unportable mode
+        boost::filesystem::copy_file(state_file_path, state_file_path + ".unportable", boost::filesystem::copy_option::overwrite_if_exists);
+        p2p_data.close();
+        p2p_data.open( state_file_path , std::ios_base::binary | std::ios_base::in);
+        if(!p2p_data.fail())
+        {
+          try
+          {
+            boost::archive::binary_iarchive a(p2p_data);
+            a >> *this;
+          }
+          catch (const std::exception &e)
+          {
+            MWARNING("Failed to load p2p config file, falling back to default config");
+            m_peerlist = peerlist_manager(); // it was probably half clobbered by the failed load
+            make_default_config();
+          }
+        }
+        else
+        {
+          make_default_config();
+        }
+      }
+    }else
+    {
+      make_default_config();
+    }
 
     // always recreate a new peer id
     make_default_peer_id();
