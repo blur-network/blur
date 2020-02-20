@@ -228,6 +228,7 @@ namespace net_utils
     uint64_t m_send_cnt;
     double m_current_speed_down;
     double m_current_speed_up;
+    connection_context_base(const connection_context_base&) = default;
 
     connection_context_base(boost::uuids::uuid connection_id,
                             const network_address &remote_address, bool is_income,
@@ -262,10 +263,12 @@ namespace net_utils
       set_details(a.m_connection_id, a.m_remote_address, a.m_is_income);
       return *this;
     }
+
     
   private:
     template<class t_protocol_handler>
     friend class connection;
+    
     void set_details(boost::uuids::uuid connection_id, const network_address &remote_address, bool is_income)
     {
       this->~connection_context_base();
