@@ -474,17 +474,17 @@ OAES_RET oaes_sprintf(
 static void oaes_get_seed( char buf[RANDSIZ + 1] )
 {
         #if !defined(__FreeBSD__) && !defined(__OpenBSD__)
-	struct timeb timer;
+	struct timespec timer;
 	struct tm *gmTimer;
 	char * _test = NULL;
 	
-	ftime (&timer);
-	gmTimer = gmtime( &timer.time );
-	_test = (char *) calloc( sizeof( char ), timer.millitm );
+	timespec_get (&timer, TIME_UTC);
+	gmTimer = gmtime( &timer.time_sec );
+	_test = (char *) calloc( sizeof( char ), timer.tv_nsec );
 	sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
 		gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
-		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.millitm,
-		_test + timer.millitm, GETPID() );
+		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
+		_test + timer.tv_nsec, GETPID() );
 	#else
 	struct timeval timer;
 	struct tm *gmTimer;
@@ -506,17 +506,17 @@ static void oaes_get_seed( char buf[RANDSIZ + 1] )
 static uint32_t oaes_get_seed(void)
 {
         #if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__ANDROID__)
-	struct timeb timer;
+	struct timespec timer;
 	struct tm *gmTimer;
 	char * _test = NULL;
 	uint32_t _ret = 0;
 	
-	ftime (&timer);
-	gmTimer = gmtime( &timer.time );
-	_test = (char *) calloc( sizeof( char ), timer.millitm );
+	timespec_get (&timer, TIME_UTC);
+	gmTimer = gmtime( &timer.tv_sec );
+	_test = (char *) calloc( sizeof( char ), timer.tv_nsec );
 	_ret = gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
-			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.millitm +
-			(uintptr_t) ( _test + timer.millitm ) + GETPID();
+			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.tv_nsec +
+			(uintptr_t) ( _test + timer.tv_nsec ) + GETPID();
 	#else
 	struct timeval timer;
 	struct tm *gmTimer;
