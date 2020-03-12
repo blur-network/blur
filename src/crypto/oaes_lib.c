@@ -473,19 +473,33 @@ OAES_RET oaes_sprintf(
 #ifdef OAES_HAVE_ISAAC
 static void oaes_get_seed( char buf[RANDSIZ + 1] )
 {
-        #if !defined(__FreeBSD__) && !defined(__OpenBSD__)
-	struct timespec timer;
-	struct tm *gmTimer;
-	char * _test = NULL;
-	
-	timespec_get (&timer, TIME_UTC);
-	gmTimer = gmtime( &timer.time_sec );
-	_test = (char *) calloc( sizeof( char ), timer.tv_nsec );
-	sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
-		gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
-		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
-		_test + timer.tv_nsec, GETPID() );
-	#else
+    #if !defined(__FreeBSD__) && !defined(__OpenBSD__)
+        #if !defined(__APPLE__) && !defined(__WIN32__)
+  	    struct timespec timer;
+	    struct tm *gmTimer;
+	    char * _test = NULL;
+
+    	timespec_get (&timer, TIME_UTC);
+    	gmTimer = gmtime( &timer.tv_sec );
+    	_test = (char *) calloc( sizeof( char ), timer.tv_nsec );
+    	sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
+    		gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
+    		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
+    		_test + timer.tv_nsec, GETPID() );
+	    #else
+        struct timeb timer;
+        struct tm *gmTimer;
+        char * _test = NULL;
+
+        ftime(&timer);
+        gmTimer = gmTime(&timer.time);
+        _test = (char*) calloc(sizeof(char),timer.millitm);
+        sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
+            gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
+            gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.millitm,
+            _test + timer.millitm, GETPID() );
+        #endif
+    #else
 	struct timeval timer;
 	struct tm *gmTimer;
 	char * _test = NULL;
@@ -498,31 +512,45 @@ static void oaes_get_seed( char buf[RANDSIZ + 1] )
 		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_usec/1000,
 		_test + timer.tv_usec/1000, GETPID() );
 	#endif
-		
+
 	if( _test )
 		free( _test );
 }
 #else
 static uint32_t oaes_get_seed(void)
 {
-        #if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__ANDROID__)
-	struct timespec timer;
-	struct tm *gmTimer;
-	char * _test = NULL;
-	uint32_t _ret = 0;
-	
-	timespec_get (&timer, TIME_UTC);
-	gmTimer = gmtime( &timer.tv_sec );
-	_test = (char *) calloc( sizeof( char ), timer.tv_nsec );
-	_ret = gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
-			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.tv_nsec +
-			(uintptr_t) ( _test + timer.tv_nsec ) + GETPID();
+    #if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__ANDROID__)
+        #if !defined(__APPLE__) && !defined(__WIN32__)
+        struct timeb timer;
+        struct tm *gmTimer;
+        char * _test = NULL;
+        uint32_t _ret = 0;
+
+        ftime (&timer);
+        gmTimer = gmtime( &timer.time );
+        _test = (char *) calloc( sizeof( char ), timer.millitm );
+        _ret = gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
+                gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.millitm +
+                (uintptr_t) ( _test + timer.millitm ) + GETPID();
+        #else
+        struct timeb timer;
+        struct tm *gmTimer;
+        char * _test = NULL;
+
+        ftime(&timer);
+        gmTimer = gmTime(&timer.time);
+        _test = (char*) calloc(sizeof(char),timer.millitm);
+        sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
+            gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
+            gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.millitm,
+            _test + timer.millitm, GETPID() );
+        #endif
 	#else
 	struct timeval timer;
 	struct tm *gmTimer;
 	char * _test = NULL;
 	uint32_t _ret = 0;
-	
+
 	gettimeofday(&timer, NULL);
 	gmTimer = gmtime( &timer.tv_sec );
 	_test = (char *) calloc( sizeof( char ), timer.tv_usec/1000 );
@@ -533,7 +561,7 @@ static uint32_t oaes_get_seed(void)
 
 	if( _test )
 		free( _test );
-	
+
 	return _ret;
 }
 #endif // OAES_HAVE_ISAAC
