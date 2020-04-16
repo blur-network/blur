@@ -945,7 +945,7 @@ namespace cryptonote
       try_add_next_blocks(context);
       return 1;
     }
-
+    else
     {
       MLOG_YELLOW(el::Level::Debug, context << " Got NEW BLOCKS inside of " << __FUNCTION__ << ": size: " << arg.blocks.size()
           << ", blocks: " << start_height << " - " << (start_height + arg.blocks.size() - 1));
