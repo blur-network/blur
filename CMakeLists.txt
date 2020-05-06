@@ -856,7 +856,7 @@ endif()
 
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-option(USE_READLINE "Build with GNU readline support." ON)
+option(USE_READLINE "Build with GNU readline support." OFF)
 
 if(USE_READLINE)
   find_package(Readline)
@@ -926,6 +926,7 @@ find_library(SODIUM_LIBRARY sodium)
 
 if(SODIUM_LIBRARY)
   set(SODIUM_LIBRARY "${SODIUM_LIBRARY}")
+  message("Using sodium library located at: ${SODIUM_LIBRARY}.")
 endif()
 
 if(NOT SODIUM_LIBRARY)
