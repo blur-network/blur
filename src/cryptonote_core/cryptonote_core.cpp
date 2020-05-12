@@ -123,16 +123,6 @@ namespace cryptonote
   , "How many blocks to sync at once during chain synchronization (0 = adaptive)."
   , 0
   };
-  static const command_line::arg_descriptor<bool> arg_fluffy_blocks  = {
-    "fluffy-blocks"
-  , "Relay blocks as fluffy blocks (obsolete, now default)"
-  , true
-  };
-  static const command_line::arg_descriptor<bool> arg_no_fluffy_blocks  = {
-    "no-fluffy-blocks"
-  , "Relay blocks as normal blocks"
-  , false
-  };
   static const command_line::arg_descriptor<size_t> arg_max_txpool_size  = {
     "max-txpool-size"
   , "Set maximum txpool size in bytes."
@@ -186,10 +176,7 @@ namespace cryptonote
 
 
     test_drop_download_height(command_line::get_arg(vm, arg_test_drop_download_height));
-    m_fluffy_blocks_enabled = !command_line::get_arg(vm, arg_no_fluffy_blocks);
     m_offline = command_line::get_arg(vm, arg_offline);
-    if (!command_line::is_arg_defaulted(vm, arg_fluffy_blocks))
-      MWARNING(arg_fluffy_blocks.name << " is obsolete, it is now default");
 
     if (command_line::get_arg(vm, arg_test_drop_download) == true)
       test_drop_download();
@@ -258,8 +245,6 @@ namespace cryptonote
     command_line::add_arg(desc, arg_fast_block_sync);
     command_line::add_arg(desc, arg_show_time_stats);
     command_line::add_arg(desc, arg_block_sync_size);
-    command_line::add_arg(desc, arg_fluffy_blocks);
-    command_line::add_arg(desc, arg_no_fluffy_blocks);
     command_line::add_arg(desc, arg_test_dbg_lock_sleep);
     command_line::add_arg(desc, arg_offline);
     command_line::add_arg(desc, arg_max_txpool_size);

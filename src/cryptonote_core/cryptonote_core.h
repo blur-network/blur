@@ -732,13 +732,6 @@ namespace cryptonote
      network_type get_nettype() const { return m_nettype; };
 
      /**
-      * @brief get whether fluffy blocks are enabled
-      *
-      * @return whether fluffy blocks are enabled
-      */
-     bool fluffy_blocks_enabled() const { return m_fluffy_blocks_enabled; }
-
-     /**
       * @brief check a set of hashes against the precompiled hash set
       *
       * @return number of usable blocks
@@ -956,7 +949,6 @@ namespace cryptonote
 
      tools::threadpool& m_threadpool;
 
-     bool m_fluffy_blocks_enabled;
      bool m_offline;
    };
 }
