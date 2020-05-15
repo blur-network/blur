@@ -3806,20 +3806,33 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
   if(blocks_entry.size() == 0)
     return false;
 
-  for (const auto &entry : blocks_entry)
-  {
-    bytes += entry.block.size();
-    for (const auto &tx_blob : entry.txs)
+  std::list<block> blocks;
+
+//      rollback_blockchain_switching(blocks, get_block_height(blocks.back()));
+  for (const auto& each : blocks_entry) {
+    cryptonote::block b;
+    bytes += each.block.size();
+    for (const auto &tx_blob : each.txs)
     {
       bytes += tx_blob.size();
     }
+    if (!parse_and_validate_block_from_blob(each.block, b))
+    {
+      LOG_ERROR("Invalid block");
+      return false;
+    }
+    blocks.push_back(b);
   }
+
+
+  m_hardfork->reorganize_from_chain_height(get_current_blockchain_height());
+
   while (!(stop_batch = m_db->batch_start(blocks_entry.size(), bytes))) {
-    m_blockchain_lock.unlock();
-    m_tx_pool.unlock();
-    epee::misc_utils::sleep_no_w(1000);
-    m_tx_pool.lock();
     m_blockchain_lock.lock();
+    m_tx_pool.lock();
+    epee::misc_utils::sleep_no_w(1000);
+    m_tx_pool.unlock();
+    m_blockchain_lock.unlock();
   }
 
   if ((m_db->height() + blocks_entry.size()) < m_blocks_hash_check.size())
