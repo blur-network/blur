@@ -46,7 +46,6 @@
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "blockchain.db.lmdb"
 
-
 using epee::string_tools::pod_to_hex;
 using namespace crypto;
 
@@ -503,8 +502,50 @@ void BlockchainLMDB::do_resize(uint64_t increase_size)
 // threshold_size is used for batch transactions
 bool BlockchainLMDB::need_resize(uint64_t threshold_size) const
 {
-  LOG_PRINT_L3("BlockchainLMDB::" << __func__);
+#if defined(ENABLE_AUTO_RESIZE)
+  MDB_envinfo mei;
+  mdb_env_info(m_env, &mei);
+  MDB_stat mst;
+  mdb_env_stat(m_env, &mst);
+
+  // size_used doesn't include data yet to be committed, which can be
+  // significant size during batch transactions. For that, we estimate the size
+  // needed at the beginning of the batch transaction and pass in the
+  // additional size needed.
+
+  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
+
+  LOG_PRINT_L1("DB map size:     " << mei.me_mapsize);
+  LOG_PRINT_L1("Space used:      " << size_used);
+  LOG_PRINT_L1("Space remaining: " << mei.me_mapsize - size_used);
+  LOG_PRINT_L1("Size threshold:  " << threshold_size);
+  float resize_percent_old = RESIZE_PERCENT;
+  LOG_PRINT_L1(boost::format("Percent used: %.04f  Percent threshold: %.04f") % ((double)size_used/mei.me_mapsize) % resize_percent_old);
+
+  if (threshold_size > 0)
+  {
+    if (mei.me_mapsize - size_used < threshold_size)
+    {
+      LOG_PRINT_L1("Threshold met (size-based)");
+      return true;
+    }
+    else
+      return false;
+  }
+
+  std::mt19937 engine(std::random_device{}());
+  std::uniform_real_distribution<double> fdis(0.6, 0.9);
+  double resize_percent = fdis(engine);
+
+  if ((double)size_used / mei.me_mapsize  > resize_percent)
+  {
+    LOG_PRINT_L1("Threshold met (percent-based)");
+    return true;
+  }
   return false;
+#else
+  return false;
+#endif
 }
 
 void BlockchainLMDB::check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes)

@@ -257,6 +257,16 @@ void BlockchainDB::pop_block(block& blk, std::vector<transaction>& txs)
   remove_transaction(get_transaction_hash(blk.miner_tx));
 }
 
+bool BlockchainDB::need_resize()
+{
+  return need_resize();
+}
+
+void BlockchainDB::do_resize()
+{
+  do_resize();
+}
+
 bool BlockchainDB::is_open() const
 {
   return m_open;

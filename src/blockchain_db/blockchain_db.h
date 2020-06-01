@@ -734,6 +734,11 @@ public:
    */
   virtual void batch_stop() = 0;
 
+  virtual bool need_resize();
+
+  virtual void do_resize();
+
+
   /**
    * @brief sets whether or not to batch transactions
    *
