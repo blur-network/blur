@@ -294,6 +294,9 @@ namespace epee
 
 
 #define END_INVOKE_MAP2() \
+  if (command == 2008) { \
+    MDEBUG("Deprecated fluffy block encountered!"); \
+  } \
   LOG_ERROR("Unknown command:" << command); \
   return LEVIN_ERROR_CONNECTION_HANDLER_NOT_DEFINED; \
   }
