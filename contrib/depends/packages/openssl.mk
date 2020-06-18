@@ -6,7 +6,7 @@ $(package)_sha256_hash=ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3f
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
-$(package)_config_opts=--prefix=$(host_prefix) --openssldir=$(host_prefix)/etc/openssl
+$(package)_config_opts=--prefix=$(host_prefix)/ssl --openssldir=$(host_prefix)/ssl
 $(package)_config_opts+=no-capieng
 $(package)_config_opts+=no-dso
 $(package)_config_opts+=no-dtls1
@@ -33,6 +33,11 @@ $(package)_config_opts+=no-store
 $(package)_config_opts+=no-unit-test
 $(package)_config_opts+=no-weak-ssl-ciphers
 $(package)_config_opts+=no-zlib
+$(package)_config_opts+=no-asm
+$(package)_config_opts+=no-cipher
+$(package)_config_opts+=no-threads
+$(package)_config_opts+=no-egd
+$(package)_config_opts+=no-hw
 $(package)_config_opts+=no-zlib-dynamic
 $(package)_config_opts+=$($(package)_cflags) $($(package)_cppflags)
 $(package)_config_opts_linux=-fPIC -Wa,--noexecstack
