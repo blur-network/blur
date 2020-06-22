@@ -944,17 +944,13 @@ namespace cryptonote
       }
       else if (b.major_version >= 10)
       {
-        // get 6 char from previous hash as varint
-        epee::span<const uint8_t> span_bytes = epee::as_byte_span(b.prev_id);
-
-        uint8_t i = 0;
-        subhash sub; sub.uint = 0;
         uint32_t id_num = 0;
-        for (const auto& byte : span_bytes) {
-          memcpy(&sub.bytes[i++], &byte, sizeof(byte));
-          id_num |= byte << (24 - (8*i));
-          if (i == 3)
-            break;
+        uint8_t bytes_span[3] = { 0, 0, 0 };
+
+        // get 6 char from previous hash as varint
+        for (size_t i = 0; i < 3; i++) {
+          memcpy(&bytes_span[i], &b.prev_id.data[i], sizeof(b.prev_id.data[i]));
+          id_num |= bytes_span[i] << (24 - (8*(i+1)));
         }
 
         // guard against zero case
