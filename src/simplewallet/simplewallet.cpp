@@ -69,7 +69,7 @@
 #include <boost/filesystem.hpp>
 #endif
 
-#ifdef USE_READLINE
+#ifdef HAVE_READLINE
 #include "readline_buffer.h"
 #endif
 
@@ -139,7 +139,7 @@ namespace
 
   std::string input_line(const std::string& prompt)
   {
-#ifdef USE_READLINE
+#ifdef HAVE_READLINE
     rdln::suspend_readline pause_readline;
 #endif
     std::cout << prompt;
@@ -156,7 +156,7 @@ namespace
 
   boost::optional<tools::password_container> password_prompter(const char *prompt, bool verify)
   {
-#ifdef USE_READLINE
+#ifdef HAVE_READLINE
     rdln::suspend_readline pause_readline;
 #endif
     auto pwd_container = tools::password_container::prompt(verify, prompt);
@@ -3717,7 +3717,7 @@ bool simple_wallet::refresh_main(uint64_t start_height, bool reset, bool is_init
   if (reset)
     m_wallet->rescan_blockchain(false);
 
-#ifdef USE_READLINE
+#ifdef HAVE_READLINE
   rdln::suspend_readline pause_readline;
 #endif
 
