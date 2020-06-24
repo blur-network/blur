@@ -64,7 +64,7 @@ monero_add_library(wallet_api
   ${wallet_api_headers}
   ${wallet_api_private_headers})
 target_link_libraries(wallet_api
-  PUBLIC
+  PRIVATE
     wallet
     common
     cryptonote_core
@@ -76,7 +76,6 @@ target_link_libraries(wallet_api
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
-  PRIVATE
     ${EXTRA_LIBRARIES})
 
 set_property(TARGET wallet_api PROPERTY EXCLUDE_FROM_ALL TRUE)
