@@ -921,7 +921,7 @@ namespace cryptonote
   {
     blobdata bd = get_block_hashing_blob(b);
     const int cn_variant = b.major_version >= 5 ? ( b.major_version >= 8 ? 2 : 1 ) : 0;
-    int cn_iters = b.major_version >= 6 ? (b.major_version >= 7 ? 0x40000 :  0x20000) : 0x80000;
+    uint32_t cn_iters = b.major_version >= 6 ? (b.major_version >= 7 ? 0x40000 :  0x20000) : 0x80000;
     uint64_t its = 0;
 
       if (b.major_version <= 7)
@@ -949,7 +949,7 @@ namespace cryptonote
 
         // get 6 char from previous hash as varint
         for (size_t i = 0; i < 3; i++) {
-          memcpy(&bytes_span[i], &b.prev_id.data[i], sizeof(b.prev_id.data[i]));
+          memset(&bytes_span[i], (int)(b.prev_id.data[i]), sizeof(b.prev_id.data[i]));
           id_num |= bytes_span[i] << (24 - (8*(i+1)));
         }
 
