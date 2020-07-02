@@ -1,5 +1,5 @@
 name: blur
-version: 0.1.9.9.2
+version: 0.1.9.9.4
 summary: "Blur Network: The private cryptocurrency (https://blur.cash)"
 description: |
     BLUR is a privacy-focused cryptocurrency based on code from Monero. The Blur
@@ -9,6 +9,7 @@ description: |
     Join the Fight for Financial Freedom.
 grade: stable
 confinement: strict
+base: core18
 
 apps:
     blurd:
@@ -42,11 +43,13 @@ parts:
         source: .
         build-packages:
             - gcc
+            - g++
             - pkg-config
             - libboost-all-dev
             - libssl-dev
             - libsodium-dev
             - git
+            - build-essential
             - libunwind-dev
             - libreadline7
             - libtinfo5
@@ -62,7 +65,7 @@ parts:
             - libboost-program-options1.62.0
             - libboost-regex1.62.0
             - libssl-dev
-            - libsodium18
+            - libsodium23
             - libstdc++6
             - libgcc1
             - libreadline7
