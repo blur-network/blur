@@ -8,11 +8,15 @@ RUN wget https://www.dropbox.com/sh/xv2jdrs0uc6z2b9/AACAPqZJTjVbLlXhBNRR2N1Ja/${
 
 RUN dpkg -i aocc-compiler-2.1.0_1_amd64.deb && rm -f aocc-compiler-2.1.0_1_amd64.deb
 
-RUN git clone https://github.com/blur-network/blur.git
+RUN git config --global user.email "you@example.com"
 
 RUN /bin/bash -c "source /opt/AMD/aocc-compiler-2.1.0/setenv_AOCC.sh" \
 && export CC=/opt/AMD/aocc-compiler-2.1.0/bin/clang \
 && export CXX=/opt/AMD/aocc-compiler-2.1.0/bin/clang++ \
-&& cd blur && make -j6 release-static
+&& git clone https://github.com/blur-network/blur.git \
+&& cd blur && git checkout v0.1.9.9.4 \
+&& git format-patch -1 3bec88abef0c46c4b9e17810960cbb0dc2dcc488 \
+&& git am 0001*patch \
+&& make -j12 # release-static-linux-x86_64
 
-RUN ls *
+RUN ls blur
