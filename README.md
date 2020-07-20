@@ -109,13 +109,13 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
 
->`cd ~/Downloads && tar xvzf blur-v0.1.9.5-linux-x86_64.tar.gz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.9.9.4-linux-x86_64.tar.gz`
 
 
 Navigate into the directory you just extracted from the archive, and start the daemon.
 
 
->`cd blur-v0.1.9.5-linux_x86_64 && ./blurd`
+>`cd blur-v0.1.9.9.4-linux_x86_64 && ./blurd`
 
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
@@ -138,9 +138,9 @@ Example: `start_mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53
 
 **Or:** Use the following startup flags when launching the daemon:
 
-`./blurd --start-mining <BLUR address> --mining-threads <num. threads>`
+`./blurd --start-mining="<BLUR address>" --mining-threads="<num. threads>"`
 
-Example: `./blurd --start-mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu --mining-threads 4`
+Example: `./blurd --start-mining="bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu" --mining-threads="4"`
 
 You should see a message for each thread that reads: `Mining started for thread[0]` or something similar. 
 
@@ -200,10 +200,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-priority-node=66.70.188.178:52541 --add-priority-node=66.70.189.131:52541 --add-priority-node=66.70.189.183:52541 --p2p-bind-port 52541 --rpc-bind-port 52542 --rpc-bind-ip 127.0.0.1`
+`./blurd --add-priority-node="66.70.188.178:52541" --add-priority-node="66.70.189.131:52541" --add-priority-node="66.70.189.183:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-priority-node=66.70.188.178:52541 --add-priority-node=66.70.189.131:52541 --add-priority-node=66.70.189.183:52541 --p2p-bind-port=52541 --rpc-bind-port=52542 --rpc-bind-ip=127.0.0.1`
+`blurd.exe --add-priority-node="66.70.188.178:52541" --add-priority-node="66.70.189.131:52541" --add-priority-node="66.70.189.183:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
 
 This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
 
