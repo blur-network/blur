@@ -435,7 +435,7 @@ void BlockchainLMDB::do_resize(uint64_t increase_size)
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   CRITICAL_REGION_LOCAL(m_synchronization_lock);
-  const uint64_t add_size = 1LL << 30;
+  const uint64_t add_size = 1LL << 27;
 
   // check disk capacity
   try
@@ -614,6 +614,7 @@ void BlockchainLMDB::add_block(const block& blk, const size_t& block_size, const
 
   m_cum_size += block_size;
   m_cum_count++;
+
 }
 
 void BlockchainLMDB::remove_block()
@@ -1043,7 +1044,7 @@ void BlockchainLMDB::open(const std::string& filename, const int db_flags)
     (result = mdb_env_set_maxreaders(m_env, threads+16)))
     throw0(DB_ERROR(lmdb_error("Failed to set max number of readers: ", result).c_str()));
 
-  size_t mapsize = DEFAULT_MAPSIZE;
+  size_t mapsize = (1LL << 27);
 
   if (db_flags & DBF_FAST)
     mdb_flags |= MDB_NOSYNC;
@@ -2485,6 +2486,18 @@ bool BlockchainLMDB::batch_start(uint64_t batch_num_blocks, uint64_t batch_bytes
   check_open();
 
   m_writer = boost::this_thread::get_id();
+
+  MDB_envinfo mei;
+  mdb_env_info(m_env, &mei);
+  MDB_stat mst;
+  mdb_env_stat(m_env, &mst);
+
+  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
+
+  if ((mei.me_mapsize - size_used) <= (1LL << 26)) {
+    do_resize();
+  }
+
   check_and_resize_for_batch(batch_num_blocks, batch_bytes);
 
   m_write_batch_txn = new mdb_txn_safe();
