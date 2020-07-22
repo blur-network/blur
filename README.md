@@ -160,9 +160,6 @@ Start the daemon by double-clicking the `blurd.exe` file.
 You will see a pop-up from your firewall.  Be sure to check the box next to "Private Networks" if you are on a private network, or your daemon will not be able to sync with the network. If you daemon stalls while syncing, close and restart the program.  You will not lose any blocks you have already synced with. Once your daemon is synced with the network...
 
 Start the wallet by double-clicking the `blur-wallet-cli` file.
-
-Follow the prompts to setup a new wallet.  When prompted for the password, please note that the CLI will not show a password or indicate your keystrokes as you type.
-
 Follow the prompts to setup a new wallet.  When prompted for the password, the CLI will not show a password as you type, as `echo` has been turned off for password entry.
 
 Record the information for your wallet.
@@ -177,9 +174,9 @@ Example: `start_mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53
 
 **Or:** Use the following startup flags when launching the daemon, from Powershell:
 
-`blurd.exe --start-mining <BLUR address> --mining-threads <num. threads>`
+`blurd.exe --start-mining="<BLUR address>" --mining-threads="<num. threads>"`
 
-Example: `blurd.exe --start-mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu --mining-threads 4`
+Example: `blurd.exe --start-mining="bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu" --mining-threads="4"`
 
 You should see a message for each thread that reads: `Mining started for thread[0]` or something similar. 
 
