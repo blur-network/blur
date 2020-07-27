@@ -35,8 +35,6 @@
 
 #include <lmdb.h>
 
-#define ENABLE_AUTO_RESIZE
-
 namespace cryptonote
 {
 
@@ -293,9 +291,9 @@ public:
   std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> get_output_histogram(const std::vector<uint64_t> &amounts, bool unlocked, uint64_t recent_cutoff) const;
 
 private:
-  void do_resize(uint64_t size_increase=0);
+  void do_resize();
 
-  bool need_resize(uint64_t threshold_size=0) const;
+  bool need_resize() const;
   void check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes);
   uint64_t get_estimated_batch_size(uint64_t batch_num_blocks, uint64_t batch_bytes) const;
 
@@ -409,16 +407,7 @@ private:
   mdb_txn_cursors m_wcursors;
   mutable boost::thread_specific_ptr<mdb_threadinfo> m_tinfo;
 
-#if defined(__arm__)
-  // force a value so it can compile with 32-bit ARM
-  constexpr static uint64_t DEFAULT_MAPSIZE = 1LL << 31;
-#else
-#if defined(ENABLE_AUTO_RESIZE)
-  constexpr static uint64_t DEFAULT_MAPSIZE = 1LL << 30;
-#else
-  constexpr static uint64_t DEFAULT_MAPSIZE = 1LL << 33;
-#endif
-#endif
+  constexpr static uint64_t DEFAULT_MAPSIZE = 1LL << 27;
 
   constexpr static float RESIZE_PERCENT = 0.8f;
 };

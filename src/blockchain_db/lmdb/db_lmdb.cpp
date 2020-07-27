@@ -431,7 +431,7 @@ inline int lmdb_txn_renew(MDB_txn *txn)
   return res;
 }
 
-void BlockchainLMDB::do_resize(uint64_t increase_size)
+void BlockchainLMDB::do_resize()
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   CRITICAL_REGION_LOCAL(m_synchronization_lock);
@@ -456,21 +456,11 @@ void BlockchainLMDB::do_resize(uint64_t increase_size)
   }
 
   MDB_envinfo mei;
-
   mdb_env_info(m_env, &mei);
-
   MDB_stat mst;
-
   mdb_env_stat(m_env, &mst);
 
-  // add 1Gb per resize, instead of doing a percentage increase
-  uint64_t new_mapsize = (double) mei.me_mapsize + add_size;
-
-  // If given, use increase_size instead of above way of resizing.
-  // This is currently used for increasing by an estimated size at start of new
-  // batch txn.
-  if (increase_size > 0)
-    new_mapsize = mei.me_mapsize + increase_size;
+  size_t new_mapsize = mei.me_mapsize + add_size;
 
   new_mapsize += (new_mapsize % mst.ms_psize);
 
@@ -499,54 +489,24 @@ void BlockchainLMDB::do_resize(uint64_t increase_size)
   mdb_txn_safe::allow_new_txns();
 }
 
-// threshold_size is used for batch transactions
-bool BlockchainLMDB::need_resize(uint64_t threshold_size) const
+bool BlockchainLMDB::need_resize() const
 {
-#if defined(ENABLE_AUTO_RESIZE)
   MDB_envinfo mei;
   mdb_env_info(m_env, &mei);
   MDB_stat mst;
   mdb_env_stat(m_env, &mst);
 
-  // size_used doesn't include data yet to be committed, which can be
-  // significant size during batch transactions. For that, we estimate the size
-  // needed at the beginning of the batch transaction and pass in the
-  // additional size needed.
+  size_t size_used = mst.ms_psize * mei.me_last_pgno;
 
-  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
-
-  LOG_PRINT_L1("DB map size:     " << mei.me_mapsize);
-  LOG_PRINT_L1("Space used:      " << size_used);
-  LOG_PRINT_L1("Space remaining: " << mei.me_mapsize - size_used);
-  LOG_PRINT_L1("Size threshold:  " << threshold_size);
-  float resize_percent_old = RESIZE_PERCENT;
-  LOG_PRINT_L1(boost::format("Percent used: %.04f  Percent threshold: %.04f") % ((double)size_used/mei.me_mapsize) % resize_percent_old);
-
-  if (threshold_size > 0)
-  {
-    if (mei.me_mapsize - size_used < threshold_size)
-    {
-      LOG_PRINT_L1("Threshold met (size-based)");
-      return true;
-    }
-    else
-      return false;
-  }
-
-  std::mt19937 engine(std::random_device{}());
-  std::uniform_real_distribution<double> fdis(0.6, 0.9);
-  double resize_percent = fdis(engine);
-
-  if ((double)size_used / mei.me_mapsize  > resize_percent)
-  {
-    LOG_PRINT_L1("Threshold met (percent-based)");
+  if ((mei.me_mapsize - size_used) <= (1LL << 26)) {
+    LOG_PRINT_L1("DB map size:     " << mei.me_mapsize);
+    LOG_PRINT_L1("Space used:      " << size_used);
+    LOG_PRINT_L1("Space remaining: " << mei.me_mapsize - size_used);
     return true;
   }
   return false;
-#else
-  return false;
-#endif
 }
+
 
 void BlockchainLMDB::check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes)
 {
@@ -1044,7 +1004,7 @@ void BlockchainLMDB::open(const std::string& filename, const int db_flags)
     (result = mdb_env_set_maxreaders(m_env, threads+16)))
     throw0(DB_ERROR(lmdb_error("Failed to set max number of readers: ", result).c_str()));
 
-  size_t mapsize = (1LL << 27);
+  size_t const mapsize = DEFAULT_MAPSIZE;
 
   if (db_flags & DBF_FAST)
     mdb_flags |= MDB_NOSYNC;
@@ -2475,6 +2435,18 @@ bool BlockchainLMDB::for_all_outputs(uint64_t amount, const std::function<bool(u
 bool BlockchainLMDB::batch_start(uint64_t batch_num_blocks, uint64_t batch_bytes)
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
+
+  MDB_envinfo mei;
+  mdb_env_info(m_env, &mei);
+  MDB_stat mst;
+  mdb_env_stat(m_env, &mst);
+
+  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
+
+  if (need_resize()) {
+    do_resize();
+  }
+
   if (! m_batch_transactions)
     throw0(DB_ERROR("batch transactions not enabled"));
   if (m_batch_active)
@@ -2486,17 +2458,6 @@ bool BlockchainLMDB::batch_start(uint64_t batch_num_blocks, uint64_t batch_bytes
   check_open();
 
   m_writer = boost::this_thread::get_id();
-
-  MDB_envinfo mei;
-  mdb_env_info(m_env, &mei);
-  MDB_stat mst;
-  mdb_env_stat(m_env, &mst);
-
-  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
-
-  if ((mei.me_mapsize - size_used) <= (1LL << 26)) {
-    do_resize();
-  }
 
   check_and_resize_for_batch(batch_num_blocks, batch_bytes);
 
