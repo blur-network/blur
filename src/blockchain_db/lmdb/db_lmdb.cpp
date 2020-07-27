@@ -496,7 +496,7 @@ bool BlockchainLMDB::need_resize() const
   MDB_stat mst;
   mdb_env_stat(m_env, &mst);
 
-  size_t size_used = mst.ms_psize * mei.me_last_pgno;
+  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
 
   if ((mei.me_mapsize - size_used) <= (1LL << 26)) {
     LOG_PRINT_L1("DB map size:     " << mei.me_mapsize);
@@ -1004,7 +1004,7 @@ void BlockchainLMDB::open(const std::string& filename, const int db_flags)
     (result = mdb_env_set_maxreaders(m_env, threads+16)))
     throw0(DB_ERROR(lmdb_error("Failed to set max number of readers: ", result).c_str()));
 
-  size_t const mapsize = DEFAULT_MAPSIZE;
+  uint64_t const mapsize = DEFAULT_MAPSIZE;
 
   if (db_flags & DBF_FAST)
     mdb_flags |= MDB_NOSYNC;
@@ -2435,13 +2435,6 @@ bool BlockchainLMDB::for_all_outputs(uint64_t amount, const std::function<bool(u
 bool BlockchainLMDB::batch_start(uint64_t batch_num_blocks, uint64_t batch_bytes)
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
-
-  MDB_envinfo mei;
-  mdb_env_info(m_env, &mei);
-  MDB_stat mst;
-  mdb_env_stat(m_env, &mst);
-
-  uint64_t size_used = mst.ms_psize * mei.me_last_pgno;
 
   if (need_resize()) {
     do_resize();
