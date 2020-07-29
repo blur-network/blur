@@ -55,6 +55,9 @@
 
 #define MIN_WANTED_SEED_NODES 3
 
+#define SEED_NODE_PEERS { "66.70.189.183", "66.70.189.131", "66.70.188.178", "51.79.66.36", "51.79.66.123", "51.79.64.184" }
+
+
 namespace nodetool
 {
   inline bool append_net_address(std::vector<epee::net_utils::network_address> & seed_nodes, std::string const & addr, uint16_t default_port);
@@ -482,6 +485,19 @@ namespace nodetool
     res = m_peerlist.init(m_allow_local_ip);
     CHECK_AND_ASSERT_MES(res, false, "Failed to init peerlist.");
 
+    if (m_nettype == cryptonote::MAINNET) {
+      std::vector<std::string> seed_peers = SEED_NODE_PEERS;
+      for (const auto& each: seed_peers) {
+        nodetool::peerlist_entry pe = AUTO_VAL_INIT(pe);
+        pe.id = crypto::rand<uint64_t>();
+        const uint16_t default_port = cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT;
+        bool r = parse_peer_from_string(pe.adr, each, default_port);
+        if (r)
+        {
+          m_command_line_peers.push_back(pe);
+        }
+      }
+    }
 
     for(auto& p: m_command_line_peers)
       m_peerlist.append_with_peer_white(p);
