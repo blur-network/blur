@@ -479,7 +479,8 @@ namespace nodetool
     res = m_peerlist.init(m_allow_local_ip);
     CHECK_AND_ASSERT_MES(res, false, "Failed to init peerlist.");
 
-    if ((m_nettype == cryptonote::MAINNET) && (vm.count("add-priority-node") == 0)) {
+    // if we are on mainnet, and have neither exclusive nor priority nodes specified
+    if ((m_nettype == cryptonote::MAINNET) && ((m_priority_peers.size() == 0) && (m_exclusive_peers.size() == 0))) {
       std::vector<std::string> seed_peers = SEED_NODE_PEERS;
       for (const auto& each: seed_peers) {
         nodetool::peerlist_entry pe = AUTO_VAL_INIT(pe);
