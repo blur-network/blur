@@ -107,31 +107,31 @@ namespace tools
   public:
     hashchain(): m_genesis(crypto::null_hash), m_offset(0) {}
 
-    size_t size() const { return m_blockchain.size() + m_offset; }
+    size_t size() const { return m_hashchain.size() + m_offset; }
     size_t offset() const { return m_offset; }
     const crypto::hash &genesis() const { return m_genesis; }
-    void push_back(const crypto::hash &hash) { if (m_offset == 0 && m_blockchain.empty()) m_genesis = hash; m_blockchain.push_back(hash); }
-    bool is_in_bounds(size_t idx) const { return idx >= m_offset && idx < size(); }
-    const crypto::hash &operator[](size_t idx) const { return m_blockchain[idx - m_offset]; }
-    crypto::hash &operator[](size_t idx) { return m_blockchain[idx - m_offset]; }
-    void crop(size_t height) { m_blockchain.resize(height - m_offset); }
-    void clear() { m_offset = 0; m_blockchain.clear(); }
-    bool empty() const { return m_blockchain.empty() && m_offset == 0; }
-    void trim(size_t height) { while (height > m_offset && m_blockchain.size() > 1) { m_blockchain.pop_front(); ++m_offset; } m_blockchain.shrink_to_fit(); }
-    void refill(const crypto::hash &hash) { m_blockchain.push_back(hash); --m_offset; }
+    void push_back(const crypto::hash &hash) { if (m_offset == 0 && m_hashchain.empty()) m_genesis = hash; m_hashchain.push_back(hash); }
+    bool is_in_bounds(size_t idx) const { return ((idx >= m_offset) && (idx < size())); }
+    const crypto::hash &operator[](size_t idx) const { return m_hashchain[idx - m_offset]; }
+    crypto::hash &operator[](size_t idx) { return m_hashchain[idx - m_offset]; }
+    void crop(size_t height) { m_hashchain.resize(height - m_offset); }
+    void clear() { m_offset = 0; m_hashchain.clear(); }
+    bool empty() const { return m_hashchain.empty() && m_offset == 0; }
+    void trim(size_t height) { while (height > m_offset && m_hashchain.size() > 1) { m_hashchain.pop_front(); ++m_offset; } m_hashchain.shrink_to_fit(); }
+    void refill(const crypto::hash &hash) { m_hashchain.push_back(hash); --m_offset; }
 
     template <class t_archive>
     inline void serialize(t_archive &a, const unsigned int ver)
     {
       a & m_offset;
       a & m_genesis;
-      a & m_blockchain;
+      a & m_hashchain;
     }
 
   private:
     size_t m_offset;
     crypto::hash m_genesis;
-    std::deque<crypto::hash> m_blockchain;
+    std::deque<crypto::hash> m_hashchain;
   };
 
   class wallet2
@@ -722,12 +722,12 @@ namespace tools
         a & blockchain;
         for (const auto &b: blockchain)
         {
-          m_blockchain.push_back(b);
+          m_hashchain.push_back(b);
         }
       }
       else
       {
-        a & m_blockchain;
+        a & m_hashchain;
       }
       a & m_transfers;
       a & m_account_public_address;
@@ -1119,7 +1119,7 @@ namespace tools
     std::string m_wallet_file;
     std::string m_keys_file;
     epee::net_utils::http::http_simple_client m_http_client;
-    hashchain m_blockchain;
+    hashchain m_hashchain;
     std::atomic<uint64_t> m_local_bc_height; //temporary workaround
     std::unordered_map<crypto::hash, unconfirmed_transfer_details> m_unconfirmed_txs;
     std::unordered_map<crypto::hash, confirmed_transfer_details> m_confirmed_txs;

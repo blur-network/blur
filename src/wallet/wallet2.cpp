@@ -1605,7 +1605,7 @@ void wallet2::process_new_blockchain_entry(const cryptonote::block& b, const cry
     if (!(height % 100))
       LOG_PRINT_L2( "Skipped block by timestamp, height: " << height << ", block time " << b.timestamp << ", account time " << m_account.get_createtime());
   }
-  m_blockchain.push_back(bl_id);
+  m_hashchain.push_back(bl_id);
   ++m_local_bc_height;
 
   if (m_callback != nullptr)
@@ -1616,17 +1616,17 @@ void wallet2::get_short_chain_history(std::list<crypto::hash>& ids) const
 {
   size_t i = 0;
   size_t current_multiplier = 1;
-  size_t sz = m_blockchain.size() - m_blockchain.offset();
+  size_t sz = m_hashchain.size() - m_hashchain.offset();
   if(!sz)
   {
-    ids.push_back(m_blockchain.genesis());
+    ids.push_back(m_hashchain.genesis());
     return;
   }
   size_t current_back_offset = 1;
   bool base_included = false;
   while(current_back_offset < sz)
   {
-    ids.push_back(m_blockchain[m_blockchain.offset() + sz-current_back_offset]);
+    ids.push_back(m_hashchain[m_hashchain.offset() + sz-current_back_offset]);
     if(sz-current_back_offset == 0)
       base_included = true;
     if(i < 10)
@@ -1639,9 +1639,9 @@ void wallet2::get_short_chain_history(std::list<crypto::hash>& ids) const
     ++i;
   }
   if(!base_included)
-    ids.push_back(m_blockchain[m_blockchain.offset()]);
-  if(m_blockchain.offset())
-    ids.push_back(m_blockchain.genesis());
+    ids.push_back(m_hashchain[m_hashchain.offset()]);
+  if(m_hashchain.offset())
+    ids.push_back(m_hashchain.genesis());
 }
 //----------------------------------------------------------------------------------------------------
 void wallet2::parse_block_round(const cryptonote::blobdata &blob, cryptonote::block &bl, crypto::hash &bl_id, bool &error) const
@@ -1753,7 +1753,7 @@ void wallet2::process_blocks(uint64_t start_height, const std::list<cryptonote::
   size_t tx_o_indices_idx = 0;
 
   THROW_WALLET_EXCEPTION_IF(blocks.size() != o_indices.size(), error::wallet_internal_error, "size mismatch");
-  THROW_WALLET_EXCEPTION_IF(!m_blockchain.is_in_bounds(current_index), error::wallet_internal_error, "Index out of bounds of hashchain");
+  THROW_WALLET_EXCEPTION_IF(!m_hashchain.is_in_bounds(current_index), error::wallet_internal_error, "Index out of bounds of hashchain");
 
   tools::threadpool& tpool = tools::threadpool::getInstance();
   int threads = tpool.get_max_concurrency();
@@ -1788,18 +1788,18 @@ void wallet2::process_blocks(uint64_t start_height, const std::list<cryptonote::
         const crypto::hash &bl_id = round_block_hashes[i];
         cryptonote::block &bl = round_blocks[i];
 
-        if(current_index >= m_blockchain.size())
+        if(current_index >= m_hashchain.size())
         {
           process_new_blockchain_entry(bl, *blocki, bl_id, current_index, o_indices[b+i]);
           ++blocks_added;
         }
-        else if(bl_id != m_blockchain[current_index])
+        else if(bl_id != m_hashchain[current_index])
         {
           //split detected here !!!
           THROW_WALLET_EXCEPTION_IF(current_index == start_height, error::wallet_internal_error,
             "wrong daemon response: split starts from the first block in response " + string_tools::pod_to_hex(bl_id) +
             " (height " + std::to_string(start_height) + "), local block id at this height: " +
-            string_tools::pod_to_hex(m_blockchain[current_index]));
+            string_tools::pod_to_hex(m_hashchain[current_index]));
 
           detach_blockchain(current_index);
           process_new_blockchain_entry(bl, *blocki, bl_id, current_index, o_indices[b+i]);
@@ -1822,18 +1822,18 @@ void wallet2::process_blocks(uint64_t start_height, const std::list<cryptonote::
     THROW_WALLET_EXCEPTION_IF(!r, error::block_parse_error, bl_entry.block);
 
     crypto::hash bl_id = get_block_hash(bl);
-    if(current_index >= m_blockchain.size())
+    if(current_index >= m_hashchain.size())
     {
       process_new_blockchain_entry(bl, bl_entry, bl_id, current_index, o_indices[tx_o_indices_idx]);
       ++blocks_added;
     }
-    else if(bl_id != m_blockchain[current_index])
+    else if(bl_id != m_hashchain[current_index])
     {
       //split detected here !!!
       THROW_WALLET_EXCEPTION_IF(current_index == start_height, error::wallet_internal_error,
         "wrong daemon response: split starts from the first block in response " + string_tools::pod_to_hex(bl_id) +
         " (height " + std::to_string(start_height) + "), local block id at this height: " +
-        string_tools::pod_to_hex(m_blockchain[current_index]));
+        string_tools::pod_to_hex(m_hashchain[current_index]));
 
       detach_blockchain(current_index);
       process_new_blockchain_entry(bl, bl_entry, bl_id, current_index, o_indices[tx_o_indices_idx]);
@@ -2141,27 +2141,27 @@ void wallet2::fast_refresh(uint64_t stop_height, uint64_t &blocks_start_height, 
   std::list<crypto::hash> hashes;
 
   const uint64_t checkpoint_height = m_checkpoints.get_max_height();
-  if (stop_height > checkpoint_height && m_blockchain.size()-1 < checkpoint_height)
+  if (stop_height > checkpoint_height && m_hashchain.size()-1 < checkpoint_height)
   {
     // we will drop all these, so don't bother getting them
-    uint64_t missing_blocks = m_checkpoints.get_max_height() - m_blockchain.size();
+    uint64_t missing_blocks = m_checkpoints.get_max_height() - m_hashchain.size();
     while (missing_blocks-- > 0)
-      m_blockchain.push_back(crypto::null_hash); // maybe a bit suboptimal, but deque won't do huge reallocs like vector
-    m_blockchain.push_back(m_checkpoints.get_points().at(checkpoint_height));
-    m_local_bc_height = m_blockchain.size();
+      m_hashchain.push_back(crypto::null_hash); // maybe a bit suboptimal, but deque won't do huge reallocs like vector
+    m_hashchain.push_back(m_checkpoints.get_points().at(checkpoint_height));
+    m_local_bc_height = m_hashchain.size();
     short_chain_history.clear();
     get_short_chain_history(short_chain_history);
   }
 
-  size_t current_index = m_blockchain.size();
+  size_t current_index = m_hashchain.size();
   while(m_run.load(std::memory_order_relaxed) && current_index < stop_height)
   {
     pull_hashes(0, blocks_start_height, short_chain_history, hashes);
     if (hashes.size() <= 3)
       return;
-    if (blocks_start_height < m_blockchain.offset())
+    if (blocks_start_height < m_hashchain.offset())
     {
-      MERROR("Blocks start before blockchain offset: " << blocks_start_height << " " << m_blockchain.offset());
+      MERROR("Blocks start before blockchain offset: " << blocks_start_height << " " << m_hashchain.offset());
       return;
     }
     if (hashes.size() + current_index < stop_height) {
@@ -2176,11 +2176,11 @@ void wallet2::fast_refresh(uint64_t stop_height, uint64_t &blocks_start_height, 
     current_index = blocks_start_height;
     for(auto& bl_id: hashes)
     {
-      if(current_index >= m_blockchain.size())
+      if(current_index >= m_hashchain.size())
       {
         if (!(current_index % 1000))
           LOG_PRINT_L2( "Skipped block by height: " << current_index);
-        m_blockchain.push_back(bl_id);
+        m_hashchain.push_back(bl_id);
         ++m_local_bc_height;
 
         if (m_callback != nullptr)
@@ -2189,7 +2189,7 @@ void wallet2::fast_refresh(uint64_t stop_height, uint64_t &blocks_start_height, 
           m_callback->on_new_block(current_index, dummy);
         }
       }
-      else if(bl_id != m_blockchain[current_index])
+      else if(bl_id != m_hashchain[current_index])
       {
         //split detected here !!!
         return;
@@ -2245,7 +2245,7 @@ void wallet2::refresh(uint64_t start_height, uint64_t & blocks_fetched, bool& re
   // pull the first set of blocks
   get_short_chain_history(short_chain_history);
   m_run.store(true, std::memory_order_relaxed);
-  if (start_height > m_blockchain.size() || m_refresh_from_block_height > m_blockchain.size()) {
+  if (start_height > m_hashchain.size() || m_refresh_from_block_height > m_hashchain.size()) {
     if (!start_height)
       start_height = m_refresh_from_block_height;
     // we can shortcut by only pulling hashes up to the start_height
@@ -2286,7 +2286,7 @@ void wallet2::refresh(uint64_t start_height, uint64_t & blocks_fetched, bool& re
       waiter.wait();
       if(blocks_start_height == next_blocks_start_height)
       {
-        m_node_rpc_proxy.set_height(m_blockchain.size());
+        m_node_rpc_proxy.set_height(m_hashchain.size());
         refreshed = true;
         break;
       }
@@ -2423,7 +2423,7 @@ void wallet2::detach_blockchain(uint64_t height)
   // size  1 2 3 4 5 6 7 8 9
   // block 0 1 2 3 4 5 6 7 8
   //               C
-  THROW_WALLET_EXCEPTION_IF(height <= m_checkpoints.get_max_height() && m_blockchain.size() > m_checkpoints.get_max_height(),
+  THROW_WALLET_EXCEPTION_IF(height <= m_checkpoints.get_max_height() && m_hashchain.size() > m_checkpoints.get_max_height(),
       error::wallet_internal_error, "Daemon claims reorg below last checkpoint");
 
   size_t transfers_detached = 0;
@@ -2458,8 +2458,8 @@ void wallet2::detach_blockchain(uint64_t height)
   }
   m_transfers.erase(it, m_transfers.end());
 
-  size_t blocks_detached = m_blockchain.size() - height;
-  m_blockchain.crop(height);
+  size_t blocks_detached = m_hashchain.size() - height;
+  m_hashchain.crop(height);
   m_local_bc_height -= blocks_detached;
 
   for (auto it = m_payments.begin(); it != m_payments.end(); )
@@ -2489,7 +2489,7 @@ bool wallet2::deinit()
 //----------------------------------------------------------------------------------------------------
 bool wallet2::clear()
 {
-  m_blockchain.clear();
+  m_hashchain.clear();
   m_transfers.clear();
   m_key_images.clear();
   m_pub_keys.clear();
@@ -3004,7 +3004,7 @@ void wallet2::generate(const std::string& wallet_, const epee::wipeable_string& 
 
   cryptonote::block b;
   generate_genesis(b, m_nettype);
-  m_blockchain.push_back(get_block_hash(b));
+  m_hashchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
   if (!wallet_.empty())
@@ -3063,7 +3063,7 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
 
   cryptonote::block b;
   generate_genesis(b, m_nettype);
-  m_blockchain.push_back(get_block_hash(b));
+  m_hashchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
   if (!wallet_.empty())
@@ -3128,7 +3128,7 @@ void wallet2::generate(const std::string& wallet_, const epee::wipeable_string& 
 
   cryptonote::block b;
   generate_genesis(b, m_nettype);
-  m_blockchain.push_back(get_block_hash(b));
+  m_hashchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
   if (!wallet_.empty())
@@ -3178,7 +3178,7 @@ void wallet2::generate(const std::string& wallet_, const epee::wipeable_string& 
 
   cryptonote::block b;
   generate_genesis(b, m_nettype);
-  m_blockchain.push_back(get_block_hash(b));
+  m_hashchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
   if (!wallet_.empty())
@@ -3218,7 +3218,7 @@ void wallet2::restore(const std::string& wallet_, const epee::wipeable_string& p
   }
   cryptonote::block b;
   generate_genesis(b, m_nettype);
-  m_blockchain.push_back(get_block_hash(b));
+  m_hashchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
   if (!wallet_.empty()) {
     store();
@@ -3314,7 +3314,7 @@ std::string wallet2::make_multisig(const epee::wipeable_string &password,
 
   cryptonote::block b;
   generate_genesis(b, m_nettype);
-  m_blockchain.push_back(get_block_hash(b));
+  m_hashchain.push_back(get_block_hash(b));
   add_subaddress_account(tr("Primary account"));
 
   if (!m_wallet_file.empty())
@@ -3799,9 +3799,9 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
   generate_genesis(genesis, m_nettype);
   crypto::hash genesis_hash = get_block_hash(genesis);
 
-  if (m_blockchain.empty())
+  if (m_hashchain.empty())
   {
-    m_blockchain.push_back(genesis_hash);
+    m_hashchain.push_back(genesis_hash);
   }
   else
   {
@@ -3813,7 +3813,7 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
   if (get_num_subaddress_accounts() == 0)
     add_subaddress_account(tr("Primary account"));
 
-  m_local_bc_height = m_blockchain.size();
+  m_local_bc_height = m_hashchain.size();
 
   try
   {
@@ -3828,38 +3828,38 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
 void wallet2::trim_hashchain()
 {
   uint64_t height = m_checkpoints.get_max_height();
-  if (!m_blockchain.empty() && m_blockchain.size() == m_blockchain.offset())
+  if (!m_hashchain.empty() && m_hashchain.size() == m_hashchain.offset())
   {
     MINFO("Fixing empty hashchain");
     cryptonote::COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::request req = AUTO_VAL_INIT(req);
     cryptonote::COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response res = AUTO_VAL_INIT(res);
     m_daemon_rpc_mutex.lock();
-    req.height = m_blockchain.size() - 1;
+    req.height = m_hashchain.size() - 1;
     bool r = net_utils::invoke_http_json_rpc("/json_rpc", "getblockheaderbyheight", req, res, m_http_client, rpc_timeout);
     m_daemon_rpc_mutex.unlock();
     if (r && res.status == CORE_RPC_STATUS_OK)
     {
       crypto::hash hash;
       epee::string_tools::hex_to_pod(res.block_header.hash, hash);
-      m_blockchain.refill(hash);
+      m_hashchain.refill(hash);
     }
     else
     {
       MERROR("Failed to request block header from daemon, hash chain may be unable to sync till the wallet is loaded with a usable daemon");
     }
   }
-  if (height > 0 && m_blockchain.size() > height)
+  if (height > 0 && m_hashchain.size() > height)
   {
     --height;
-    MDEBUG("trimming to " << height << ", offset " << m_blockchain.offset());
-    m_blockchain.trim(height);
+    MDEBUG("trimming to " << height << ", offset " << m_hashchain.offset());
+    m_hashchain.trim(height);
   }
 }
 //----------------------------------------------------------------------------------------------------
 void wallet2::check_genesis(const crypto::hash& genesis_hash) const {
   std::string what("Genesis block mismatch. You probably use wallet without testnet (or stagenet) flag with blockchain from test (or stage) network or vice versa");
 
-  THROW_WALLET_EXCEPTION_IF(genesis_hash != m_blockchain.genesis(), error::wallet_internal_error, what);
+  THROW_WALLET_EXCEPTION_IF(genesis_hash != m_hashchain.genesis(), error::wallet_internal_error, what);
 }
 //----------------------------------------------------------------------------------------------------
 std::string wallet2::path() const
@@ -4186,7 +4186,7 @@ void wallet2::rescan_blockchain(bool refresh)
   cryptonote::block genesis;
   generate_genesis(genesis, m_nettype);
   crypto::hash genesis_hash = get_block_hash(genesis);
-  m_blockchain.push_back(genesis_hash);
+  m_hashchain.push_back(genesis_hash);
   add_subaddress_account(tr("Primary account"));
   m_local_bc_height = 1;
 
@@ -5250,7 +5250,7 @@ uint32_t wallet2::adjust_priority(uint32_t priority)
 
       // get the last N block headers and sum the block sizes
       const size_t N = 10;
-      if (m_blockchain.size() < N)
+      if (m_hashchain.size() < N)
       {
         MERROR("The blockchain is too short");
         return priority;
@@ -5258,8 +5258,8 @@ uint32_t wallet2::adjust_priority(uint32_t priority)
       cryptonote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request getbh_req = AUTO_VAL_INIT(getbh_req);
       cryptonote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response getbh_res = AUTO_VAL_INIT(getbh_res);
       m_daemon_rpc_mutex.lock();
-      getbh_req.start_height = m_blockchain.size() - N;
-      getbh_req.end_height = m_blockchain.size() - 1;
+      getbh_req.start_height = m_hashchain.size() - N;
+      getbh_req.end_height = m_hashchain.size() - 1;
       r = net_utils::invoke_http_json_rpc("/json_rpc", "getblockheadersrange", getbh_req, getbh_res, m_http_client, rpc_timeout);
       m_daemon_rpc_mutex.unlock();
       THROW_WALLET_EXCEPTION_IF(!r, error::no_connection_to_daemon, "getblockheadersrange");
@@ -8940,33 +8940,33 @@ void wallet2::import_payments_out(const std::list<std::pair<crypto::hash,wallet2
 std::tuple<size_t,crypto::hash,std::vector<crypto::hash>> wallet2::export_blockchain() const
 {
   std::tuple<size_t, crypto::hash, std::vector<crypto::hash>> bc;
-  std::get<0>(bc) = m_blockchain.offset();
-  std::get<1>(bc) = m_blockchain.empty() ? crypto::null_hash: m_blockchain.genesis();
-  for (size_t n = m_blockchain.offset(); n < m_blockchain.size(); ++n)
+  std::get<0>(bc) = m_hashchain.offset();
+  std::get<1>(bc) = m_hashchain.empty() ? crypto::null_hash: m_hashchain.genesis();
+  for (size_t n = m_hashchain.offset(); n < m_hashchain.size(); ++n)
   {
-    std::get<2>(bc).push_back(m_blockchain[n]);
+    std::get<2>(bc).push_back(m_hashchain[n]);
   }
   return bc;
 }
 
 void wallet2::import_blockchain(const std::tuple<size_t, crypto::hash, std::vector<crypto::hash>> &bc)
 {
-  m_blockchain.clear();
+  m_hashchain.clear();
   if (std::get<0>(bc))
   {
     for (size_t n = std::get<0>(bc); n > 0; --n)
-      m_blockchain.push_back(std::get<1>(bc));
-    m_blockchain.trim(std::get<0>(bc));
+      m_hashchain.push_back(std::get<1>(bc));
+    m_hashchain.trim(std::get<0>(bc));
   }
   for (auto const &b : std::get<2>(bc))
   {
-    m_blockchain.push_back(b);
+    m_hashchain.push_back(b);
   }
   cryptonote::block genesis;
   generate_genesis(genesis, m_nettype);
   crypto::hash genesis_hash = get_block_hash(genesis);
   check_genesis(genesis_hash);
-  m_local_bc_height = m_blockchain.size();
+  m_local_bc_height = m_hashchain.size();
 }
 //----------------------------------------------------------------------------------------------------
 std::vector<tools::wallet2::transfer_details> wallet2::export_outputs() const
