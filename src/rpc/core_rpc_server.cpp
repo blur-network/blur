@@ -208,6 +208,53 @@ namespace cryptonote
     return true;
   }
   //-----------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_write_varint(const COMMAND_RPC_WRITE_VARINT::request& req, COMMAND_RPC_WRITE_VARINT::response& res)
+  {
+    std::string const data = req.data;
+
+    if (data.empty()) {
+      res.status = "Failure: input data must not be empty!";
+      res.varint = "ERROR";
+      return true;
+    } else if (data.length() > 20) {
+      res.status = "Failure: length of input data cannot be greater than 20 characters";
+      res.varint = "ERROR";
+      return true;
+    }
+
+    for (size_t i = 0; i < data.length(); i++) {
+      if (!std::isdigit(req.data[i])) {
+        res.status = "Failure: data must be a number, represented in decimal";
+        res.varint = "ERROR";
+        return true;
+      }
+    }
+
+    if (data.length() == 20) {
+      std::string first_ten, last_ten;
+      first_ten = data.substr(0,10);
+      last_ten = data.substr(10,10);
+      uint64_t first, last;
+      first = strtoull(first_ten.c_str(), 0, 10);
+      last = strtoull(last_ten.c_str(), 0, 10);
+      if (first >= 1844674407) {
+        if (last > 3709551615) {
+          // need to make sure we do not overflow amount for strtoull
+          res.status = "Failure: value of input too large for 64-bit unsigned integer";
+          res.varint = "ERROR";
+          return true;
+        }
+      }
+    }
+
+    size_t data_as_integer = std::strtoull(data.c_str(), 0, 10);
+    std::string varint_blob = tools::get_varint_data(data_as_integer);
+    std::string const varint = epee::string_tools::buff_to_hex_nodelimer(varint_blob);
+    res.varint = varint;
+    res.status = "OK";
+    return true;
+  }
+  //-----------------------------------------------------------------------------------------------------------------
   static cryptonote::blobdata get_pruned_tx_blob(cryptonote::transaction &tx)
   {
     std::stringstream ss;

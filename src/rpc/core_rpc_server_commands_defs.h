@@ -1027,6 +1027,30 @@ namespace cryptonote
     };
   };
   //-----------------------------------------------
+  struct COMMAND_RPC_WRITE_VARINT
+  {
+    struct request
+    {
+      std::string data;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(data)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      std::string varint;
+      std::string status;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(varint)
+        KV_SERIALIZE(status)
+      END_KV_SERIALIZE_MAP()
+    };
+
+  };
+  //-----------------------------------------------
   struct COMMAND_RPC_GET_INFO
   {
     struct request
