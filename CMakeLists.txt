@@ -370,10 +370,6 @@ if (UNIX AND NOT APPLE AND NOT DEPENDS)
   add_cxx_flag_if_supported(-pthread CMAKE_CXX_FLAGS)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-find_package(Backward)
-endif()
-
 # Handle OpenSSL, used for sha256sum on binary updates and light wallet ssl http
 if (CMAKE_SYSTEM_NAME MATCHES "(SunOS|Solaris)")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthreads")
@@ -414,18 +410,18 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/translations")
 add_subdirectory(external)
 
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
-include(ExternalProject)
-ExternalProject_Add(backward
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/backward
-  CMAKE_ARGS -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_CURRENT_BINARY_DIR}/external/backward -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}/external/backward
-  CONFIGURE_COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/external/backward ${CMAKE_CURRENT_BINARY_DIR}/external/
-  BUILD_COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cd ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cmake -DCMAKE_BUILD_TYPE=debug .. && make
-  INSTALL_COMMAND cmake -E echo ""
-)
+  find_package(Backward)
+  include(ExternalProject)
+  ExternalProject_Add(backward
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/backward
+    CMAKE_ARGS -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_CURRENT_BINARY_DIR}/external/backward -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}/external/backward
+    CONFIGURE_COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/external/backward ${CMAKE_CURRENT_BINARY_DIR}/external/
+    BUILD_COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cd ${CMAKE_CURRENT_BINARY_DIR}/external/backward/build && cmake -DCMAKE_BUILD_TYPE=debug .. && make
+    INSTALL_COMMAND cmake -E echo ""
+  )
+  set(BACKWARD_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/external/backward/build/libbackward.a)
+  message(STATUS "Using BACKWARD_LIBRARIES for stack traces located at: ${BACKWARD_LIBRARIES}")
 endif()
-
-set(BACKWARD_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/external/backward/build/libbackward.a)
-message(STATUS "Using BACKWARD_LIBRARIES for stack traces located at: ${BACKWARD_LIBRARIES}")
 
 # Final setup for easylogging++
 include_directories(${EASYLOGGING_INCLUDE})
@@ -865,25 +861,22 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND ARCH_WIDTH EQUAL "32" AND NOT IOS AN
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BUILD_SHARED_LIBRARIES)
-find_library(ELF_LIBRARY elf)
-if(ELF_LIBRARY)
-  set(ELF_LIBRARY ${ELF_LIBRARY})
-  message(STATUS "Using libelf located at: ${ELF_LIBRARY}")
-endif()
-
-find_package(DWARF)
+  find_library(ELF_LIBRARY elf)
+  if(ELF_LIBRARY)
+    set(ELF_LIBRARY ${ELF_LIBRARY})
+    message(STATUS "Using libelf located at: ${ELF_LIBRARY}")
+  endif()
+  find_package(DWARF)
   if(LIBDWARF_LIBRARIES AND BACKWARD_HAS_DWARF)
     set(LIBDWARF_LIBRARIES "${LIBDWARF_LIBRARIES}")
     message(STATUS "Using LIBDWARF_LIBRARIES located at ${LIBDWARF_LIBRARIES}")
     include_directories(DWARF_INCLUDE_DIRS ${LIBDWARF_INCLUDE_DIRS})
   endif()
-
   if(LIBBFD_LIBRARIES AND BACKWARD_HAS_BFD)
     set(LIBBFD_LIBRARIES "${LIBBFD_LIBRARIES}")
     message(STATUS "Found LIBBFD_LIBRARIES located at ${LIBBFD_LIBRARIES}")
     include_directories(LIBBFD_INCLUDE_DIRS ${LIBBFD_INCLUDE_DIRS})
   endif()
-
   if(LIBBFD_LIBRARIES AND LIBDWARF_LIBRARIES AND BACKWARD_HAS_BFD AND BACKWARD_HAS_DWARF)
     set(BACKWARD_LIBRARIES "${LIBDWARF_LIBRARIES} ${LIBBFD_LIBRARIES} ${BACKWARD_LIBRARIES}")
   endif()
@@ -899,11 +892,8 @@ find_package(DWARF)
     include_directories(LIBDW_INCLUDE_DIRS ${LIBDW_INCLUDE_DIRS})
     set(BACKWARD_LIBRARIES "${BACKWARD_LIBRARIES} ${LIBDW_LIBRARIES}")
   endif()
-
-
-include_directories(BACKWARD_INCLUDE_DIRS ${BACKWARD_INCLUDE_DIRS})
-link_directories(BACKWARD_LIBRARIES ${BACKWARD_LIBRARIES})
-
+  include_directories(BACKWARD_INCLUDE_DIRS ${BACKWARD_INCLUDE_DIRS})
+  link_directories(BACKWARD_LIBRARIES ${BACKWARD_LIBRARIES})
 endif()
 
 find_library(SODIUM_LIBRARY sodium)
