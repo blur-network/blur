@@ -1,15 +1,13 @@
 ![Blur: The Private Cryptocurrency](https://i.ibb.co/CJyDmLm/blur-repo.jpg)
 # Blur Network 
-Copyright (c) 2018-2019, Blur Network</br>
+Copyright (c) 2018-2019, Blur Network<br></br>
 
 
 [![Blur Network Command-Line Tools](https://snapcraft.io/blur/badge.svg)](https://snapcraft.io/blur)
-![](https://github.com/blur-network/blur/workflows/Blur%20Master%20Branch/badge.svg?branch=master)
+[![Blur Master Branch Build Status](https://github.com/blur-network/blur/workflows/Blur%20Master%20Branch/badge.svg?branch=master)](https://github.com/blur-network/blur/actions?query=workflow%3A%22Blur+Master+Branch%22)
 
 
-
-
-*See [LICENSE](License).*<br>
+*See [License](LICENSE)*<br>
 *See [Code of Conduct](CODE_OF_CONDUCT.md)*<br>
 
 # About the Project
@@ -58,7 +56,7 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 <h3>Step 1: Clone this repository's stable branch:</h3>
 
->`git clone --recursive https://github.com/blur-network/blur.git`
+`git clone --recursive https://github.com/blur-network/blur.git`
 
 
 
@@ -70,16 +68,16 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 Ubuntu/Debian:
 
-Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev binutils-dev rapidjson-dev`
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev binutils-dev rapidjson-dev libreadline-dev`
 
-Optional:  `sudo apt-get install -y liblzma-dev libexpat1-dev libgtest-dev libreadline-dev`
+Optional:  `sudo apt-get install -y liblzma-dev libexpat1-dev libgtest-dev`
 
 
 **Arch Linux:**
 
-Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind binutils-devel rapidjson-devel`
+Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind binutils-devel rapidjson-devel readline`
 
-Optional:  `sudo pacman -S xz expat gtest readline`
+Optional:  `sudo pacman -S xz expat gtest`
 
 
 
@@ -109,13 +107,13 @@ We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snap
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
 
->`cd ~/Downloads && tar xvzf blur-v0.1.9.9.4-linux-x86_64.tar.gz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.9.9.5-linux-x86_64.tar.gz`
 
 
 Navigate into the directory you just extracted from the archive, and start the daemon.
 
 
->`cd blur-v0.1.9.9.4-linux_x86_64 && ./blurd`
+>`cd blur-v0.1.9.9.5-linux_x86_64 && ./blurd`
 
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
