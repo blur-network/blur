@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2010, Blur Network
+// Copyright (c) 2019-2021, Blur Network
 //
 // All rights reserved.
 //
