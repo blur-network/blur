@@ -1,4 +1,4 @@
-packages:=boost openssl expat readline libiconv
+packages:=boost openssl readline libiconv
 native_packages := native_ccache
 
 darwin_native_packages = native_biplist native_ds_store native_mac_alias
