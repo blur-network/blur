@@ -70,14 +70,14 @@ Ubuntu/Debian:
 
 Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev binutils-dev rapidjson-dev libreadline-dev`
 
-Optional:  `sudo apt-get install -y liblzma-dev libexpat1-dev libgtest-dev`
+Optional:  `sudo apt-get install -y liblzma-dev libgtest-dev`
 
 
 **Arch Linux:**
 
 Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind binutils-devel rapidjson-devel readline`
 
-Optional:  `sudo pacman -S xz expat gtest`
+Optional:  `sudo pacman -S xz gtest`
 
 
 
