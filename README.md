@@ -68,20 +68,22 @@ Currency:   | <center> Blur (Ticker: BLUR) </center>
 
 Ubuntu/Debian:
 
-Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev binutils-dev rapidjson-dev libreadline-dev`
+Required:  `sudo apt-get install -y build-essential cmake pkg-config libboost-all-dev libssl-dev libsodium-dev libunwind-dev binutils-dev libreadline-dev`
 
 Optional:  `sudo apt-get install -y liblzma-dev libgtest-dev`
 
 
 **Arch Linux:**
 
-Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind binutils-devel rapidjson-devel readline`
+Required:  `sudo pacman -S base-devel cmake boost openssl libsodium libunwind binutils-devel readline`
 
 Optional:  `sudo pacman -S xz gtest`
 
 
 
 <h3 id="build-deps">Step 2(b): Build dependencies, and link statically, all in one go</h3>
+
+Install additional dependency: `sudo apt-get install -y curl`
 
 To compile for Linux (distro-agnostic): `make release-cross-linux-x86_64`
 
