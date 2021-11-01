@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2021, Blur Network
+// Copyright (c) 2018-2022, Blur Network
 //
 // All rights reserved.
 //
@@ -71,10 +71,9 @@
       return out;
     }
 
-    for(size_t i = 0; i < len; i += 2) {
-      std::istringstream strm(input.substr(i, 2));
-      uint8_t x;
-      strm >> std::hex >> x;
+    for(size_t i = 0; i < len; i++) {
+      std::string tmp = input.substr(i*2, 2);
+      uint8_t x = std::stoi(tmp, nullptr, 16);
       out.push_back(x);
     }
     return out;
@@ -106,20 +105,38 @@
   {
     size_t len = input.length();
     bool too_long = (len > 4096);
-    std::string short_long = too_long ? ("longer") : ("shorter");
+    std::string short_long = "longer";
     std::vector<uint8_t> out;
 
-    if (len != 64) {
-      MERROR("Tried to convert a hex string that is " << short_long << " than the required 4096-character length.");
-      std::fill(out.begin(), out.begin()+4096, 0);
+    if (len >= 8191) {
+      MERROR("Tried to convert a hex string that is " << short_long << " than the required 4096-byte length.");
+      std::fill(out.begin(), out.begin()+len, 0);
       return out;
     }
-
-    for(size_t i = 0; i < len; i += 2) {
-      std::istringstream strm(input.substr(i, 2));
-      uint8_t x;
-      strm >> std::hex >> x;
+    for(size_t i = 0; i < (len/2); i++) {
+      std::string tmp = input.substr(i*2, 2);
+      uint8_t x = std::stoi(tmp, nullptr, 16);
       out.push_back(x);
     }
     return out;
+  }
+  //----------------------------------------------------------------
+  std::string bytes4096_to_hex(std::vector<uint8_t> &input)
+  {
+    static const char characters[] = "0123456789abcdef";
+    std::string ret(input.size() * 2, 0);
+    char *buffer = const_cast<char *>(ret.data());
+
+    size_t elements = input.size();
+
+    if (elements > 4095) {
+      MERROR("Tried to convert a vector that is longer than the required 4096-byte length.");
+      return "";
+    }
+
+    for (const auto &each_byte : input) {
+      *buffer++ = characters[each_byte >> 4];
+      *buffer++ = characters[each_byte & 0x0F];
+    }
+    return ret;
   }

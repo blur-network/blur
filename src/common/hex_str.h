@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2021, Blur Network
+// Copyright (c) 2018-2022, Blur Network
 //
 // All rights reserved.
 //
@@ -30,3 +30,4 @@
   std::vector<uint8_t> hex_to_bytes256(const std::string &input);
   std::string span_to_hex(epee::span<const uint8_t> &input);
   std::vector<uint8_t> hex_to_bytes4096(const std::string &input);
+  std::string bytes4096_to_hex(std::vector<uint8_t> &input);
