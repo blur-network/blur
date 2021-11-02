@@ -1,0 +1,7 @@
+get_filename_component(bitcoin_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+if(NOT TARGET bitcoin::bitcoin)
+    include("${bitcoin_CMAKE_DIR}/bitcoin-targets.cmake")
+endif()
+
+set(bitcoin_LIBRARIES bitcoin::bitcoin)

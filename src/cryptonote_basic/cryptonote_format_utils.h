@@ -30,6 +30,7 @@
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
+#include "bitcoin/bitcoin.h"
 #include "blobdatatype.h"
 #include "cryptonote_basic_impl.h"
 #include "account.h"
