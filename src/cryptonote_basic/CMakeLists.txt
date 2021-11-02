@@ -42,6 +42,7 @@ set(cryptonote_basic_sources
   cryptonote_format_utils.cpp
   difficulty.cpp
   hardfork.cpp
+  komodo_notaries.cpp
   miner.cpp)
 
 set(cryptonote_basic_headers)
@@ -57,6 +58,7 @@ set(cryptonote_basic_private_headers
   cryptonote_stat_info.h
   difficulty.h
   hardfork.h
+  komodo_notaries.h
   miner.h
   tx_extra.h
   verification_context.h)

@@ -43,6 +43,7 @@ using namespace epee;
 #include "string_tools.h"
 #include "serialization/string.h"
 #include "cryptonote_format_utils.h"
+#include "komodo_notaries.h"
 #include "cryptonote_config.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
@@ -237,7 +238,7 @@ namespace cryptonote
       return true;
   }
   //---------------------------------------------------------------
-/*  bool extract_and_parse_opreturn(std::string const& raw_tx_hex, std::string& opreturn, std::string& btchash, std::string& srchash, std::string& desthash, uint64_t& height, std::string& symbol)
+  bool extract_and_parse_opreturn(std::string const& raw_tx_hex, std::string& opreturn, std::string& btchash, std::string& srchash, std::string& desthash, uint64_t& height, std::string& symbol)
   {
     std::string bintxdata;
     btchash = epee::string_tools::pod_to_hex(crypto::null_hash);
@@ -324,7 +325,7 @@ namespace cryptonote
 
     height = std::stoull(hexheight, 0, 16);
     return true;
-  }*/
+  }
   //---------------------------------------------------------------
   std::string uint256_to_hex(uint256 const& hash)
   {
