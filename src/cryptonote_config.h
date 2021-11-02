@@ -36,7 +36,15 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 
-#define CRYPTONOTE_DNS_TIMEOUT_MS                       20000
+#define DPOW_SIG_COUNT                                  2
+#define DPOW_MAX_NOTA_PER_BLOCK                         (DPOW_SIG_COUNT)
+#define DPOW_FORK_VERSION                               11
+#define DPOW_NOTA_TX_VERSION                            2
+#define DPOW_NOTARIZATION_WINDOW                        25
+#define DPOW_SYMBOL                                     "BLUR"
+
+//#define ENABLE_DPOWCONFS                                1
+/* sets 'confirmations = 1' until block is notarized */
 
 #define CRYPTONOTE_MAX_BLOCK_NUMBER                     500000000
 #define CRYPTONOTE_MAX_BLOCK_SIZE                       500000000  /* block header blob limit, never used! */
@@ -232,6 +240,8 @@ namespace cryptonote
       ::config::testnet::P2P_DEFAULT_PORT,
       ::config::testnet::RPC_DEFAULT_PORT,
       ::config::testnet::NETWORK_ID,
+      ::config::testnet::GENESIS_TX,
+      ::config::testnet::GENESIS_NONCE
     };
     static const config_t stagenet = {
       ::config::stagenet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
