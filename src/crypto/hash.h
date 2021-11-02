@@ -52,9 +52,13 @@ namespace crypto {
   POD_CLASS hash8 {
     char data[8];
   };
+  POD_CLASS pubkey33 {
+    char data[PUBKEY33_SIZE];
+  };
 #pragma pack(pop)
 
   static_assert(sizeof(hash) == HASH_SIZE, "Invalid structure size");
+  static_assert(sizeof(pubkey33) == PUBKEY33_SIZE, "Invalid structure size");
   static_assert(sizeof(hash8) == 8, "Invalid structure size");
 
   /*
