@@ -36,7 +36,7 @@ using namespace epee;
 #include <atomic>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
-#include <sstream> 
+#include <sstream>
 #include <stdio.h>
 #include "common/int-util.h"
 #include "wipeable_string.h"
@@ -55,6 +55,18 @@ using namespace epee;
 #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
 
 // #define ENABLE_HASH_CASH_INTEGRITY_CHECK
+
+// bitcoin opcodes
+#define OP_RETURN      106
+#define OP_NEXTBYTES   75
+#define OP_PUSHDATA1   76
+#define OP_PUSHDATA2   77
+#define OP_PUSHDATA4   78
+
+// kmd op_return sizes
+#define HASHDATA_SIZE  32
+#define HEIGHT_SIZE    4
+#define SYMBOL_SIZE    5
 
 using namespace crypto;
 
@@ -209,6 +221,128 @@ namespace cryptonote
     get_transaction_hash(tx, tx_hash);
     get_transaction_prefix_hash(tx, tx_prefix_hash);
     return true;
+  }
+  //---------------------------------------------------------------
+  bool string_to_hash(std::string const& strhash, crypto::hash& hash)
+  {
+      cryptonote::blobdata hash_data;
+      if(!epee::string_tools::parse_hexstr_to_binbuff(strhash, hash_data) || hash_data.size() != sizeof(crypto::hash))
+      {
+        MERROR("Failed to parse hexstr_to_binbuff in string_to_hash()!");
+        return false;
+      }
+      const crypto::hash hash_const = *reinterpret_cast<const crypto::hash*>(hash_data.data());
+      hash = hash_const;
+      return true;
+  }
+  //---------------------------------------------------------------
+  bool extract_and_parse_opreturn(std::string const& raw_tx_hex, std::string& opreturn, std::string& btchash, std::string& srchash, std::string& desthash, uint64_t& height, std::string& symbol)
+  {
+    std::string bintxdata;
+    btchash = epee::string_tools::pod_to_hex(crypto::null_hash);
+    srchash = epee::string_tools::pod_to_hex(crypto::null_hash);
+    desthash = epee::string_tools::pod_to_hex(crypto::null_hash);
+    height = 0;
+    std::vector<uint8_t> bitscontainer;
+
+    if (raw_tx_hex.empty()) {
+      if (opreturn.empty()) {
+        MERROR("No raw_tx_data or opreturn data to extract and/or parse!");
+        return false;
+      }
+    } else {
+      opreturn = raw_tx_hex.substr(raw_tx_hex.size()-158,150);
+      if (!epee::string_tools::parse_hexstr_to_binbuff(raw_tx_hex, bintxdata)) {
+        MERROR("Failed to parse_hexstr_to_binbuff in extract_and_parse_opreturn!");
+        return false;
+      }
+      uint8_t const* txdata = reinterpret_cast<uint8_t const*>(bintxdata.data());
+      bits256 btc_hash = cryptonote::komodo::bits256_doublesha256(txdata, bintxdata.size());
+      for (const auto& each : btc_hash.bytes) {
+        bitscontainer.push_back(each);
+      }
+      btchash = bytes256_to_hex(bitscontainer);
+    }
+
+    std::string hexheight, hexsymbol;
+    uint32_t x = 0;
+
+    std::vector<uint8_t> script_vchr = hex_to_bytes4096(opreturn);
+
+    if (script_vchr[x++] != OP_RETURN) {
+      MERROR("hex does not have proper opcode! actual: " << std::to_string(script_vchr[x-1]) << ", expected: " << std::to_string(OP_RETURN));
+      return false;
+    }
+
+    if (script_vchr[x] <= OP_NEXTBYTES)
+    {
+      size_t data_size = script_vchr[x];
+      //MWARNING("-->OP_NEXTBYTES code found: " << data_size);
+
+      // need to flip encoded hash bytes
+      srchash.clear();
+      for (size_t i = (x + HASHDATA_SIZE); i > x; i--) {
+        srchash += opreturn.substr(i*2, 2);
+      }
+      x += HASHDATA_SIZE;
+      // same for height
+      for (size_t i = (x + HEIGHT_SIZE); i > x; i--) {
+        hexheight += opreturn.substr(i*2,2);
+      }
+      x += HEIGHT_SIZE;
+
+      if (data_size >= (x + SYMBOL_SIZE))
+      {
+        desthash.clear();
+        // if > 5 bytes left, we probably have a desthash too
+        for (size_t i = (x + HASHDATA_SIZE); i > x; i--) {
+          desthash += opreturn.substr(i*2, 2);
+        }
+        x += HASHDATA_SIZE;
+      }
+
+      //symbol is not flipped
+      hexsymbol = opreturn.substr((opreturn.size()-10), 10);
+      std::string binsymbol;
+      epee::string_tools::parse_hexstr_to_binbuff(hexsymbol, binsymbol);
+      for (size_t i = 0; i < SYMBOL_SIZE; i++)
+      {
+        // exclude null bytes
+        if (std::stoull(hexsymbol.substr(i*2,2),0,16) != 0)
+          symbol += binsymbol.substr(i,1);
+      }
+      x += SYMBOL_SIZE;
+      if (data_size != (x - 1)) {
+        MERROR("Inconsistency in data OP_NEXTBYTES vs actual data size!");
+      }
+
+      if (symbol != DPOW_SYMBOL) {
+        MERROR("OP_RETURN data is not for " << DPOW_SYMBOL << " - check data!");
+      }
+    }  // else if OP_PUSHDATA(1|2|4)
+
+    height = std::stoull(hexheight, 0, 16);
+    return true;
+  }
+  //---------------------------------------------------------------
+  std::string uint256_to_hex(uint256 const& hash)
+  {
+    std::vector<uint8_t> vchr(hash.begin(), hash.begin()+32);
+    return bytes256_to_hex(vchr);
+  }
+  //---------------------------------------------------------------
+  bool string_to_pubkey33(std::string const& strhash, crypto::pubkey33& pubkey33)
+  {
+      cryptonote::blobdata hash_data;
+      MWARNING("strhash = " << strhash);
+      if(!epee::string_tools::parse_hexstr_to_binbuff(strhash, hash_data) || hash_data.size() != PUBKEY33_SIZE)
+      {
+        MERROR("Failed to parse hexstr_to_binbuff in string_to_pubkey33()!");
+        return false;
+      }
+      const crypto::pubkey33 key33 = *reinterpret_cast<const crypto::pubkey33*>(hash_data.data());
+      pubkey33 = key33;
+      return true;
   }
   //---------------------------------------------------------------
   bool generate_key_image_helper(const account_keys& ack, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, const crypto::public_key& out_key, const crypto::public_key& tx_public_key, const std::vector<crypto::public_key>& additional_tx_public_keys, size_t real_output_index, keypair& in_ephemeral, crypto::key_image& ki, hw::device &hwdev)
@@ -394,6 +528,23 @@ namespace cryptonote
     CHECK_AND_NO_ASSERT_MES_L1(::serialization::check_stream_state(ar), false, "failed to deserialize extra field. extra = " << string_tools::buff_to_hex_nodelimer(std::string(reinterpret_cast<const char*>(tx_extra.data()), tx_extra.size())));
 
     return true;
+  }
+  //---------------------------------------------------------------
+  std::vector<uint32_t> hashes_to_shortnums(std::vector<crypto::hash> const& hashes)
+  {
+     std::vector<uint32_t> shortnums;
+     for (const auto& each : hashes) {
+       uint32_t id_num = 0;
+       uint8_t bytes_span[3] = { 0, 0, 0 };
+
+        // get 6 char from each hash as varint
+        for (size_t i = 0; i < 3; i++) {
+          memset(&bytes_span[i], (int)(each.data[i]), sizeof(each.data[i]));
+          id_num |= bytes_span[i] << (24 - (8*(i+1)));
+        }
+        shortnums.push_back(id_num);
+     }
+     return shortnums;
   }
   //---------------------------------------------------------------
   crypto::public_key get_tx_pub_key_from_extra(const std::vector<uint8_t>& tx_extra, size_t pk_index)

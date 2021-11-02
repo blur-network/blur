@@ -48,7 +48,7 @@ using namespace std;
 
 DISABLE_VS_WARNINGS(4244 4345)
 
-  namespace cryptonote
+namespace cryptonote
 {
 
   //-----------------------------------------------------------------
@@ -76,6 +76,15 @@ DISABLE_VS_WARNINGS(4244 4345)
   {
     m_keys.m_spend_secret_key = crypto::secret_key();
     m_keys.m_multisig_keys.clear();
+  }
+  //-----------------------------------------------------------------
+  crypto::secret_key account_base::generate_secret() const
+  {
+    crypto::public_key dummy_pub = crypto::null_pkey;
+    crypto::secret_key dummy_recov = crypto::null_skey;
+    crypto::secret_key ret = crypto::null_skey;
+    ret = generate_keys(dummy_pub, ret, dummy_recov, false);
+    return ret;
   }
   //-----------------------------------------------------------------
   crypto::secret_key account_base::generate(const crypto::secret_key& recovery_key, bool recover, bool two_random)
@@ -127,7 +136,21 @@ DISABLE_VS_WARNINGS(4244 4345)
     if (m_creation_timestamp == (uint64_t)-1) // failure
       m_creation_timestamp = 0; // lowest value
   }
-
+  //-----------------------------------------------------------------
+  bool account_base::create_from_btc(const crypto::secret_key& btc_pubkey, const crypto::secret_key& spendkey, crypto::public_key& viewkey_pub, crypto::public_key& spendkey_pub, cryptonote::account_public_address& address)
+  {
+    m_keys.m_spend_secret_key = spendkey;
+    m_keys.m_view_secret_key = btc_pubkey;
+    bool r = crypto::secret_key_to_public_key(m_keys.m_view_secret_key, viewkey_pub);
+    if (!r) { MERROR("Pubkey could not be derived from view privkey"); return false; }
+    else { m_keys.m_account_address.m_view_public_key = viewkey_pub; };
+    bool rtwo = crypto::secret_key_to_public_key(m_keys.m_spend_secret_key, spendkey_pub);
+    if (!rtwo) { MERROR("Pubkey could not be derived from spend privkey"); return false; }
+    else { m_keys.m_account_address.m_spend_public_key = spendkey_pub; }
+    create_from_keys(m_keys.m_account_address, m_keys.m_view_secret_key, m_keys.m_spend_secret_key);
+    address = m_keys.m_account_address;
+    return true;
+  }
   //-----------------------------------------------------------------
   void account_base::create_from_device(const std::string &device_name)
   {

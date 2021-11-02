@@ -53,6 +53,10 @@ namespace cryptonote
   crypto::hash get_transaction_prefix_hash(const transaction_prefix& tx);
   bool parse_and_validate_tx_from_blob(const blobdata& tx_blob, transaction& tx, crypto::hash& tx_hash, crypto::hash& tx_prefix_hash);
   bool parse_and_validate_tx_from_blob(const blobdata& tx_blob, transaction& tx);
+  bool string_to_hash(std::string const& strhash, crypto::hash& hash);
+  bool extract_and_parse_opreturn(std::string const& raw_tx_hex, std::string& opreturn, std::string& btchash, std::string& srchash, std::string& desthash, uint64_t& height, std::string& symbol);
+  std::string uint256_to_hex(uint256 const& hash);
+  bool string_to_pubkey33(std::string const& strhash, uint8_t* pubkey33);
   bool parse_and_validate_tx_base_from_blob(const blobdata& tx_blob, transaction& tx);
 
   template<typename T>
@@ -67,6 +71,7 @@ namespace cryptonote
   }
 
   bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields);
+  std::vector<uint32_t> hashes_to_shortnums(std::vector<crypto::hash> const& hashes);
   crypto::public_key get_tx_pub_key_from_extra(const std::vector<uint8_t>& tx_extra, size_t pk_index = 0);
   crypto::public_key get_tx_pub_key_from_extra(const transaction_prefix& tx, size_t pk_index = 0);
   crypto::public_key get_tx_pub_key_from_extra(const transaction& tx, size_t pk_index = 0);

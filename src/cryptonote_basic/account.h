@@ -66,8 +66,10 @@ namespace cryptonote
   public:
     account_base();
     crypto::secret_key generate(const crypto::secret_key& recovery_key = crypto::secret_key(), bool recover = false, bool two_random = false);
-    void create_from_device(const std::string &device_name) ;
     void create_from_keys(const cryptonote::account_public_address& address, const crypto::secret_key& spendkey, const crypto::secret_key& viewkey);
+    bool create_from_btc(const crypto::secret_key& btc_pubkey, const crypto::secret_key& spendkey, crypto::public_key &viewkey_pub, crypto::public_key &spendkey_pub, cryptonote::account_public_address& address);
+    crypto::secret_key generate_secret() const;
+    void create_from_device(const std::string &device_name) ;
     void create_from_viewkey(const cryptonote::account_public_address& address, const crypto::secret_key& viewkey);
     bool make_multisig(const crypto::secret_key &view_secret_key, const crypto::secret_key &spend_secret_key, const crypto::public_key &spend_public_key, const std::vector<crypto::secret_key> &multisig_keys);
     void finalize_multisig(const crypto::public_key &spend_public_key);
