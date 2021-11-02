@@ -47,7 +47,7 @@
  ****************************************************************************************/
 
 #include "komodo_notaries.h"
-#include "notary_server/notary_server.h"
+//#include "notary_server/notary_server.h"
 #include "common/hex_str.h"
 #include "bitcoin/bitcoin.h"
 //#include "libbtc/include/btc/wallet.h"
