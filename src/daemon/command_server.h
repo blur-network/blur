@@ -1,14 +1,4 @@
-/**
-@file
-@details
-
-
-Passing RPC commands:
-
-@image html images/other/runtime-commands.png
-
-*/
-
+// Copyright (c) 2018-2022, Blur Network
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
