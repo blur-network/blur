@@ -226,14 +226,16 @@ namespace cryptonote
         }
         tvc.m_verifivation_impossible = true;
         tvc.m_added_to_pool = true;
-      }else
+      }
+      else
       {
         LOG_PRINT_L1("tx used wrong inputs, rejected");
         tvc.m_verifivation_failed = true;
         tvc.m_invalid_input = true;
         return false;
       }
-    }else
+    }
+    else
     {
       //update transactions container
       meta.blob_size = blob_size;

@@ -1,7 +1,3 @@
-/// @file
-/// @author rfree (current maintainer/user in monero.cc project - most of code is from CryptoNote)
-/// @brief This is the original cryptonote protocol network-events handler, modified by us
-
 // Copyright (c) 2018-2022, Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
@@ -165,7 +161,7 @@ namespace cryptonote
         << std::setw(10) << std::fixed << (connection_time == 0 ? 0.0 : cntxt.m_send_cnt / connection_time / 1024)
         << std::setw(13) << std::fixed << cntxt.m_current_speed_up / 1024
         << (local_ip ? "[LAN]" : "")
-        << std::left << (cntxt.m_remote_address.is_loopback() ? "[LOCALHOST]" : "") // 127.0.0.1
+        << std::left << (cntxt.m_remote_address.is_loopback() ? "[LOCALHOST]" : "")  /*127.0.0.1*/
         << ENDL;
 
       if (connection_time > 1)
@@ -459,8 +455,6 @@ namespace cryptonote
     return 1;
   }
   //------------------------------------------------------------------------------------------------------------------------
-
-
   template<class t_core>
   double t_cryptonote_protocol_handler<t_core>::get_avg_block_size()
   {
@@ -473,8 +467,7 @@ namespace cryptonote
     for (const auto &element : m_avg_buffer) avg += element;
     return avg / m_avg_buffer.size();
   }
-
-
+  //------------------------------------------------------------------------------------------------------------------------
   template<class t_core>
   int t_cryptonote_protocol_handler<t_core>::handle_response_get_objects(int command, NOTIFY_RESPONSE_GET_OBJECTS::request& arg, cryptonote_connection_context& context)
   {
@@ -549,7 +542,7 @@ namespace cryptonote
         start_height = boost::get<txin_gen>(b.miner_tx.vin[0]).height;
 
       const crypto::hash block_hash = get_block_hash(b);
-      auto req_it = context.m_requested_objects.find(block_hash);
+      std::unordered_set<crypto::hash>::iterator req_it = context.m_requested_objects.find(block_hash);
       if(req_it == context.m_requested_objects.end())
       {
         LOG_ERROR_CCONTEXT("sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id=" << epee::string_tools::pod_to_hex(get_blob_hash(block_entry.block))
@@ -560,7 +553,7 @@ namespace cryptonote
       if(b.tx_hashes.size() != block_entry.txs.size())
       {
         LOG_ERROR_CCONTEXT("sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id=" << epee::string_tools::pod_to_hex(get_blob_hash(block_entry.block))
-          << ", tx_hashes.size()=" << b.tx_hashes.size() << " mismatch with block_complete_entry.m_txs.size()=" << block_entry.txs.size() << ", dropping connection");
+          << ", tx_hashes.size()=" << b.tx_hashes.size() << " mismatch with block_complete_entry.m_txs.size() = " << block_entry.txs.size() << ", dropping connection");
         drop_connection(context, false, false);
         return 1;
       }
@@ -1222,7 +1215,6 @@ skip:
   template<class t_core>
   bool t_cryptonote_protocol_handler<t_core>::relay_block(NOTIFY_NEW_BLOCK::request& arg, cryptonote_connection_context& exclude_context)
   {
-    // sort peers between fluffy ones and others
     std::list<boost::uuids::uuid> fullConnections;
     m_p2p->for_each_connection([&exclude_context, &fullConnections](connection_context& context, nodetool::peerid_type peer_id, uint32_t support_flags)
     {

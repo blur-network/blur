@@ -1,7 +1,3 @@
-/// @file
-/// @author rfree (current maintainer/user in monero.cc project - most of code is from CryptoNote)
-/// @brief This is the original cryptonote protocol network-events handler, modified by us
-
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -49,8 +45,6 @@
 
 PUSH_WARNINGS
 DISABLE_VS_WARNINGS(4355)
-
-#define LOCALHOST_INT 2130706433
 
 namespace cryptonote
 {

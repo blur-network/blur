@@ -259,7 +259,7 @@ namespace cryptonote
         KV_SERIALIZE(current_blockchain_height)
       END_KV_SERIALIZE_MAP()
     };
-  };  
+  };
 
   /************************************************************************/
   /*                                                                      */
@@ -271,15 +271,14 @@ namespace cryptonote
     struct request
     {
       crypto::hash block_hash;
-      uint64_t current_blockchain_height;      
+      uint64_t current_blockchain_height;
       std::vector<uint64_t> missing_tx_indices;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE_VAL_POD_AS_BLOB(block_hash)
         KV_SERIALIZE(current_blockchain_height)
         KV_SERIALIZE_CONTAINER_POD_AS_BLOB(missing_tx_indices)
       END_KV_SERIALIZE_MAP()
     };
-  }; 
-    
+  };
 }

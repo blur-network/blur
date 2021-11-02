@@ -44,6 +44,9 @@ using namespace epee;
 #include "crypto/hash.h"
 #include "ringct/rctSigs.h"
 #include "multisig/multisig.h"
+#include "common/hex_str.h"
+#include "cryptonote_basic/cryptonote_format_utils.h"
+#include "cryptonote_basic/komodo_notaries.h"
 
 using namespace crypto;
 
