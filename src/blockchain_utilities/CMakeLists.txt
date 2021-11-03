@@ -100,10 +100,10 @@ monero_add_executable(blockchain_import
 
 target_link_libraries(blockchain_import
   PRIVATE
-    cryptonote_core
     blockchain_db
     p2p
     epee
+    cryptonote_core
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
@@ -123,11 +123,12 @@ install(TARGETS blockchain_import DESTINATION bin)
 monero_add_executable(blockchain_export
   ${blockchain_export_sources}
   ${blockchain_export_private_headers})
+
 target_link_libraries(blockchain_export
   PRIVATE
-    cryptonote_core
     blockchain_db
     p2p
+    cryptonote_core
     epee
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
@@ -146,11 +147,11 @@ monero_add_executable(blockchain_blackball
 
 target_link_libraries(blockchain_blackball
   PRIVATE
-    wallet
-    cryptonote_core
     blockchain_db
+    cryptonote_core
     p2p
     epee
+    wallet
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
@@ -166,10 +167,11 @@ install(TARGETS blockchain_blackball DESTINATION bin)
 monero_add_executable(blockchain_usage
   ${blockchain_usage_sources}
   ${blockchain_usage_private_headers})
+
 target_link_libraries(blockchain_usage
   PRIVATE
-    cryptonote_core
     blockchain_db
+    cryptonote_core
     p2p
     epee
     ${Boost_FILESYSTEM_LIBRARY}

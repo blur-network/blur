@@ -45,6 +45,7 @@
 #include "misc_log_ex.h"
 #include "blockchain_db/db_types.h"
 #include "cryptonote_core/cryptonote_core.h"
+#include "cryptonote_basic/komodo_notaries.h"
 #include "version.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
