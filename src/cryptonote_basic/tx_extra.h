@@ -33,6 +33,7 @@
 
 #define TX_EXTRA_PADDING_MAX_COUNT          255
 #define TX_EXTRA_NONCE_MAX_COUNT            255
+#define TX_EXTRA_NTZ_MAX_COUNT              4095
 
 #define TX_EXTRA_TAG_PADDING                0x00
 #define TX_EXTRA_TAG_PUBKEY                 0x01
@@ -40,6 +41,9 @@
 #define TX_EXTRA_MERGE_MINING_TAG           0x03
 #define TX_EXTRA_TAG_ADDITIONAL_PUBKEYS     0x04
 #define TX_EXTRA_MYSTERIOUS_MINERGATE_TAG   0xDE
+#define TX_EXTRA_NTZ_TXN_TAG                0x05
+#define TX_EXTRA_NTZ_PADDING                0x05
+#define TX_EXTRA_NTZ_SIGNER                 0x06
 
 #define TX_EXTRA_NONCE_PAYMENT_ID           0x00
 #define TX_EXTRA_NONCE_ENCRYPTED_PAYMENT_ID 0x01
