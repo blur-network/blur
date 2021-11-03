@@ -305,6 +305,11 @@ namespace cryptonote
     return m_blockchain_storage.get_alternative_blocks(blocks);
   }
   //-----------------------------------------------------------------------------------------------
+  uint64_t core::get_notarization_wait() const
+  {
+    return m_blockchain_storage.get_notarization_wait();
+  }
+  //-----------------------------------------------------------------------------------------------
   size_t core::get_alternative_blocks_count() const
   {
     return m_blockchain_storage.get_alternative_blocks_count();
@@ -458,6 +463,8 @@ namespace cryptonote
     bool show_time_stats = command_line::get_arg(vm, arg_show_time_stats) != 0;
     m_blockchain_storage.set_show_time_stats(show_time_stats);
     CHECK_AND_ASSERT_MES(r, false, "Failed to initialize blockchain storage");
+
+    //m_blockchain_storage.komodo_update();
 
     block_sync_size = command_line::get_arg(vm, arg_block_sync_size);
 
@@ -730,7 +737,6 @@ namespace cryptonote
     st_inf.top_block_id_str = epee::string_tools::pod_to_hex(m_blockchain_storage.get_tail_id());
     return true;
   }
-
   //-----------------------------------------------------------------------------------------------
   bool core::check_tx_semantic(const transaction& tx, bool keeped_by_block) const
   {
@@ -865,13 +871,13 @@ namespace cryptonote
       std::list<transaction> txs;
       std::list<crypto::hash> missed_txs;
       uint64_t coinbase_amount = get_outs_money_amount(b.miner_tx);
-      this->get_transactions(b.tx_hashes, txs, missed_txs);      
+      this->get_transactions(b.tx_hashes, txs, missed_txs);
       uint64_t tx_fee_amount = 0;
       for(const auto& tx: txs)
       {
         tx_fee_amount += get_tx_fee(tx);
       }
-      
+
       emission_amount += coinbase_amount - tx_fee_amount;
       total_fee_amount += tx_fee_amount;
       return true;
@@ -1228,7 +1234,7 @@ namespace cryptonote
   bool core::get_pool_transaction(const crypto::hash &id, cryptonote::blobdata& tx) const
   {
     return m_mempool.get_transaction(id, tx);
-  }  
+  }
   //-----------------------------------------------------------------------------------------------
   bool core::pool_has_tx(const crypto::hash &id) const
   {

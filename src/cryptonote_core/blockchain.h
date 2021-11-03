@@ -57,9 +57,11 @@
 #include "checkpoints/checkpoints.h"
 #include "cryptonote_basic/hardfork.h"
 #include "blockchain_db/blockchain_db.h"
+#include "blockchain_db/db_structs.h"
 
 namespace cryptonote
 {
+
   class tx_memory_pool;
   struct test_options;
 
@@ -73,6 +75,7 @@ namespace cryptonote
     db_async, //!< handle syncing calls instead of the backing db, asynchronously
     db_nosync //!< Leave syncing up to the backing db (safest, but slowest because of disk I/O)
   };
+
 
   /************************************************************************/
   /*                                                                      */
@@ -143,6 +146,16 @@ namespace cryptonote
      */
     bool deinit();
 
+    uint64_t get_ntz_count(std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>>& ret) const;
+    crypto::hash get_ntz_merkle(std::vector<std::pair<crypto::hash,uint64_t>> const& notarizations);
+    bool is_block_notarized(cryptonote::block const& b);
+    uint64_t get_notarized_height(crypto::hash& ntz_hash) const;
+    uint64_t get_notarization_wait() const;
+    void komodo_update();
+    void update_raw_src_tx(std::string const& raw_src_tx);
+    void fetch_raw_src_tx(std::string& raw_src_tx);
+    void clear_raw_src_tx();
+
     /**
      * @brief assign a set of blockchain checkpoint hashes
      *
@@ -197,6 +210,7 @@ namespace cryptonote
      * @return the hash of the block at the requested height, or a zeroed hash if there is no such block
      */
     crypto::hash get_block_id_by_height(uint64_t height) const;
+
 
     /**
      * @brief gets the block with a given hash
@@ -689,6 +703,7 @@ namespace cryptonote
     template<class t_ids_container, class t_tx_container, class t_missed_container>
     bool get_transactions(const t_ids_container& txs_ids, t_tx_container& txs, t_missed_container& missed_txs) const;
 
+
     //debug functions
 
     /**
@@ -895,6 +910,7 @@ namespace cryptonote
       return *m_db;
     }
 
+
     /**
      * @brief get a number of outputs of a specific amount
      *
@@ -948,6 +964,13 @@ namespace cryptonote
      * Used for handling txes from historical blocks in a fast way
      */
     void on_new_tx_from_block(const cryptonote::transaction &tx);
+
+    /**
+     * @brief returns the hash of the top block in chain
+     *
+     * Analagous to BTC's 'getbestblockhash'
+     */
+    crypto::hash get_best_block_hash() const;
 
   private:
 

@@ -46,12 +46,14 @@
 #include "misc_language.h"
 #include "profile_tools.h"
 #include "file_io_utils.h"
+#include "common/hex_str.h"
 #include "common/int-util.h"
 #include "common/threadpool.h"
 #include "common/boost_serialization_helper.h"
 #include "warnings.h"
 #include "crypto/hash.h"
 #include "cryptonote_core.h"
+#include "cryptonote_basic/komodo_notaries.h"
 #include "ringct/rctSigs.h"
 #include "common/perf_timer.h"
 #if defined(PER_BLOCK_CHECKPOINT)
@@ -84,6 +86,18 @@ DISABLE_VS_WARNINGS(4267)
 
 // used to overestimate the block reward when estimating a per kB to use
 #define BLOCK_REWARD_OVERESTIMATE (10 * 1000000000000)
+
+
+namespace cryptonote
+{
+  namespace komodo
+  {
+    extern int32_t NOTARIZED_HEIGHT, NOTARIZED_PREVHEIGHT, NUM_NPOINTS;
+    extern uint256 NOTARIZED_HASH, NOTARIZED_DESTTXID, NOTARIZED_MOM;
+    extern std::string RAW_SRC_TX;
+  }
+}
+
 
 static const struct {
   uint8_t version;
@@ -160,6 +174,203 @@ bool Blockchain::have_tx_keyimg_as_spent(const crypto::key_image &key_im) const
   // well as not accessing class members, even read only (ie, m_invalid_blocks). The caller must
   // lock if it is otherwise needed.
   return  m_db->has_key_image(key_im);
+}
+//------------------------------------------------------------------
+uint64_t Blockchain::get_ntz_count(std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>>& ret) const
+{
+  // vector of hash, height pair for all notarizations in DB
+  // return value is total count
+  LOG_PRINT_L3("Blockchain::" << __func__);
+  uint64_t count = 0;
+  std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>> hash_height_index;
+  for_all_transactions([this, &hash_height_index, &count](const crypto::hash &hash, const cryptonote::transaction &tx)->bool
+  {
+    if ((tx.version == (DPOW_NOTA_TX_VERSION)) && (tx.vin[0].type() != typeid(txin_gen))) {
+      uint64_t ntz_index = count;
+      const uint64_t height = m_db->get_tx_block_height(hash);
+      auto each = std::make_tuple(hash,height,ntz_index);
+      hash_height_index.push_back(each);
+      count += 1;
+    }
+    return true;
+  });
+
+  ret = hash_height_index;
+  return (count/(DPOW_SIG_COUNT));
+}
+//------------------------------------------------------------------
+crypto::hash Blockchain::get_ntz_merkle(std::vector<std::pair<crypto::hash,uint64_t>> const& notarizations)
+{
+  // TODO: this function is incorrect
+  crypto::hash merkle_root = crypto::null_hash;
+  std::vector<crypto::hash> hashes;
+  std::vector<cryptonote::block> blocks;
+  for (const auto& each : notarizations) {
+    cryptonote::block b;
+    crypto::hash each_hash = crypto::null_hash;
+    each_hash = get_block_id_by_height(each.second);
+    if (!get_block_by_hash(each_hash, b))
+      return crypto::null_hash;
+    else {
+      hashes.push_back(get_tx_tree_hash(b));
+    }
+  }
+  if (!hashes.empty()) {
+    merkle_root = get_tx_tree_hash(hashes);
+  }
+  return merkle_root;
+}
+//------------------------------------------------------------------
+uint64_t Blockchain::get_notarized_height(crypto::hash& ntz_hash) const
+{
+  std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>> ntz_txs;
+  uint64_t ntz_count = get_ntz_count(ntz_txs);
+  uint64_t notarized_height = 0;
+  ntz_hash = crypto::null_hash;
+  for (const auto& each : ntz_txs) {
+    if (std::get<1>(each) > notarized_height) {
+      notarized_height = std::get<1>(each);
+      ntz_hash = std::get<0>(each);
+    }
+  }
+  return notarized_height;
+}
+//------------------------------------------------------------------
+uint64_t Blockchain::get_notarization_wait() const
+{
+  uint64_t ntz_height = komodo::NOTARIZED_HEIGHT;
+  uint64_t ret = 0;
+  if (ntz_height) {
+    ret = (ntz_height + (DPOW_NOTARIZATION_WINDOW));
+  }
+  return ret;
+}
+//------------------------------------------------------------------
+bool Blockchain::is_block_notarized(cryptonote::block const& b)
+{
+  uint64_t greatest_height = 0;
+  uint64_t const b_height = get_block_height(b);
+  //komodo_update();
+  uint64_t ntz_height = (komodo::NOTARIZED_HEIGHT >= 0) ? ((uint64_t)komodo::NOTARIZED_HEIGHT) : 0;
+  uint64_t prev_ntz_height = (komodo::NOTARIZED_PREVHEIGHT >= 0) ? ((uint64_t)komodo::NOTARIZED_PREVHEIGHT) : 0;
+  if (b_height <= ntz_height) {
+    if (b_height <= prev_ntz_height) {
+      LOG_PRINT_L1("Block height less than NOTARIZED_HEIGHT && NOTARIZED_PREVHEIGHT");
+      // two notarization delay
+      return true;
+    }
+    else {
+      LOG_PRINT_L1("Block height less than NOTARIZED_HEIGHT, but greater than NOTARIZED_PREVHEIGHT");
+      return false;
+    }
+  }
+  return false;
+}
+//------------------------------------------------------------------
+void Blockchain::update_raw_src_tx(std::string const& raw_src_tx)
+{
+  MWARNING("---> in blockchain::update_raw_src_tx: \n" << raw_src_tx << "\n");
+  komodo::RAW_SRC_TX = raw_src_tx;
+}
+//------------------------------------------------------------------
+void Blockchain::clear_raw_src_tx()
+{
+  MWARNING("===== raw_src_tx cleared! =====");
+  komodo::RAW_SRC_TX.clear();
+}
+//------------------------------------------------------------------
+void Blockchain::fetch_raw_src_tx(std::string& raw_src_tx)
+{
+  std::vector<uint8_t> src_tx_vchr, doublesha_vec;
+  src_tx_vchr = hex_to_bytes4096(komodo::RAW_SRC_TX);
+  crypto::hash btc_hash = crypto::null_hash;
+  uint64_t current_height = m_db->height();
+  if (!src_tx_vchr.empty())
+  {
+    bits256 bits = komodo::bits256_doublesha256(src_tx_vchr.data(), src_tx_vchr.size());
+    for (const auto& each : bits.bytes)
+      doublesha_vec.push_back(each);
+    std::string btc_hash_s = bytes256_to_hex(doublesha_vec);
+    MWARNING(">>> btc_hash = " << btc_hash_s << " <<<");
+    if (string_to_hash(btc_hash_s, btc_hash))
+    {
+      if (m_db->btc_tx_exists(btc_hash))
+      {
+        uint64_t btc_tx_height = m_db->get_btc_tx_block_height(btc_hash);
+        if (btc_tx_height < m_db->height())
+          clear_raw_src_tx();
+      }
+    }
+  }
+  raw_src_tx = komodo::RAW_SRC_TX;
+
+  if (!raw_src_tx.empty())
+    MWARNING("---> in blockchain::fetch_raw_src_tx: \n" << raw_src_tx << "\n");
+}
+//------------------------------------------------------------------
+void Blockchain::komodo_update()
+{
+    std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>> notarizations;
+    uint64_t ntz_count = get_ntz_count(notarizations);
+
+    crypto::hash ntz_txid = crypto::null_hash;
+    uint64_t greatest_height = 0;
+    uint64_t previous_height = 0;
+    for (const auto& each: notarizations) {
+      if (std::get<1>(each) > greatest_height) {
+        greatest_height = std::get<1>(each);
+        ntz_txid = std::get<0>(each);
+      }
+    }
+    for (const auto& each : notarizations) {
+      if (std::get<1>(each) > previous_height) {
+        if (std::get<1>(each) == greatest_height) {
+          /* ignore */
+        } else {
+          previous_height = std::get<1>(each);
+        }
+      }
+    }
+
+    std::vector<std::pair<crypto::hash,uint64_t>> ntzs;
+    for (const auto& each: notarizations) {
+      std::pair<crypto::hash,uint64_t> hh;
+      hh.first = std::get<0>(each);
+      hh.second = std::get<1>(each);
+      ntzs.push_back(hh);
+    }
+    crypto::hash ntz_merkle = get_ntz_merkle(ntzs);
+
+    epee::span<const uint8_t> span_desttxid = epee::as_byte_span(ntz_txid);
+    epee::span<const uint8_t> span_notarizedhash = epee::as_byte_span(get_block_id_by_height(greatest_height));
+    epee::span<const uint8_t> span_merkle = epee::as_byte_span(ntz_merkle);
+
+    size_t i = 0;
+    for (const auto& each: span_desttxid) {
+      memcpy((komodo::NOTARIZED_DESTTXID.begin() + (i++)), &each, sizeof(each));
+    }
+
+    i = 0;
+    for (const auto& each: span_notarizedhash) {
+      memcpy((komodo::NOTARIZED_HASH.begin() + (i++)), &each, sizeof(each));
+    }
+
+    i = 0;
+    for (const auto& each: span_merkle) {
+      memcpy((komodo::NOTARIZED_MOM.begin() + (i++)), &each, sizeof(each));
+    }
+/*
+   std::vector<uint8_t> v_txid(komodo::NOTARIZED_DESTTXID.begin(), komodo::NOTARIZED_DESTTXID.begin() + 32);
+   std::vector<uint8_t> v_hash(komodo::NOTARIZED_HASH.begin(), komodo::NOTARIZED_HASH.begin() + 32);
+   std::vector<uint8_t> v_mom(komodo::NOTARIZED_MOM.begin(), komodo::NOTARIZED_MOM.begin() + 32);
+
+    MWARNING(bytes256_to_hex(v_txid) << " ----- " << bytes256_to_hex(v_hash) << " ----- " << bytes256_to_hex(v_mom));
+*/
+    komodo::NUM_NPOINTS = ntz_count;
+    komodo::NOTARIZED_HEIGHT = greatest_height;
+    komodo::NOTARIZED_PREVHEIGHT = previous_height;
+    LOG_PRINT_L1("komodo::NOTARIZED_HEIGHT = " << std::to_string(komodo::NOTARIZED_HEIGHT));
+    LOG_PRINT_L1("komodo::NOTARIZED_PREVHEIGHT = " << std::to_string(komodo::NOTARIZED_PREVHEIGHT));
 }
 //------------------------------------------------------------------
 // This function makes sure that each "input" in an input (mixins) exists
@@ -1454,6 +1665,7 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
     crypto::hash proof_of_work = null_hash;
     get_block_longhash(bei.bl, proof_of_work, bei.height);
+
     if(!check_hash(proof_of_work, current_diff))
     {
       MERROR_VER("Block with id: " << id << std::endl << " for alternative chain, does not have enough proof of work: " << proof_of_work << std::endl << " expected difficulty: " << current_diff);
@@ -2459,6 +2671,7 @@ bool Blockchain::have_tx_keyimges_as_spent(const transaction &tx) const
   }
   return false;
 }
+//------------------------------------------------------------------
 bool Blockchain::expand_transaction_2(transaction &tx, const crypto::hash &tx_prefix_hash, const std::vector<std::vector<rct::ctkey>> &pubkeys)
 {
   PERF_TIMER(expand_transaction_2);
@@ -4363,6 +4576,12 @@ void Blockchain::unlock()
 bool Blockchain::for_all_key_images(std::function<bool(const crypto::key_image&)> f) const
 {
   return m_db->for_all_key_images(f);
+}
+
+crypto::hash Blockchain::get_best_block_hash() const
+{
+  const crypto::hash top_id = m_db->top_block_hash();
+  return top_id;
 }
 
 bool Blockchain::for_blocks_range(const uint64_t& h1, const uint64_t& h2, std::function<bool(uint64_t, const crypto::hash&, const block&)> f) const

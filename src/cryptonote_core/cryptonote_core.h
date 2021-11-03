@@ -166,7 +166,7 @@ namespace cryptonote
       * @note see Blockchain::cleanup_handle_incoming_blocks
       */
      bool cleanup_handle_incoming_blocks(bool force_sync = false);
-     	     	
+
      /**
       * @brief check the size of a block against the current maximum
       *
@@ -376,6 +376,8 @@ namespace cryptonote
       */
      bool get_alternative_blocks(std::list<block>& blocks) const;
 
+     uint64_t get_notarization_wait() const;
+
      /**
       * @copydoc Blockchain::get_alternative_blocks_count
       *
@@ -425,7 +427,7 @@ namespace cryptonote
       * @note see tx_memory_pool::get_txpool_backlog
       */
      bool get_txpool_backlog(std::vector<tx_backlog_entry>& backlog) const;
-     
+
      /**
       * @copydoc tx_memory_pool::get_transactions
       * @param include_unrelayed_txes include unrelayed txes in result
