@@ -506,6 +506,128 @@ namespace cryptonote
     return r;
   }
   //---------------------------------------------------------------
+  void remove_ntz_data_from_tx_extra(std::vector<uint8_t> const& tx_extra, std::vector<uint8_t>& new_extra, std::vector<uint8_t>& ntz_data, blobdata& ntz_str, int& signer_index)
+  {
+    size_t ntz_data_size;
+    uint8_t ex_nonce_size;
+    std::string byte_one, byte_two, byte_one_bin, byte_two_bin, extra;
+    std::list<uint8_t> tmp;
+    for (const auto& each : tx_extra) {
+      tmp.push_back(each);
+      extra += epee::string_tools::pod_to_hex(each);
+    }
+//    MWARNING("Full extra field: " << extra);
+    std::vector<tx_extra_field> fields;
+    tx_extra_nonce ex_nonce;
+    tx_extra_pub_key pk_primary;
+    tx_extra_additional_pub_keys pk_additional;
+    std::ostringstream ss, ntz_ss;
+
+    bool has_ex_nonce = tmp.empty() ? 0 : (tx_extra[0] == TX_EXTRA_NONCE);
+    size_t i = 0;
+
+    if (has_ex_nonce)
+    {
+      ex_nonce_size = tx_extra[1];
+      std::string ex_nonce_string;
+      for (size_t j = 0; j < (size_t)(ex_nonce_size+2); j++) {
+        ex_nonce_string += epee::string_tools::pod_to_hex(tx_extra[j]);
+      }
+      //MWARNING("Found extra nonce with size = " << std::to_string(ex_nonce_size) << ", Full Extra nonce = " << ex_nonce_string);
+      for (size_t j = 0; j < (size_t)(ex_nonce_size + 2); j++) {
+        new_extra.push_back(tx_extra[j]);
+        ++i;
+      }
+      for (size_t j = 0; j < (size_t)(ex_nonce_size + 2); j++) {
+        tmp.pop_front();
+      }
+      for (const auto& each: tmp) {
+        std::string tmp_string = epee::string_tools::pod_to_hex(each);
+        ss << tmp_string;
+      }
+      //MWARNING("Remainder of tx_extra after popping fronts: " << ss.str());
+    }
+
+    if (tmp.front() == TX_EXTRA_NTZ_TXN_TAG)
+    {
+      tmp.pop_front(); // remove tag
+      byte_one = epee::string_tools::pod_to_hex(tmp.front());
+      tmp.pop_front();
+      byte_two = epee::string_tools::pod_to_hex(tmp.front());
+      tmp.pop_front();
+      std::ostringstream oss, n_ss;
+      ntz_ss << byte_one;
+      ntz_ss << byte_two;
+      i+=3;
+      size_t ii = i++;
+
+      size_t ntz_size = stoi(ntz_ss.str(), nullptr, 16);
+      //MWARNING("ntz_size (hex): " << ntz_ss.str() << ", ntz_size (decimal): " << std::to_string(ntz_size));
+
+      for (size_t j = ii; j < (size_t)(ii + ntz_size); j++)
+      {
+        ntz_data.push_back(tx_extra[j]);
+        ntz_str += epee::string_tools::pod_to_hex(tx_extra[j]);
+        if (!tmp.empty()) {
+          tmp.pop_front();
+        }
+        i++;
+      }
+
+      for (const auto& each: tmp)
+      {
+        std::string tmp_string = epee::string_tools::pod_to_hex(each);
+        oss << std::hex << tmp_string;
+      }
+
+      for (const auto& each: ntz_data)
+      {
+        std::string tmp_string = epee::string_tools::pod_to_hex(each);
+        n_ss << std::hex << tmp_string;
+      }
+
+      //MWARNING("Remainder of tx_extra [AFTER NTZ TX REMOVAL]: " << oss.str());
+    }
+    else
+    {
+      return;
+    }
+
+    if ((tmp.front() == TX_EXTRA_TAG_PUBKEY) || (tmp.front() == TX_EXTRA_TAG_ADDITIONAL_PUBKEYS))
+    {
+      do {
+        //MWARNING("Found pubkey or additional!");
+        //std::ostringstream oss;
+        size_t o = i - 1;
+        for (size_t j = o; j < (o + 1 + sizeof(crypto::public_key)); j++) {
+           new_extra.push_back(tx_extra[j]);
+           if (!tmp.empty())
+             tmp.pop_front();
+           i++;
+        }
+        //for (const auto& each: tmp) {
+        //  std::string tmp_string = epee::string_tools::pod_to_hex(each);
+        //  oss << tmp_string;
+        //}
+        //MWARNING("Remainder of tx_extra after popping fronts: " << oss.str());
+      } while ((tmp.front() == TX_EXTRA_TAG_PUBKEY) || (tmp.front() == TX_EXTRA_TAG_ADDITIONAL_PUBKEYS));
+    }
+
+    if (tmp.front() == TX_EXTRA_NTZ_SIGNER) {
+      i -= 1;
+      //MWARNING("Found signer index in tx_extra!");
+      new_extra.push_back(tx_extra[i++]);
+      tmp.pop_front();
+      new_extra.push_back(tx_extra[i]);
+      signer_index = tx_extra[i];
+      tmp.pop_front();
+    } else {
+      signer_index = -1;
+    }
+    //TODO: handle excess tx.extra data if present
+
+  }
+  //---------------------------------------------------------------
  bool parse_tx_extra(const std::vector<uint8_t>& tx_extra, std::vector<tx_extra_field>& tx_extra_fields)
   {
     tx_extra_fields.clear();
