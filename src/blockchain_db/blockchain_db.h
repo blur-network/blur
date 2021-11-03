@@ -302,6 +302,16 @@ class KEY_IMAGE_EXISTS : public DB_EXCEPTION
     KEY_IMAGE_EXISTS(const char* s) : DB_EXCEPTION(s) { }
 };
 
+/**
+ * @brief thrown when a btc_txid exists, and we attempt to add a duplicate
+ */
+class BTC_TXID_EXISTS : public DB_EXCEPTION
+{
+  public:
+    BTC_TXID_EXISTS() : DB_EXCEPTION("The doublesha256 hash to be added already exists!") { }
+    BTC_TXID_EXISTS(const char* s) : DB_EXCEPTION(s) { }
+};
+
 /***********************************
  * End of Exception Definitions
  ***********************************/
@@ -454,6 +464,9 @@ private:
    * @param k_image the spent key image to store
    */
   virtual void add_spent_key(const crypto::key_image& k_image) = 0;
+
+  virtual uint64_t add_btc_tx(crypto::hash const& btc_hash, crypto::hash const& blk_hash) = 0;
+  virtual void remove_btc_tx_data(crypto::hash const& btc_hash) = 0;
 
   /**
    * @brief remove a spent key
@@ -1046,6 +1059,8 @@ public:
   virtual bool tx_exists(const crypto::hash& h) const = 0;
   virtual bool tx_exists(const crypto::hash& h, uint64_t& tx_id) const = 0;
 
+  virtual bool btc_tx_exists(const crypto::hash& btc_hash) const = 0;
+
   // return unlock time of tx with hash <h>
   /**
    * @brief fetch a transaction's unlock time/height
@@ -1140,6 +1155,8 @@ public:
    * @return the height of the transaction's block
    */
   virtual uint64_t get_tx_block_height(const crypto::hash& h) const = 0;
+
+  virtual uint64_t get_btc_tx_block_height(const crypto::hash& h) const = 0;
 
   // returns the total number of outputs of amount <amount>
   /**

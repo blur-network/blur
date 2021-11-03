@@ -55,6 +55,8 @@ typedef struct mdb_txn_cursors
 
   MDB_cursor *m_txc_spent_keys;
 
+  MDB_cursor *m_txc_btc_indices;
+
   MDB_cursor *m_txc_txpool_meta;
   MDB_cursor *m_txc_txpool_blob;
 
@@ -71,6 +73,7 @@ typedef struct mdb_txn_cursors
 #define m_cur_tx_indices	m_cursors->m_txc_tx_indices
 #define m_cur_tx_outputs	m_cursors->m_txc_tx_outputs
 #define m_cur_spent_keys	m_cursors->m_txc_spent_keys
+#define m_cur_btc_indices	m_cursors->m_txc_btc_indices
 #define m_cur_txpool_meta	m_cursors->m_txc_txpool_meta
 #define m_cur_txpool_blob	m_cursors->m_txc_txpool_blob
 #define m_cur_hf_versions	m_cursors->m_txc_hf_versions
@@ -87,6 +90,7 @@ typedef struct mdb_rflags
   bool m_rf_tx_indices;
   bool m_rf_tx_outputs;
   bool m_rf_spent_keys;
+  bool m_rf_btc_indices;
   bool m_rf_txpool_meta;
   bool m_rf_txpool_blob;
   bool m_rf_hf_versions;
@@ -216,15 +220,21 @@ public:
   virtual bool tx_exists(const crypto::hash& h) const;
   virtual bool tx_exists(const crypto::hash& h, uint64_t& tx_index) const;
 
+  virtual bool btc_tx_exists(const crypto::hash& btc_hash) const;
+
   virtual uint64_t get_tx_unlock_time(const crypto::hash& h) const;
 
   virtual bool get_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
 
   virtual uint64_t get_tx_count() const;
 
+  virtual uint64_t get_btc_tx_count() const;
+
   virtual std::vector<transaction> get_tx_list(const std::vector<crypto::hash>& hlist) const;
 
   virtual uint64_t get_tx_block_height(const crypto::hash& h) const;
+
+  virtual uint64_t get_btc_tx_block_height(const crypto::hash& h) const;
 
   virtual uint64_t get_num_outputs(const uint64_t& amount) const;
 
@@ -297,6 +307,7 @@ private:
   void do_resize();
 
   bool need_resize() const;
+
   void check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes);
   uint64_t get_estimated_batch_size(uint64_t batch_num_blocks, uint64_t batch_bytes) const;
 
@@ -331,6 +342,10 @@ private:
   virtual void add_spent_key(const crypto::key_image& k_image);
 
   virtual void remove_spent_key(const crypto::key_image& k_image);
+
+  virtual uint64_t add_btc_tx(crypto::hash const& btc_hash, crypto::hash const& blk_hash);
+
+  virtual void remove_btc_tx_data(crypto::hash const& btc_hash);
 
   uint64_t num_outputs() const;
 
@@ -388,6 +403,8 @@ private:
   MDB_dbi m_output_amounts;
 
   MDB_dbi m_spent_keys;
+
+  MDB_dbi m_btc_indices;
 
   MDB_dbi m_txpool_meta;
   MDB_dbi m_txpool_blob;
