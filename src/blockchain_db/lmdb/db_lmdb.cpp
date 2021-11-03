@@ -153,6 +153,8 @@ int compare_string(const MDB_val *a, const MDB_val *b)
  * tx_indices       txn hash     {txn ID, metadata}
  * tx_outputs       txn ID       [txn amount output indices]
  *
+ * btc_indices      btc hash     {btc txn ID, metadata}
+ *
  * output_txs       output ID    {txn hash, local index}
  * output_amounts   amount       [{amount output index, metadata}...]
  *
@@ -180,6 +182,8 @@ char const* LMDB_TX_OUTPUTS = "tx_outputs";
 char const* LMDB_OUTPUT_TXS = "output_txs";
 char const* LMDB_OUTPUT_AMOUNTS = "output_amounts";
 char const* LMDB_SPENT_KEYS = "spent_keys";
+
+char const* LMDB_BTC_INDICES = "btc_indices";
 
 char const* LMDB_TXPOOL_META = "txpool_meta";
 char const* LMDB_TXPOOL_BLOB = "txpool_blob";
@@ -657,6 +661,28 @@ void BlockchainLMDB::remove_transaction_data(const crypto::hash& tx_hash, const 
   // Don't delete the tx_indices entry until the end, after we're done with val_tx_id
   if (mdb_cursor_del(m_cur_tx_indices, 0))
       throw1(DB_ERROR("Failed to add removal of tx index to db transaction"));
+}
+
+void BlockchainLMDB::remove_btc_tx_data(crypto::hash const& btc_hash)
+{
+  int result;
+
+  LOG_PRINT_L3("BlockchainLMDB::" << __func__);
+  check_open();
+
+  mdb_txn_cursors *m_cursors = &m_wcursors;
+  CURSOR(btc_indices)
+
+  MDB_val_set(val_h, btc_hash);
+
+  if (mdb_cursor_get(m_cur_btc_indices, (MDB_val *)&zerokval, &val_h, MDB_GET_BOTH))
+      throw1(TX_DNE("Attempting to remove btc data that isn't in the db"));
+  btcindex *tip = (btcindex *)val_h.mv_data;
+  MDB_val_set(val_tx_id, tip->data.btc_idx);
+
+  // Don't delete the tx_indices entry until the end, after we're done with val_tx_id
+  if (mdb_cursor_del(m_cur_btc_indices, 0))
+      throw1(DB_ERROR("Failed to add removal of btcindex to db transaction"));
 }
 
 uint64_t BlockchainLMDB::add_output(const crypto::hash& tx_hash,
