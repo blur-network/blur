@@ -33,6 +33,7 @@
 #include "cryptonote_basic/blobdatatype.h" // for type blobdata
 #include "ringct/rctTypes.h"
 #include <boost/thread/tss.hpp>
+#include "blockchain_db/db_structs.h"
 
 #include <lmdb.h>
 
@@ -58,14 +59,15 @@ typedef struct mdb_txn_cursors
   MDB_cursor *m_txc_txpool_blob;
 
   MDB_cursor *m_txc_hf_versions;
+
 } mdb_txn_cursors;
 
-#define m_cur_blocks	m_cursors->m_txc_blocks
+#define m_cur_blocks            m_cursors->m_txc_blocks
 #define m_cur_block_heights	m_cursors->m_txc_block_heights
 #define m_cur_block_info	m_cursors->m_txc_block_info
 #define m_cur_output_txs	m_cursors->m_txc_output_txs
 #define m_cur_output_amounts	m_cursors->m_txc_output_amounts
-#define m_cur_txs	m_cursors->m_txc_txs
+#define m_cur_txs               m_cursors->m_txc_txs
 #define m_cur_tx_indices	m_cursors->m_txc_tx_indices
 #define m_cur_tx_outputs	m_cursors->m_txc_tx_outputs
 #define m_cur_spent_keys	m_cursors->m_txc_spent_keys

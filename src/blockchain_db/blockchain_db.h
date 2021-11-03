@@ -41,6 +41,7 @@
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_basic/difficulty.h"
 #include "cryptonote_basic/hardfork.h"
+#include "db_structs.h"
 
 /** \file
  * Cryptonote Blockchain Database Interface
@@ -108,28 +109,6 @@ extern const command_line::arg_descriptor<std::string> arg_db_type;
 extern const command_line::arg_descriptor<std::string> arg_db_sync_mode;
 extern const command_line::arg_descriptor<bool, false> arg_db_salvage;
 
-#pragma pack(push, 1)
-
-/**
- * @brief a struct containing output metadata
- */
-struct output_data_t
-{
-  crypto::public_key pubkey;       //!< the output's public key (for spend verification)
-  uint64_t           unlock_time;  //!< the output's unlock time (or height)
-  uint64_t           height;       //!< the height of the block which created the output
-  rct::key           commitment;   //!< the output's amount commitment (for spend verification)
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-struct tx_data_t
-{
-  uint64_t tx_id;
-  uint64_t unlock_time;
-  uint64_t block_id;
-};
-#pragma pack(pop)
 
 /**
  * @brief a struct containing txpool per transaction metadata

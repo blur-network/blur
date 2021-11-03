@@ -37,9 +37,6 @@
 #include "ringct/rctOps.h"
 
 #include "lmdb/db_lmdb.h"
-#ifdef BERKELEY_DB
-#include "berkeleydb/db_bdb.h"
-#endif
 
 static const char *db_types[] = {
   "lmdb",

@@ -39,10 +39,11 @@
 #include "string_tools.h"
 #include "file_io_utils.h"
 #include "common/util.h"
-#include "cryptonote_basic/cryptonote_format_utils.h"
 #include "crypto/crypto.h"
+#include "cryptonote_basic/cryptonote_format_utils.h"
 #include "profile_tools.h"
 #include "ringct/rctOps.h"
+#include "blockchain_db/db_structs.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "blockchain.db.lmdb"
@@ -52,16 +53,6 @@ using namespace crypto;
 
 namespace
 {
-
-#pragma pack(push, 1)
-// This MUST be identical to output_data_t, without the extra rct data at the end
-struct pre_rct_output_data_t
-{
-  crypto::public_key pubkey;       //!< the output's public key (for spend verification)
-  uint64_t           unlock_time;  //!< the output's unlock time (or height)
-  uint64_t           height;       //!< the height of the block which created the output
-};
-#pragma pack(pop)
 
 template <typename T>
 inline void throw0(const T &e)
@@ -178,25 +169,25 @@ int compare_string(const MDB_val *a, const MDB_val *b)
  *
  * The output_amounts table doesn't use a dummy key, but uses DUPSORT.
  */
-const char* const LMDB_BLOCKS = "blocks";
-const char* const LMDB_BLOCK_HEIGHTS = "block_heights";
-const char* const LMDB_BLOCK_INFO = "block_info";
+char const* LMDB_BLOCKS = "blocks";
+char const* LMDB_BLOCK_HEIGHTS = "block_heights";
+char const* LMDB_BLOCK_INFO = "block_info";
 
-const char* const LMDB_TXS = "txs";
-const char* const LMDB_TX_INDICES = "tx_indices";
-const char* const LMDB_TX_OUTPUTS = "tx_outputs";
+char const* LMDB_TXS = "txs";
+char const* LMDB_TX_INDICES = "tx_indices";
+char const* LMDB_TX_OUTPUTS = "tx_outputs";
 
-const char* const LMDB_OUTPUT_TXS = "output_txs";
-const char* const LMDB_OUTPUT_AMOUNTS = "output_amounts";
-const char* const LMDB_SPENT_KEYS = "spent_keys";
+char const* LMDB_OUTPUT_TXS = "output_txs";
+char const* LMDB_OUTPUT_AMOUNTS = "output_amounts";
+char const* LMDB_SPENT_KEYS = "spent_keys";
 
-const char* const LMDB_TXPOOL_META = "txpool_meta";
-const char* const LMDB_TXPOOL_BLOB = "txpool_blob";
+char const* LMDB_TXPOOL_META = "txpool_meta";
+char const* LMDB_TXPOOL_BLOB = "txpool_blob";
 
-const char* const LMDB_HF_STARTING_HEIGHTS = "hf_starting_heights";
-const char* const LMDB_HF_VERSIONS = "hf_versions";
+char const* const LMDB_HF_STARTING_HEIGHTS = "hf_starting_heights";
+char const* LMDB_HF_VERSIONS = "hf_versions";
 
-const char* const LMDB_PROPERTIES = "properties";
+char const* LMDB_PROPERTIES = "properties";
 
 const char zerokey[8] = {0};
 const MDB_val zerokval = { sizeof(zerokey), (void *)zerokey };
@@ -239,44 +230,6 @@ inline void lmdb_db_open(MDB_txn* txn, const char* name, int flags, MDB_dbi& dbi
 
 namespace cryptonote
 {
-
-typedef struct mdb_block_info
-{
-  uint64_t bi_height;
-  uint64_t bi_timestamp;
-  uint64_t bi_coins;
-  uint64_t bi_size; // a size_t really but we need 32-bit compat
-  difficulty_type bi_diff;
-  crypto::hash bi_hash;
-} mdb_block_info;
-
-typedef struct blk_height {
-    crypto::hash bh_hash;
-    uint64_t bh_height;
-} blk_height;
-
-typedef struct txindex {
-    crypto::hash key;
-    tx_data_t data;
-} txindex;
-
-typedef struct pre_rct_outkey {
-    uint64_t amount_index;
-    uint64_t output_id;
-    pre_rct_output_data_t data;
-} pre_rct_outkey;
-
-typedef struct outkey {
-    uint64_t amount_index;
-    uint64_t output_id;
-    output_data_t data;
-} outkey;
-
-typedef struct outtx {
-    uint64_t output_id;
-    crypto::hash tx_hash;
-    uint64_t local_index;
-} outtx;
 
 std::atomic<uint64_t> mdb_txn_safe::num_active_txns{0};
 std::atomic_flag mdb_txn_safe::creation_gate = ATOMIC_FLAG_INIT;
@@ -575,7 +528,6 @@ void BlockchainLMDB::add_block(const block& blk, const size_t& block_size, const
 
   m_cum_size += block_size;
   m_cum_count++;
-
 }
 
 void BlockchainLMDB::remove_block()
@@ -756,15 +708,9 @@ uint64_t BlockchainLMDB::add_output(const crypto::hash& tx_hash,
   ok.data.pubkey = boost::get < txout_to_key > (tx_output.target).key;
   ok.data.unlock_time = unlock_time;
   ok.data.height = m_height;
-  if (tx_output.amount == 0)
-  {
-    ok.data.commitment = *commitment;
-    data.mv_size = sizeof(ok);
-  }
-  else
-  {
-    data.mv_size = sizeof(pre_rct_outkey);
-  }
+  ok.data.commitment = *commitment;
+  data.mv_size = sizeof(ok);
+
   data.mv_data = &ok;
 
   if ((result = mdb_cursor_put(m_cur_output_amounts, &val_amount, &data, MDB_APPENDDUP)))
@@ -835,7 +781,7 @@ void BlockchainLMDB::remove_output(const uint64_t amount, const uint64_t& out_in
   else if (result)
     throw0(DB_ERROR(lmdb_error("DB error attempting to get an output", result).c_str()));
 
-  const pre_rct_outkey *ok = (const pre_rct_outkey *)v.mv_data;
+  const outkey *ok = (const outkey *)v.mv_data;
   MDB_val_set(otxk, ok->output_id);
   result = mdb_cursor_get(m_cur_output_txs, (MDB_val *)&zerokval, &otxk, MDB_GET_BOTH);
   if (result == MDB_NOTFOUND)
@@ -1471,7 +1417,7 @@ cryptonote::blobdata BlockchainLMDB::get_txpool_tx_blob(const crypto::hash& txid
   return bd;
 }
 
-bool BlockchainLMDB::for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata*)> f, bool include_blob, bool include_unrelayed_txes) const
+bool BlockchainLMDB::for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata* bd)> f, bool include_blob, bool include_unrelayed_txes) const
 {
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   check_open();
@@ -1498,7 +1444,6 @@ bool BlockchainLMDB::for_all_txpool_txes(std::function<bool(const crypto::hash&,
     if (!include_unrelayed_txes && meta.do_not_relay)
       // Skipping that tx
       continue;
-    const cryptonote::blobdata *passed_bd = NULL;
     cryptonote::blobdata bd;
     if (include_blob)
     {
@@ -1509,10 +1454,9 @@ bool BlockchainLMDB::for_all_txpool_txes(std::function<bool(const crypto::hash&,
       if (result)
         throw0(DB_ERROR(lmdb_error("Failed to enumerate txpool tx blob: ", result).c_str()));
       bd.assign(reinterpret_cast<const char*>(b.mv_data), b.mv_size);
-      passed_bd = &bd;
     }
 
-    if (!f(txid, meta, passed_bd)) {
+    if (!f(txid, meta, &bd)) {
       ret = false;
       break;
     }
@@ -2119,17 +2063,9 @@ output_data_t BlockchainLMDB::get_output_key(const uint64_t& amount, const uint6
     throw0(DB_ERROR("Error attempting to retrieve an output pubkey from the db"));
 
   output_data_t ret;
-  if (amount == 0)
-  {
-    const outkey *okp = (const outkey *)v.mv_data;
-    ret = okp->data;
-  }
-  else
-  {
-    const pre_rct_outkey *okp = (const pre_rct_outkey *)v.mv_data;
-    memcpy(&ret, &okp->data, sizeof(pre_rct_output_data_t));;
-    ret.commitment = rct::zeroCommit(amount);
-  }
+  const outkey *okp = (const outkey *)v.mv_data;
+  ret = okp->data;
+
   TXN_POSTFIX_RDONLY();
   return ret;
 }
@@ -2820,17 +2756,18 @@ void BlockchainLMDB::get_output_key(const uint64_t &amount, const std::vector<ui
       throw0(DB_ERROR(lmdb_error("Error attempting to retrieve an output pubkey from the db", get_result).c_str()));
 
     output_data_t data;
-    if (amount == 0)
-    {
+    // below removed, and in other places... rct always active on BLUR
+//    if (amount == 0)
+//    {
       const outkey *okp = (const outkey *)v.mv_data;
       data = okp->data;
-    }
-    else
-    {
-      const pre_rct_outkey *okp = (const pre_rct_outkey *)v.mv_data;
-      memcpy(&data, &okp->data, sizeof(pre_rct_output_data_t));
-      data.commitment = rct::zeroCommit(amount);
-    }
+//    }
+//    else
+//    {
+//      const pre_rct_outkey *okp = (const pre_rct_outkey *)v.mv_data;
+//      memcpy(&data, &okp->data, sizeof(pre_rct_output_data_t));
+//      data.commitment = rct::zeroCommit(amount);
+//    }
     outputs.push_back(data);
   }
 
