@@ -47,7 +47,6 @@
 #include "wallet/wallet_args.h"
 #include "wallet/wallet2.h"
 
-using namespace std;
 using namespace epee;
 using namespace cryptonote;
 using boost::lexical_cast;

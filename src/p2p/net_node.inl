@@ -474,6 +474,7 @@ namespace nodetool
 
     m_config_folder = command_line::get_arg(vm, cryptonote::arg_data_dir);
 
+
     res = init_config();
     CHECK_AND_ASSERT_MES(res, false, "Failed to init config.");
 
@@ -1182,7 +1183,8 @@ namespace nodetool
         //then do grey list
         if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
           return false;
-      }else
+      }
+      else
       {
         //start from white list
         if(!make_expected_connections_count(white, m_config.m_net_config.max_out_connection_count))
