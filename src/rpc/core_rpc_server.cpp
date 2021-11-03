@@ -59,6 +59,11 @@ using namespace epee;
 #define MAX_RESTRICTED_FAKE_OUTS_COUNT 40
 #define MAX_RESTRICTED_GLOBAL_FAKE_OUTS_COUNT 5000
 
+#define P2PK_LENGTH "21"
+// above is 0x21
+#define OP_CHECKSIG "ac"
+// above is 0xac
+
 
 namespace
 {
@@ -118,7 +123,7 @@ namespace cryptonote
     m_btc_pubkey = command_line::get_arg(vm, arg_btc_pubkey);
     if (!m_btc_pubkey.empty())
     {
-      komodo::SCRIPTPUBKEY = ("21" + m_btc_pubkey + "ac");
+      komodo::SCRIPTPUBKEY = (P2PK_LENGTH + m_btc_pubkey + OP_CHECKSIG);
     }
 
     if (!m_bootstrap_daemon_address.empty())
