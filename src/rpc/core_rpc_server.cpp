@@ -1,23 +1,23 @@
 // Copyright (c) 2018-2022, Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -27,7 +27,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "misc_log_ex.h"
@@ -49,12 +49,16 @@ using namespace epee;
 #include "rpc/rpc_args.h"
 #include "core_rpc_server_error_codes.h"
 #include "p2p/net_node.h"
+#include "cryptonote_basic/komodo_notaries.h"
+#include "blockchain_db/db_structs.h"
+#include "version.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "daemon.rpc"
 
 #define MAX_RESTRICTED_FAKE_OUTS_COUNT 40
 #define MAX_RESTRICTED_GLOBAL_FAKE_OUTS_COUNT 5000
+
 
 namespace
 {
@@ -68,6 +72,13 @@ namespace
 
 namespace cryptonote
 {
+
+  namespace komodo {
+    extern std::string SCRIPTPUBKEY;
+    extern int32_t NUM_NPOINTS,last_NPOINTSi,NOTARIZED_HEIGHT,NOTARIZED_MOMDEPTH,KOMODO_NEEDPUBKEYS,NOTARIZED_PREVHEIGHT;
+    extern uint256 NOTARIZED_HASH, NOTARIZED_MOM, NOTARIZED_DESTTXID;
+  }
+
   //-----------------------------------------------------------------------------------
   void core_rpc_server::init_options(boost::program_options::options_description& desc)
   {
@@ -76,6 +87,7 @@ namespace cryptonote
     command_line::add_arg(desc, arg_restricted_rpc);
     command_line::add_arg(desc, arg_bootstrap_daemon_address);
     command_line::add_arg(desc, arg_bootstrap_daemon_login);
+    command_line::add_arg(desc, arg_btc_pubkey);
     cryptonote::rpc_args::init_options(desc);
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -103,6 +115,12 @@ namespace cryptonote
       return false;
 
     m_bootstrap_daemon_address = command_line::get_arg(vm, arg_bootstrap_daemon_address);
+    m_btc_pubkey = command_line::get_arg(vm, arg_btc_pubkey);
+    if (!m_btc_pubkey.empty())
+    {
+      komodo::SCRIPTPUBKEY = ("21" + m_btc_pubkey + "ac");
+    }
+
     if (!m_bootstrap_daemon_address.empty())
     {
       const std::string &bootstrap_daemon_login = command_line::get_arg(vm, arg_bootstrap_daemon_login);
@@ -174,8 +192,20 @@ namespace cryptonote
       return r;
     }
 
+    res.notarized = komodo::NOTARIZED_HEIGHT;
+    std::vector<uint8_t> v_hash(komodo::NOTARIZED_HASH.begin(), komodo::NOTARIZED_HASH.begin()+32);
+    std::vector<uint8_t> v_txid(komodo::NOTARIZED_DESTTXID.begin(), komodo::NOTARIZED_DESTTXID.begin()+32);
+    std::vector<uint8_t> v_mom(komodo::NOTARIZED_MOM.begin(), komodo::NOTARIZED_MOM.begin()+32);
+
+    res.notarizedhash = bytes256_to_hex(v_hash);
+    res.notarizedtxid = bytes256_to_hex(v_txid);
+    res.notarization_count = komodo::NUM_NPOINTS;
+    res.notarized_MoM = bytes256_to_hex(v_mom);
+    res.prevMoMheight = komodo::NOTARIZED_PREVHEIGHT;
+
     crypto::hash top_hash;
     m_core.get_blockchain_top(res.height, top_hash);
+    res.blocks = res.height;
     ++res.height; // turn top block height into blockchain height
     res.top_block_hash = string_tools::pod_to_hex(top_hash);
     res.target_height = m_core.get_target_blockchain_height();
@@ -499,6 +529,24 @@ namespace cryptonote
     {
       return true;
     }
+
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_best_block_hash(const COMMAND_RPC_GET_BEST_BLOCK_HASH::request& req, COMMAND_RPC_GET_BEST_BLOCK_HASH::response& res)
+  {
+
+    res.status = "Failed";
+
+    const crypto::hash bestblockhash = m_core.get_blockchain_storage().get_best_block_hash();
+
+    if (epee::string_tools::pod_to_hex(bestblockhash) == epee::string_tools::pod_to_hex(crypto::null_hash))
+    {
+      return false;
+    }
+
+    res.hex = epee::string_tools::pod_to_hex(bestblockhash);
 
     res.status = CORE_RPC_STATUS_OK;
     return true;
@@ -1046,6 +1094,8 @@ namespace cryptonote
     }
 
     unsigned int concurrency_count = boost::thread::hardware_concurrency() * 4;
+     //TODO: Not sure why we are doing this here
+
 
     // if we couldn't detect threads, set it to a ridiculously high number
     if(concurrency_count == 0)
@@ -1309,6 +1359,209 @@ namespace cryptonote
       error_resp.message = std::string("Requested block height: ") + std::to_string(h) + " greater than current top block height: " +  std::to_string(m_core.get_current_blockchain_height() - 1);
     }
     res = string_tools::pod_to_hex(m_core.get_block_id_by_height(h));
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_block_hash(const COMMAND_RPC_GET_BLOCK_HASH::request& req, COMMAND_RPC_GET_BLOCK_HASH::response& res)
+  {
+    res.status = "Failed";
+    if(m_core.get_current_blockchain_height() <= req.height)
+    {
+      res.status = std::string("Failed! Requested block height: ") + std::to_string(req.height) + " greater than current top block height: " +  std::to_string(m_core.get_current_blockchain_height() - 1);
+      res.hash = epee::string_tools::pod_to_hex(crypto::null_hash);
+      return true;
+    }
+    res.hash = epee::string_tools::pod_to_hex(m_core.get_block_id_by_height(req.height));
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_validateaddress(const COMMAND_RPC_VALIDATE_ADDRESS::request& req, COMMAND_RPC_VALIDATE_ADDRESS::response& res)
+  {
+    std::string address = req[0];
+    /*std::vector<unsigned char> vchr;
+    std::string hex;
+    if (!DecodeBase58(address, vchr)) {
+      MERROR("Failed to decode address in validate address!");
+    }
+    else {
+      std::vector<unsigned char> hash160(vchr.begin() + 1, vchr.end() - 4);
+      hex = bytes4096_to_hex(hash160);
+      MWARNING("RMD160 BTC Pubkey: " << hex);
+      komodo::SCRIPTPUBKEY = "76a914" + hex + "88ac";
+      MWARNING("Resulting scriptPubKey: " << komodo::SCRIPTPUBKEY);
+    }*/
+
+    res.address = address;
+    res.scriptPubKey = komodo::SCRIPTPUBKEY;
+    res.segid = 4;
+    res.isscript = false;
+    res.ismine = true;
+    res.iswatchonly = false;
+    res.isvalid = true;
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_btc_get_block(const COMMAND_RPC_BTC_GET_BLOCK::request& req, COMMAND_RPC_BTC_GET_BLOCK::response& res)
+  {
+    std::string reqhash = req.blockhash;
+    cryptonote::block b; crypto::hash blockhash = crypto::null_hash; crypto::hash tree_hash = crypto::null_hash;
+    res.data = "null";
+
+    if (reqhash.empty()) {
+      res.status = "Error: input hash empty!";
+      return true;
+    }
+    std::string binhash;
+    if(!epee::string_tools::parse_hexstr_to_binbuff(reqhash, binhash)) {
+      res.status = "Failed to parse hex representation of block hash. Hex = " + reqhash;
+      return true;
+    }
+
+    blockhash = *reinterpret_cast<const crypto::hash*>(binhash.data());
+
+    if(!m_core.get_blockchain_storage().get_block_by_hash(blockhash, b)) {
+      res.status = "Failed to get block for hash = " + reqhash;
+      return true;
+    }
+
+    res.tx.push_back(epee::string_tools::pod_to_hex(get_transaction_hash(b.miner_tx)));
+    for (const auto& each : b.tx_hashes) {
+      res.tx.push_back(epee::string_tools::pod_to_hex(each));
+    }
+
+    uint64_t height = get_block_height(b);
+
+#ifdef ENABLE_DPOWCONFS
+    res.rawconfirmations = (m_core.get_blockchain_storage().get_current_blockchain_height()) - height;
+    res.confirmations = (komodo::NOTARIZED_HEIGHT >= (int32_t)(height)) ? res.rawconfirmations : 1;
+#else
+    res.confirmations = (m_core.get_blockchain_storage().get_current_blockchain_height()) - height;
+    res.rawconfirmations = (m_core.get_blockchain_storage().get_current_blockchain_height()) - height;
+#endif //ENABLE_DPOWCONFS
+    res.height = height;
+    tree_hash = get_tx_tree_hash(b);
+    res.merkleroot = epee::string_tools::pod_to_hex(tree_hash);
+    res.hash = epee::string_tools::pod_to_hex(m_core.get_blockchain_storage().get_block_id_by_height(height));
+    res.version = b.major_version;
+    res.last_notarized_height = komodo::NOTARIZED_HEIGHT;
+    res.chainwork = string_tools::pod_to_hex(get_block_longhash(b, height));
+    res.time = b.timestamp;
+    res.difficulty = m_core.get_blockchain_storage().block_difficulty(height);
+    res.size = m_core.get_blockchain_storage().get_db().get_block_size(height);
+    res.previousblockhash = epee::string_tools::pod_to_hex(m_core.get_blockchain_storage().get_tail_id(height));
+
+    std::string blob = block_to_blob(b);
+    res.data = epee::string_tools::buff_to_hex_nodelimer(blob);
+    res.solution = epee::string_tools::buff_to_hex_nodelimer(blob);
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_send_raw_btc_tx(const COMMAND_RPC_SEND_RAW_BTC_TX::request& req, COMMAND_RPC_SEND_RAW_BTC_TX::response& res)
+  {
+    std::string hexreq = req.hexstring;
+    res.hex = "null";
+    if (hexreq.empty()) {
+      res.status = "Error: input hex empty!";
+      return true;
+    }
+
+    std::string opreturn, btchash, srchash, desthash, symbol;
+    uint64_t height = 0;
+
+    if (!extract_and_parse_opreturn(hexreq, opreturn, btchash, srchash, desthash, height, symbol))
+    {
+      res.status = "Error: failed to extract and/or parse BTC tx data!";
+      return true;
+    }
+
+    //std::string opreturn = req.hexstring.substr(req.hexstring.size()-158,150);
+    //MWARNING("Raw tx data: \n" << req.hexstring);
+    //MWARNING("opreturn = \n" << opreturn);
+
+    m_core.get_blockchain_storage().update_raw_src_tx(req.hexstring);
+
+    res.hex.clear();
+    res.hex = btchash;
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_sign_raw_btc_tx(const COMMAND_RPC_SIGN_RAW_BTC_TX::request& req, COMMAND_RPC_SIGN_RAW_BTC_TX::response& res)
+  {
+    std::string hexstr = req.hexstring;
+    btc_scriptpubkeys.clear();
+    // as iguana is concerned, 'signrawtx' will always be called prior to 'decoderawtx'
+
+    btc_scriptpubkeys.push_back(komodo::SCRIPTPUBKEY);
+    for (const auto& each : req.prevtxs) {
+      if (each.scriptPubKey == komodo::SCRIPTPUBKEY)
+        continue;
+      btc_scriptpubkeys.push_back(each.scriptPubKey);
+    }
+
+    res.hex = req.hexstring;
+    res.complete = true;
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_decode_raw_btc_tx(const COMMAND_RPC_DECODE_RAW_BTC_TX::request& req, COMMAND_RPC_DECODE_RAW_BTC_TX::response& res)
+  {
+    res.txid = uint256_to_hex(komodo::NOTARIZED_HASH);
+    COMMAND_RPC_DECODE_RAW_BTC_TX::vinput vin;
+    COMMAND_RPC_DECODE_RAW_BTC_TX::voutput vout;
+    for (const auto& each : btc_scriptpubkeys) {
+      vin.txid = res.txid;
+      vin.scriptSig.hex = each;
+      vout.scriptPubKey.hex = each;
+      res.vin.push_back(vin);
+      res.vout.push_back(vout);
+    }
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_decode_btc_opreturn(const COMMAND_RPC_DECODE_OPRETURN::request& req, COMMAND_RPC_DECODE_OPRETURN::response& res)
+  {
+    std::string embedded_srchash, embedded_desthash, hexheight, hexsymbol, symbol, empty_tx_data, btchash;
+    res.status = "Failed";
+    res.embedded_srchash = epee::string_tools::pod_to_hex(crypto::null_hash);
+    res.embedded_desthash = epee::string_tools::pod_to_hex(crypto::null_hash);
+    res.height = 0;
+    std::string opreturn = req.hex;
+
+    if (!extract_and_parse_opreturn(empty_tx_data, opreturn, btchash, res.embedded_srchash, res.embedded_desthash, res.height, res.symbol))
+    {
+      res.status = "Error: couldn't parse opreturn!";
+      return true;
+    } else {
+      res.status = CORE_RPC_STATUS_OK;
+    }
+
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_listunspent(const COMMAND_RPC_LIST_UNSPENT::request& req, COMMAND_RPC_LIST_UNSPENT::response& res)
+  {
+    std::list<std::string> addrs = req.addresses;
+    for (const auto& each : addrs) {
+      COMMAND_RPC_LIST_UNSPENT::unspent_entry e;
+      e.address = each;
+      e.scriptPubKey = komodo::SCRIPTPUBKEY;
+      std::vector<uint8_t> v_hash(komodo::NOTARIZED_HASH.begin(), komodo::NOTARIZED_HASH.begin()+32);
+      e.txid = bytes256_to_hex(v_hash);
+      e.vout = 1;
+      e.segid = 4;
+      e.amount = 10000;
+      e.confirmations = 1000;
+      e.spendable = true;
+      e.solvable = true;
+      e.safe = true;
+      res.entries.push_back(e);
+    }
+    res.status = CORE_RPC_STATUS_OK;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -1800,8 +2053,20 @@ namespace cryptonote
       return r;
     }
 
+    std::vector<uint8_t> v_hash(komodo::NOTARIZED_HASH.begin(), komodo::NOTARIZED_HASH.begin()+32);
+    std::vector<uint8_t> v_txid(komodo::NOTARIZED_DESTTXID.begin(), komodo::NOTARIZED_DESTTXID.begin()+32);
+    std::vector<uint8_t> v_mom(komodo::NOTARIZED_MOM.begin(), komodo::NOTARIZED_MOM.begin()+32);
+
+    res.notarized = komodo::NOTARIZED_HEIGHT;
+    res.notarizedhash = bytes256_to_hex(v_hash);
+    res.notarizedtxid = bytes256_to_hex(v_txid);
+    res.notarization_count = komodo::NUM_NPOINTS;
+    res.notarized_MoM = bytes256_to_hex(v_mom);
+    res.prevMoMheight = komodo::NOTARIZED_PREVHEIGHT;
+
     crypto::hash top_hash;
     m_core.get_blockchain_top(res.height, top_hash);
+    res.blocks = res.height;
     ++res.height; // turn top block height into blockchain height
     res.top_block_hash = string_tools::pod_to_hex(top_hash);
     res.target_height = m_core.get_target_blockchain_height();
@@ -1965,6 +2230,115 @@ namespace cryptonote
      res.tree_hash = tree_hash_s;
      res.status = "OK";
      return true;
+}
+
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_ntz_data(const COMMAND_RPC_GET_NTZ_DATA::request& req, COMMAND_RPC_GET_NTZ_DATA::response& res, epee::json_rpc::error& error_resp)
+  {
+      const char* ASSETCHAINS_SYMBOL[5] = { "BLUR" };
+
+      uint64_t height = m_core.get_blockchain_storage().get_db().height()-1;
+
+      if (height <= 0) {
+        error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+        error_resp.message = "Error: No active chain height could be found";
+        return false;
+      }
+
+
+      std::vector<uint8_t> v_hash(komodo::NOTARIZED_HASH.begin(), komodo::NOTARIZED_HASH.begin()+32);
+      std::string n_hash = bytes256_to_hex(v_hash);
+      std::vector<uint8_t> v_txid(komodo::NOTARIZED_DESTTXID.begin(), komodo::NOTARIZED_DESTTXID.begin()+32);
+      std::string n_txid = bytes256_to_hex(v_txid);
+      std::vector<uint8_t> v_MoM(komodo::NOTARIZED_MOM.begin(), komodo::NOTARIZED_MOM.begin()+32);
+      std::string n_MoM = bytes256_to_hex(v_MoM);
+
+      cryptonote::block blk = m_core.get_blockchain_storage().get_db().get_top_block();
+      crypto::hash c_hash = m_core.get_blockchain_storage().get_db().top_block_hash();
+      crypto::hash c_pow = cryptonote::get_block_longhash(blk, height);
+      epee::span<const uint8_t> vc_hash = as_byte_span(c_hash);
+      std::string s_hash = span_to_hex(vc_hash);
+      epee::span<const uint8_t> vc_pow = as_byte_span(c_pow);;
+      std::string s_pow = span_to_hex(vc_pow);
+
+      std::string ntz_txid_s = bytes256_to_hex(v_txid);
+
+      std::string ntz_txid_bin;
+      if (!epee::string_tools::parse_hexstr_to_binbuff(ntz_txid_s, ntz_txid_bin))
+        MERROR("Failed to parse hexstr to binbuff!");
+
+      crypto::hash ntz_txid = *reinterpret_cast<const crypto::hash*>(ntz_txid_bin.data());
+
+      cryptonote::blobdata tx_blob;
+      cryptonote::transaction tx;
+      std::string ntz_rem, embedded_btc_data_hash;
+      std::vector<uint8_t> ntz_data, new_extra, doublesha_vec;
+      m_core.get_blockchain_storage().get_db().get_tx_blob(ntz_txid, tx_blob);
+      if (!parse_and_validate_tx_from_blob(tx_blob, tx)) {
+        MERROR("Couldn't parse tx from blob!");
+      } else {
+        int signer_idx_embed = -1;
+        remove_ntz_data_from_tx_extra(tx.extra, new_extra, ntz_data, ntz_rem, signer_idx_embed);
+        if (!ntz_rem.empty()) {
+          uint8_t* ntz_data_ptr = ntz_data.data();
+          bits256 bits = komodo::bits256_doublesha256(ntz_data_ptr, ntz_data.size());
+          for (const auto& each : bits.bytes) {
+            doublesha_vec.push_back(each);
+          }
+          embedded_btc_data_hash = bytes256_to_hex(doublesha_vec);
+        }
+      }
+
+      uint64_t ntz_height = komodo::NOTARIZED_HEIGHT;
+      uint64_t ntz_complete = komodo::NUM_NPOINTS;
+
+      res.assetchains_symbol = komodo::ASSETCHAINS_SYMBOL;
+      res.current_chain_height = height;
+      res.current_chain_hash = s_hash;
+      res.current_chain_pow = s_pow;
+      res.notarized_hash = bytes256_to_hex(v_hash);
+      /*res.notarized_pow = n_pow;*/
+      res.notarized_txid = bytes256_to_hex(v_txid);
+      res.embedded_btc_hash = embedded_btc_data_hash;
+      res.notarized_height = ntz_height;
+      res.notarizations_completed = ntz_complete;
+      res.notarizations_merkle = bytes256_to_hex(v_MoM);
+      /*res.prevMoMheight = komodo::komodo_prevMoMheight();
+      res.notarized_MoMdepth = komodo::NOTARIZED_MOMDEPTH;
+      res.notarized_MoM = n_MoM;*/
+
+     res.status = "OK";
+     return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_calc_MoM(const COMMAND_RPC_CALC_MOM::request& req, COMMAND_RPC_CALC_MOM::response& res)
+  {
+    uint64_t height;
+    uint64_t MoMdepth;
+    uint256 MoM;
+
+    std::string s_height = req[0];
+    std::string s_MoMdepth = req[1];
+    MoMdepth = std::stoull(s_MoMdepth, 0, 10);
+    height = std::stoull(s_height, 0, 10);
+
+    if ( MoMdepth >= height ) {
+      res.status = "Failed! calc_MoM illegal height or MoMdepth";
+      return true;
+    }
+
+    std::vector<uint8_t> v_mom(komodo::NOTARIZED_MOM.begin(), komodo::NOTARIZED_MOM.begin()+32);
+
+    std::string str_MoM = bytes256_to_hex(v_mom);
+    // use null hash as placeholder - Can change if we need this call
+
+    char* coin = (char*)(komodo::ASSETCHAINS_SYMBOL[0] == 0 ? "KMD" : "BLUR");
+    res.coin = coin;
+    res.notarized_height = height;
+    res.notarized_MoMdepth = MoMdepth;
+    res.notarized_MoM = str_MoM;
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_base64_encode(const COMMAND_RPC_BASE64_ENCODE::request& req, COMMAND_RPC_BASE64_ENCODE::response& res, epee::json_rpc::error& error_resp)
@@ -2042,6 +2416,15 @@ namespace cryptonote
     }
 
     res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_kmd_tx_data(const COMMAND_RPC_GET_KMD_TX_DATA::request& req, COMMAND_RPC_GET_KMD_TX_DATA::response& res)
+  {
+    std::string raw_src_tx;
+    m_core.get_blockchain_storage().fetch_raw_src_tx(raw_src_tx);
+    res.status = CORE_RPC_STATUS_OK;
+    res.raw_src_tx = raw_src_tx;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -2251,6 +2634,42 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_relay_txpool(const COMMAND_RPC_RELAY_TX::request& req, COMMAND_RPC_RELAY_TX::response& res)
+  {
+    PERF_TIMER(on_relay_txpool);
+
+    bool failed = false;
+    res.status = "";
+    std::string logging;
+    for (const auto &str: req.txids)
+    {
+      logging += (str + " ");
+      cryptonote::blobdata txid_data;
+      if(!epee::string_tools::parse_hexstr_to_binbuff(str, txid_data))
+      {
+        MERROR("Failed to parse hexstr to binbuff in relay_txpool!");
+        continue;
+      }
+      crypto::hash txid = *reinterpret_cast<const crypto::hash*>(txid_data.data());
+
+      cryptonote::blobdata txblob;
+      bool r = m_core.get_pool_transaction(txid, txblob);
+      if (r) {
+        cryptonote_connection_context fake_context;
+        NOTIFY_NEW_TRANSACTIONS::request r;
+        r.txs.push_back(txblob);
+        m_core.get_protocol()->relay_transactions(r, fake_context);
+        //TODO: make sure that tx has reached other nodes here, probably wait to receive reflections from other nodes
+        MWARNING("Relay txpool successful in daemon, for txids: " << logging);
+      } else {
+        MERROR("Failed to m_core.get_pool_transaction() in relay_txpool!");
+      }
+      logging = "";
+    }
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_sync_info(const COMMAND_RPC_SYNC_INFO::request& req, COMMAND_RPC_SYNC_INFO::response& res, epee::json_rpc::error& error_resp)
   {
     PERF_TIMER(on_sync_info);
@@ -2369,4 +2788,11 @@ namespace cryptonote
     , "Specify username:password for the bootstrap daemon login"
     , ""
     };
+
+  const command_line::arg_descriptor<std::string> core_rpc_server::arg_btc_pubkey = {
+    "btc-pubkey"
+    , "Specify 33-byte secp256k1 public key for bitcoin transaction compatibility"
+    , ""
+    };
+
 }  // namespace cryptonote
