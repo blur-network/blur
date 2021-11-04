@@ -1836,8 +1836,13 @@ bool Blockchain::handle_get_objects(NOTIFY_REQUEST_GET_OBJECTS::request& arg, NO
       e.txs.push_back(tx);
   }
   //get another transactions, if need
+  std::vector<crypto::hash> tx_hashes;
+  for (const auto& each : arg.txs)
+  {
+    tx_hashes.push_back(each);
+  }
   std::list<cryptonote::blobdata> txs;
-  get_transactions_blobs(arg.txs, txs, rsp.missed_ids);
+  get_transactions_blobs(tx_hashes, txs, rsp.missed_ids);
   //pack aside transactions
   for (const auto& tx: txs)
     rsp.txs.push_back(tx);
@@ -2270,8 +2275,7 @@ bool Blockchain::get_blocks(const t_ids_container& block_ids, t_blocks_container
 //------------------------------------------------------------------
 //TODO: return type should be void, throw on exception
 //       alternatively, return true only if no transactions missed
-template<class t_ids_container, class t_tx_container, class t_missed_container>
-bool Blockchain::get_transactions_blobs(const t_ids_container& txs_ids, t_tx_container& txs, t_missed_container& missed_txs) const
+bool Blockchain::get_transactions_blobs(std::vector<crypto::hash> const& txs_ids, std::list<cryptonote::blobdata>& txs, std::list<crypto::hash>& missed_txs) const
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
