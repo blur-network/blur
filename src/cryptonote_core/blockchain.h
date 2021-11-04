@@ -699,7 +699,6 @@ namespace cryptonote
      * @return false if an unexpected exception occurs, else true
      */
     bool get_transactions_blobs(std::vector<crypto::hash> const& txs_ids, std::list<cryptonote::blobdata>& txs, std::list<crypto::hash>& missed_txs) const;
-    //bool get_transactions_blobs(const t_ids_container& txs_ids, t_tx_container& txs, t_missed_container& missed_txs) const;
     template<class t_ids_container, class t_tx_container, class t_missed_container>
     bool get_transactions(const t_ids_container& txs_ids, t_tx_container& txs, t_missed_container& missed_txs) const;
 

@@ -1440,8 +1440,8 @@ namespace nodetool
         LOG_WARNING_CC(ping_context, "back ping connect failed to " << address.str());
         return false;
       }
-      COMMAND_PING::request req;
-      COMMAND_PING::response rsp;
+      COMMAND_PING::request req = AUTO_VAL_INIT(req);
+      COMMAND_PING::response rsp = AUTO_VAL_INIT(rsp);
       //vc2010 workaround
       /*std::string ip_ = ip;
       std::string port_=port;
@@ -1488,7 +1488,7 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::try_get_support_flags(const p2p_connection_context& context, std::function<void(p2p_connection_context&, const uint32_t&)> f)
   {
-    COMMAND_REQUEST_SUPPORT_FLAGS::request support_flags_request;
+    COMMAND_REQUEST_SUPPORT_FLAGS::request support_flags_request = AUTO_VAL_INIT(support_flags_request);
     bool r = epee::net_utils::async_invoke_remote_command2<typename COMMAND_REQUEST_SUPPORT_FLAGS::response>
     (
       context.m_connection_id,
