@@ -794,6 +794,168 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_notarizations(const COMMAND_RPC_GET_NOTARIZATIONS::request& req, COMMAND_RPC_GET_NOTARIZATIONS::response& res)
+  {
+    std::vector<crypto::hash> vh;
+    std::vector<std::pair<crypto::hash,uint64_t>> ntz_hash_height;
+    uint64_t ntz_count = m_core.get_blockchain_storage().get_ntz_count(ntz_hash_height);
+    std::vector<std::string> ntz_hexs;
+    std::vector<std::pair<std::string,uint64_t>> ntz_hexs_height;
+    for (const auto& each : ntz_hash_height)
+    {
+      if (!req.txs_hashes.empty())
+      {
+        for (const auto& req_each : req.txs_hashes)
+        {
+          std::string ntz_hashstr = epee::string_tools::pod_to_hex(each.first);
+          if (ntz_hashstr == req_each)
+          {
+            ntz_hexs_height.push_back(std::make_pair(ntz_hashstr,each.second));
+            ntz_hexs.push_back(ntz_hashstr);
+          }
+        }
+      } else {
+        ntz_hexs_height.push_back(std::make_pair(epee::string_tools::pod_to_hex(each.first),each.second));
+        ntz_hexs.push_back(epee::string_tools::pod_to_hex(each.first));
+      }
+    }
+    for(const auto& tx_hex_str: ntz_hexs_height)
+    {
+      blobdata b;
+      if(!string_tools::parse_hexstr_to_binbuff(tx_hex_str.first, b))
+      {
+        res.status = "Failed to parse hex representation of transaction hash";
+        return true;
+      }
+      if(b.size() != sizeof(crypto::hash))
+      {
+        res.status = "Failed, size of data mismatch";
+        return true;
+      }
+      vh.push_back(*reinterpret_cast<const crypto::hash*>(b.data()));
+    }
+    std::list<crypto::hash> missed_txs;
+    std::list<transaction> txs;
+    for (const auto& each : vh) {
+      cryptonote::transaction each_tx;
+      bool r = m_core.get_blockchain_storage().get_db().get_tx(each, each_tx);
+      if (!r) {
+        missed_txs.push_back(get_transaction_hash(each_tx));
+      } else {
+        txs.push_back(each_tx);
+      }
+    }
+    // try the pool for any missing txes
+    size_t found_in_pool = 0;
+    std::unordered_set<crypto::hash> pool_tx_hashes;
+    std::unordered_map<crypto::hash, bool> double_spend_seen;
+    if (!missed_txs.empty())
+    {
+      std::vector<tx_info> pool_tx_info;
+      std::vector<spent_key_image_info> pool_key_image_info;
+      bool r = m_core.get_pool_transactions_and_spent_keys_info(pool_tx_info, pool_key_image_info);
+      if(r)
+      {
+        // sort to match original request
+        std::vector<tx_info>::const_iterator i;
+        std::list<transaction> sorted_txs;
+        for (const crypto::hash &h: vh)
+        {
+          if (std::find(missed_txs.begin(), missed_txs.end(), h) == missed_txs.end())
+          {
+            if (txs.empty())
+            {
+              res.status = "Failed: internal error - txs is empty";
+              return true;
+            }
+            // core returns the ones it finds in the right order
+            if (get_transaction_hash(txs.front()) != h)
+            {
+              res.status = "Failed: tx hash mismatch";
+              return true;
+            }
+            sorted_txs.push_back(std::move(txs.front()));
+            txs.pop_front();
+          }
+          else if ((i = std::find_if(pool_tx_info.begin(), pool_tx_info.end(), [h](const tx_info &txi) { return epee::string_tools::pod_to_hex(h) == txi.id_hash; })) != pool_tx_info.end())
+          {
+            cryptonote::transaction tx;
+            if (!cryptonote::parse_and_validate_tx_from_blob(i->tx_blob, tx))
+            {
+              res.status = "Failed to parse and validate tx from blob";
+              return true;
+            }
+            sorted_txs.push_back(tx);
+            missed_txs.remove(h);
+            pool_tx_hashes.insert(h);
+            const std::string hash_string = epee::string_tools::pod_to_hex(h);
+            for (const auto &ti: pool_tx_info)
+            {
+              if (ti.id_hash == hash_string)
+              {
+                double_spend_seen.insert(std::make_pair(h, ti.double_spend_seen));
+                break;
+              }
+            }
+            ++found_in_pool;
+          }
+        }
+      }
+    }
+    LOG_PRINT_L2("Found " << txs.size() << "/" << vh.size() << " transactions on the blockchain");
+
+    std::vector<std::string>::const_iterator txhi = ntz_hexs.begin();
+    std::vector<crypto::hash>::const_iterator vhi = vh.begin();
+    for(auto& tx: txs)
+    {
+      if (tx.version != 2) {
+
+      } else {
+        res.txs.push_back(COMMAND_RPC_GET_NOTARIZATIONS::entry());
+        COMMAND_RPC_GET_NOTARIZATIONS::entry &e = res.txs.back();
+
+        crypto::hash tx_hash = *vhi++;
+        e.ntz_tx_hash = *txhi++;
+        blobdata blob = t_serializable_object_to_blob(tx);
+        e.as_hex = string_tools::buff_to_hex_nodelimer(blob);
+        if (req.decode_as_json)
+          e.as_json = obj_to_json_str(tx);
+        e.in_pool = pool_tx_hashes.find(tx_hash) != pool_tx_hashes.end();
+        if (e.in_pool)
+        {
+          e.block_height = e.block_timestamp = std::numeric_limits<uint64_t>::max();
+          if (double_spend_seen.find(tx_hash) != double_spend_seen.end())
+          {
+            e.double_spend_seen = double_spend_seen[tx_hash];
+          }
+          else
+          {
+            MERROR("Failed to determine double spend status for " << tx_hash);
+            e.double_spend_seen = false;
+          }
+        } else {
+          e.block_height = m_core.get_blockchain_storage().get_db().get_tx_block_height(tx_hash);
+          e.block_timestamp = m_core.get_blockchain_storage().get_db().get_block_timestamp(e.block_height);
+          e.double_spend_seen = false;
+          bool r = m_core.get_tx_outputs_gindexs(tx_hash, e.output_indices);
+          if (!r)
+          {
+              res.status = "Failed";
+              return false;
+          }
+        }
+      }
+    }
+    for(const auto& miss_tx: missed_txs)
+    {
+      res.missed_tx.push_back(string_tools::pod_to_hex(miss_tx));
+    }
+
+    LOG_PRINT_L2(res.txs.size() << " transactions found, " << res.missed_tx.size() << " not found");
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_get_transactions_by_heights(const COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS::request& req, COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS::response& res)
   {
     PERF_TIMER(on_get_transactions_by_heights);

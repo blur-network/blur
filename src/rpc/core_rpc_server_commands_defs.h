@@ -616,6 +616,67 @@ namespace cryptonote
   };
 
   //-----------------------------------------------
+  struct COMMAND_RPC_GET_NOTARIZATIONS
+  {
+    struct request
+    {
+      std::list<std::string> txs_hashes;
+      bool decode_as_json;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(txs_hashes)
+        KV_SERIALIZE(decode_as_json)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct entry
+    {
+      std::string ntz_tx_hash;
+      std::string as_hex;
+      std::string as_json;
+      bool in_pool;
+      bool double_spend_seen;
+      uint64_t block_height;
+      uint64_t block_timestamp;
+      std::vector<uint64_t> output_indices;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(ntz_tx_hash)
+        KV_SERIALIZE(as_hex)
+        KV_SERIALIZE(as_json)
+        KV_SERIALIZE(in_pool)
+        KV_SERIALIZE(double_spend_seen)
+        KV_SERIALIZE(block_height)
+        KV_SERIALIZE(block_timestamp)
+        KV_SERIALIZE(output_indices)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      // older compatibility stuff
+      std::list<std::string> txs_as_hex;  //transactions blobs as hex (old compat)
+      std::list<std::string> txs_as_json; //transactions decoded as json (old compat)
+
+      // in both old and new
+      std::list<std::string> missed_tx;   //not found transactions
+
+      // new style
+      std::vector<entry> txs;
+      std::string status;
+      bool untrusted;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(txs_as_hex)
+        KV_SERIALIZE(txs_as_json)
+        KV_SERIALIZE(txs)
+        KV_SERIALIZE(missed_tx)
+        KV_SERIALIZE(status)
+        KV_SERIALIZE(untrusted)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+  //-----------------------------------------------
   struct COMMAND_RPC_GET_TRANSACTIONS_BY_HEIGHTS
   {
     struct request
