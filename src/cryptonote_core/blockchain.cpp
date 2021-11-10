@@ -176,27 +176,34 @@ bool Blockchain::have_tx_keyimg_as_spent(const crypto::key_image &key_im) const
   return  m_db->has_key_image(key_im);
 }
 //------------------------------------------------------------------
-uint64_t Blockchain::get_ntz_count(std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>>& ret) const
+uint64_t Blockchain::get_ntz_count(std::vector<std::pair<crypto::hash,uint64_t>>& ret) const
 {
   // vector of hash, height pair for all notarizations in DB
   // return value is total count
   LOG_PRINT_L3("Blockchain::" << __func__);
   uint64_t count = 0;
-  std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>> hash_height_index;
-  for_all_transactions([this, &hash_height_index, &count](const crypto::hash &hash, const cryptonote::transaction &tx)->bool
+  std::vector<std::pair<crypto::hash,uint64_t>> hash_height;
+  for_all_transactions([this, &hash_height, &count](const crypto::hash &hash, const cryptonote::transaction &tx)->bool
   {
     if ((tx.version == (DPOW_NOTA_TX_VERSION)) && (tx.vin[0].type() != typeid(txin_gen))) {
       uint64_t ntz_index = count;
       const uint64_t height = m_db->get_tx_block_height(hash);
-      auto each = std::make_tuple(hash,height,ntz_index);
-      hash_height_index.push_back(each);
+      hash_height.push_back(std::make_pair(hash,height));
       count += 1;
     }
     return true;
   });
 
   ret = hash_height_index;
-  return (count/(DPOW_SIG_COUNT));
+  if (count % (DPOW_SIG_COUNT) == 0)
+  {
+    return (count/(DPOW_SIG_COUNT));
+  }
+  else
+  {
+    MERROR("Inconsistency in enumeration of ntz_count vs minsigs! Count should be an even multiple of required signatures!");
+    return 0;
+  }
 }
 //------------------------------------------------------------------
 crypto::hash Blockchain::get_ntz_merkle(std::vector<std::pair<crypto::hash,uint64_t>> const& notarizations)
@@ -223,14 +230,16 @@ crypto::hash Blockchain::get_ntz_merkle(std::vector<std::pair<crypto::hash,uint6
 //------------------------------------------------------------------
 uint64_t Blockchain::get_notarized_height(crypto::hash& ntz_hash) const
 {
-  std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>> ntz_txs;
+  std::vector<std::pair<crypto::hash,uint64_t>> ntz_txs;
   uint64_t ntz_count = get_ntz_count(ntz_txs);
   uint64_t notarized_height = 0;
   ntz_hash = crypto::null_hash;
-  for (const auto& each : ntz_txs) {
-    if (std::get<1>(each) > notarized_height) {
-      notarized_height = std::get<1>(each);
-      ntz_hash = std::get<0>(each);
+  for (const auto& each : ntz_txs)
+  {
+    if (each.second > notarized_height)
+    {
+      notarized_height = each.second;
+      ntz_hash = each.first;
     }
   }
   return notarized_height;
@@ -310,36 +319,36 @@ void Blockchain::fetch_raw_src_tx(std::string& raw_src_tx)
 //------------------------------------------------------------------
 void Blockchain::komodo_update()
 {
-    std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>> notarizations;
+    std::vector<std::pair<crypto::hash,uint64_t>> notarizations;
     uint64_t ntz_count = get_ntz_count(notarizations);
 
     crypto::hash ntz_txid = crypto::null_hash;
     uint64_t greatest_height = 0;
     uint64_t previous_height = 0;
-    for (const auto& each: notarizations) {
-      if (std::get<1>(each) > greatest_height) {
-        greatest_height = std::get<1>(each);
-        ntz_txid = std::get<0>(each);
+    for (const auto& each: notarizations)
+    {
+      if (each.second > greatest_height)
+      {
+        greatest_height = each.second;
+        ntz_txid = each.first;
       }
     }
-    for (const auto& each : notarizations) {
-      if (std::get<1>(each) > previous_height) {
-        if (std::get<1>(each) == greatest_height) {
+    for (const auto& each : notarizations)
+    {
+      if (each.second > previous_height)
+      {
+        if (each.second == greatest_height)
+        {
           /* ignore */
-        } else {
-          previous_height = std::get<1>(each);
+        }
+        else
+        {
+          previous_height = each.second;
         }
       }
     }
 
-    std::vector<std::pair<crypto::hash,uint64_t>> ntzs;
-    for (const auto& each: notarizations) {
-      std::pair<crypto::hash,uint64_t> hh;
-      hh.first = std::get<0>(each);
-      hh.second = std::get<1>(each);
-      ntzs.push_back(hh);
-    }
-    crypto::hash ntz_merkle = get_ntz_merkle(ntzs);
+    crypto::hash ntz_merkle = get_ntz_merkle(notarizations);
 
     epee::span<const uint8_t> span_desttxid = epee::as_byte_span(ntz_txid);
     epee::span<const uint8_t> span_notarizedhash = epee::as_byte_span(get_block_id_by_height(greatest_height));

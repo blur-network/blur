@@ -146,7 +146,7 @@ namespace cryptonote
      */
     bool deinit();
 
-    uint64_t get_ntz_count(std::vector<std::tuple<crypto::hash,uint64_t,uint64_t>>& ret) const;
+    uint64_t get_ntz_count(std::vector<std::pair<crypto::hash,uint64_t>>& ret) const;
     crypto::hash get_ntz_merkle(std::vector<std::pair<crypto::hash,uint64_t>> const& notarizations);
     bool is_block_notarized(cryptonote::block const& b);
     uint64_t get_notarized_height(crypto::hash& ntz_hash) const;
