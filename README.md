@@ -191,7 +191,7 @@ Switch back to the terminal or tab in which your daemon is running, and type `sh
 Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
 
 
-<h1 id="sync-issues">How to Fix Synchronizing Issues</h1>
+<h1 id="sync-issues">How to Fix Synchronization Issues</h1>
 
 
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
@@ -202,6 +202,6 @@ Linux: `cd` to the directory you downloaded the files into, and type:
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
 `blurd.exe --add-priority-node="66.70.188.178:52541" --add-priority-node="66.70.189.131:52541" --add-priority-node="66.70.189.183:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
 
-This should fix the synchronizing issue if the daemon does not connect to the seed nodes automatically. 
+This should fix the synchronizattion issue if the daemon does not connect to the seed nodes automatically. 
 
 You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions. 
