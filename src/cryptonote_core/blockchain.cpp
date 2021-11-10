@@ -194,7 +194,7 @@ uint64_t Blockchain::get_ntz_count(std::vector<std::pair<crypto::hash,uint64_t>>
     return true;
   });
 
-  ret = hash_height_index;
+  ret = hash_height;
   if (count % (DPOW_SIG_COUNT) == 0)
   {
     return (count/(DPOW_SIG_COUNT));
