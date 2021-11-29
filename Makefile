@@ -152,7 +152,7 @@ clean:
 	@echo "WARNING: Back-up your wallet if it exists within ./build!" ; \
         read -r -p "This will destroy the build directory, continue (y/N)?: " CONTINUE; \
 	[ $$CONTINUE = "y" ] || [ $$CONTINUE = "Y" ] || (echo "Exiting."; exit 1;)
-	rm -rf build
+	rm -rf build && rm src/version.h
 
 tags:
 	ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q src contrib tests/gtest

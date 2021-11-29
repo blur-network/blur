@@ -51,7 +51,6 @@ using namespace epee;
 #include "p2p/net_node.h"
 #include "cryptonote_basic/komodo_notaries.h"
 #include "blockchain_db/db_structs.h"
-#include "version.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "daemon.rpc"

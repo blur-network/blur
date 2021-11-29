@@ -45,7 +45,6 @@
 #include "daemon/command_server.h"
 #include "daemon/command_server.h"
 #include "daemon/command_line_args.h"
-#include "version.h"
 
 using namespace epee;
 
