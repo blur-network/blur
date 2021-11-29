@@ -104,12 +104,10 @@
   std::vector<uint8_t> hex_to_bytes4096(const std::string &input)
   {
     size_t len = input.length();
-    bool too_long = (len > 4096);
-    std::string short_long = "longer";
     std::vector<uint8_t> out;
 
     if (len >= 8191) {
-      MERROR("Tried to convert a hex string that is " << short_long << " than the required 4096-byte length.");
+      MERROR("Tried to convert a hex string that is longer than the required 4096-byte length.");
       std::fill(out.begin(), out.begin()+len, 0);
       return out;
     }

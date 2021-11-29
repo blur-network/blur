@@ -563,7 +563,7 @@ namespace cryptonote
 
     // TODO-TK: need to consider tx versioning standard.
     const size_t max_tx_version = CURRENT_TRANSACTION_VERSION;
-    uint8_t version = m_blockchain_storage.get_current_hard_fork_version();
+    //uint8_t version = m_blockchain_storage.get_current_hard_fork_version();
     if (tx.version == 0 || tx.version > max_tx_version)
     {
       // v2 is the latest one we know

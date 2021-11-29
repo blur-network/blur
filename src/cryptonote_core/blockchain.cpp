@@ -186,7 +186,7 @@ uint64_t Blockchain::get_ntz_count(std::vector<std::pair<crypto::hash,uint64_t>>
   for_all_transactions([this, &hash_height, &count](const crypto::hash &hash, const cryptonote::transaction &tx)->bool
   {
     if ((tx.version == (DPOW_NOTA_TX_VERSION)) && (tx.vin[0].type() != typeid(txin_gen))) {
-      uint64_t ntz_index = count;
+      //uint64_t ntz_index = count;
       const uint64_t height = m_db->get_tx_block_height(hash);
       hash_height.push_back(std::make_pair(hash,height));
       count += 1;
@@ -231,9 +231,11 @@ crypto::hash Blockchain::get_ntz_merkle(std::vector<std::pair<crypto::hash,uint6
 uint64_t Blockchain::get_notarized_height(crypto::hash& ntz_hash) const
 {
   std::vector<std::pair<crypto::hash,uint64_t>> ntz_txs;
-  uint64_t ntz_count = get_ntz_count(ntz_txs);
   uint64_t notarized_height = 0;
   ntz_hash = crypto::null_hash;
+
+  get_ntz_count(ntz_txs);
+
   for (const auto& each : ntz_txs)
   {
     if (each.second > notarized_height)
@@ -257,9 +259,7 @@ uint64_t Blockchain::get_notarization_wait() const
 //------------------------------------------------------------------
 bool Blockchain::is_block_notarized(cryptonote::block const& b)
 {
-  uint64_t greatest_height = 0;
   uint64_t const b_height = get_block_height(b);
-  //komodo_update();
   uint64_t ntz_height = (komodo::NOTARIZED_HEIGHT >= 0) ? ((uint64_t)komodo::NOTARIZED_HEIGHT) : 0;
   uint64_t prev_ntz_height = (komodo::NOTARIZED_PREVHEIGHT >= 0) ? ((uint64_t)komodo::NOTARIZED_PREVHEIGHT) : 0;
   if (b_height <= ntz_height) {
@@ -293,7 +293,6 @@ void Blockchain::fetch_raw_src_tx(std::string& raw_src_tx)
   std::vector<uint8_t> src_tx_vchr, doublesha_vec;
   src_tx_vchr = hex_to_bytes4096(komodo::RAW_SRC_TX);
   crypto::hash btc_hash = crypto::null_hash;
-  uint64_t current_height = m_db->height();
   if (!src_tx_vchr.empty())
   {
     bits256 bits = komodo::bits256_doublesha256(src_tx_vchr.data(), src_tx_vchr.size());
@@ -2836,9 +2835,9 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
   std::vector < uint64_t > results;
   results.resize(tx.vin.size(), 0);
 
-  tools::threadpool& tpool = tools::threadpool::getInstance();
-  tools::threadpool::waiter waiter;
-  int threads = tpool.get_max_concurrency();
+  //tools::threadpool& tpool = tools::threadpool::getInstance();
+  //tools::threadpool::waiter waiter;
+  //int threads = tpool.get_max_concurrency();
 
   for (const auto& txin : tx.vin)
   {
@@ -3431,8 +3430,10 @@ leave:
   // FIXME: height parameter is not used...should it be used or should it not
   // be a parameter?
   // validate proof_of_work versus difficulty target
+
   bool precomputed = false;
-  bool fast_check = false;
+  //bool fast_check = false;
+
 #if defined(PER_BLOCK_CHECKPOINT)
   if (m_db->height() < m_blocks_hash_check.size())
   {
@@ -3515,7 +3516,8 @@ leave:
 
 // XXX old code adds miner tx here
 
-  size_t tx_index = 0;
+  //size_t tx_index = 0;
+
   // Iterate over the block's transaction hashes, grabbing each
   // from the tx_pool and validating them.  Each is then added
   // to txs.  Keys spent in each are added to <keys> by the double spend check.

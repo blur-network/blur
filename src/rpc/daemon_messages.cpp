@@ -1,21 +1,22 @@
+// Copyright (c) 2018-2022, Blur Network
 // Copyright (c) 2016-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -177,7 +178,9 @@ rapidjson::Value GetTransactions::Request::toJson(rapidjson::Document& doc) cons
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  //TODO: Check if this call to member GetAllocator() is necessary at all
+  // seems irrelevant if we are not using the resulting value 'al'
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, tx_hashes, tx_hashes);
 
@@ -193,7 +196,7 @@ rapidjson::Value GetTransactions::Response::toJson(rapidjson::Document& doc) con
 {
   rapidjson::Value val(rapidjson::kObjectType);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, txs, txs);
   INSERT_INTO_JSON_OBJECT(val, doc, missed_hashes, missed_hashes);
@@ -212,7 +215,7 @@ rapidjson::Value KeyImagesSpent::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, key_images, key_images);
 
@@ -228,7 +231,7 @@ rapidjson::Value KeyImagesSpent::Response::toJson(rapidjson::Document& doc) cons
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, spent_status, spent_status);
 
@@ -245,7 +248,7 @@ rapidjson::Value GetTxGlobalOutputIndices::Request::toJson(rapidjson::Document& 
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, tx_hash, tx_hash);
 
@@ -261,7 +264,7 @@ rapidjson::Value GetTxGlobalOutputIndices::Response::toJson(rapidjson::Document&
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, output_indices, output_indices);
 
@@ -278,7 +281,7 @@ rapidjson::Value GetRandomOutputsForAmounts::Request::toJson(rapidjson::Document
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, amounts, amounts);
   INSERT_INTO_JSON_OBJECT(val, doc, count, count);
@@ -296,7 +299,7 @@ rapidjson::Value GetRandomOutputsForAmounts::Response::toJson(rapidjson::Documen
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, amounts_with_outputs, amounts_with_outputs);
 
@@ -313,7 +316,7 @@ rapidjson::Value SendRawTx::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, tx, tx);
   INSERT_INTO_JSON_OBJECT(val, doc, relay, relay);
@@ -331,7 +334,7 @@ rapidjson::Value SendRawTx::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, relayed, relayed);
 
@@ -348,7 +351,7 @@ rapidjson::Value StartMining::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, miner_address, miner_address);
   INSERT_INTO_JSON_OBJECT(val, doc, threads_count, threads_count);
@@ -408,7 +411,7 @@ rapidjson::Value MiningStatus::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, active, active);
   INSERT_INTO_JSON_OBJECT(val, doc, speed, speed);
@@ -442,7 +445,7 @@ rapidjson::Value GetInfo::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, info, info);
 
@@ -459,7 +462,7 @@ rapidjson::Value SaveBC::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   return val;
 }
@@ -472,7 +475,7 @@ rapidjson::Value SaveBC::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   return val;
 }
@@ -486,7 +489,7 @@ rapidjson::Value GetBlockHash::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, height, height);
 
@@ -502,7 +505,7 @@ rapidjson::Value GetBlockHash::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, hash, hash);
 
@@ -519,7 +522,7 @@ rapidjson::Value GetLastBlockHeader::Request::toJson(rapidjson::Document& doc) c
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   return val;
 }
@@ -532,7 +535,7 @@ rapidjson::Value GetLastBlockHeader::Response::toJson(rapidjson::Document& doc) 
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, header, header);
 
@@ -549,7 +552,7 @@ rapidjson::Value GetBlockHeaderByHash::Request::toJson(rapidjson::Document& doc)
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, hash, hash);
 
@@ -565,7 +568,7 @@ rapidjson::Value GetBlockHeaderByHash::Response::toJson(rapidjson::Document& doc
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, header, header);
 
@@ -582,7 +585,7 @@ rapidjson::Value GetBlockHeaderByHeight::Request::toJson(rapidjson::Document& do
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, height, height);
 
@@ -598,7 +601,7 @@ rapidjson::Value GetBlockHeaderByHeight::Response::toJson(rapidjson::Document& d
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, header, header);
 
@@ -615,7 +618,7 @@ rapidjson::Value GetBlockHeadersByHeight::Request::toJson(rapidjson::Document& d
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, heights, heights);
 
@@ -631,7 +634,7 @@ rapidjson::Value GetBlockHeadersByHeight::Response::toJson(rapidjson::Document& 
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, headers, headers);
 
@@ -648,7 +651,7 @@ rapidjson::Value GetPeerList::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   return val;
 }
@@ -661,7 +664,7 @@ rapidjson::Value GetPeerList::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, white_list, white_list);
   INSERT_INTO_JSON_OBJECT(val, doc, gray_list, gray_list);
@@ -715,7 +718,7 @@ rapidjson::Value GetTransactionPool::Response::toJson(rapidjson::Document& doc) 
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, transactions, transactions);
   INSERT_INTO_JSON_OBJECT(val, doc, key_images, key_images);
@@ -734,7 +737,7 @@ rapidjson::Value HardForkInfo::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, version, version);
 
@@ -750,7 +753,7 @@ rapidjson::Value HardForkInfo::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, info, info);
 
@@ -767,7 +770,7 @@ rapidjson::Value GetOutputHistogram::Request::toJson(rapidjson::Document& doc) c
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, amounts, amounts);
   INSERT_INTO_JSON_OBJECT(val, doc, min_count, min_count);
@@ -791,7 +794,7 @@ rapidjson::Value GetOutputHistogram::Response::toJson(rapidjson::Document& doc) 
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, histogram, histogram);
 
@@ -808,7 +811,7 @@ rapidjson::Value GetOutputKeys::Request::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, outputs, outputs);
 
@@ -824,7 +827,7 @@ rapidjson::Value GetOutputKeys::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, keys, keys);
 
@@ -850,7 +853,7 @@ rapidjson::Value GetRPCVersion::Response::toJson(rapidjson::Document& doc) const
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, version, version);
 
@@ -866,7 +869,7 @@ rapidjson::Value GetPerKBFeeEstimate::Request::toJson(rapidjson::Document& doc) 
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, num_grace_blocks, num_grace_blocks);
 
@@ -882,7 +885,7 @@ rapidjson::Value GetPerKBFeeEstimate::Response::toJson(rapidjson::Document& doc)
 {
   auto val = Message::toJson(doc);
 
-  auto& al = doc.GetAllocator();
+  doc.GetAllocator();
 
   INSERT_INTO_JSON_OBJECT(val, doc, estimated_fee_per_kb, estimated_fee_per_kb);
 

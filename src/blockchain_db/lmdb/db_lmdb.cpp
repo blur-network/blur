@@ -666,7 +666,6 @@ void BlockchainLMDB::remove_transaction_data(const crypto::hash& tx_hash, const 
 void BlockchainLMDB::remove_btc_tx_data(crypto::hash const& btc_hash)
 {
   int result;
-
   LOG_PRINT_L3("BlockchainLMDB::" << __func__);
   check_open();
 
@@ -681,6 +680,8 @@ void BlockchainLMDB::remove_btc_tx_data(crypto::hash const& btc_hash)
   MDB_val_set(val_tx_id, tip->data.btc_idx);
 
   // Don't delete the tx_indices entry until the end, after we're done with val_tx_id
+  if ((result = mdb_cursor_get(m_cur_btc_indices, &val_tx_id, NULL, MDB_SET)))
+      throw1(DB_ERROR(lmdb_error("Failed to locate btc_tx for removal: ", result).c_str()));
   if (mdb_cursor_del(m_cur_btc_indices, 0))
       throw1(DB_ERROR("Failed to add removal of btcindex to db transaction"));
 }
@@ -874,7 +875,8 @@ uint64_t BlockchainLMDB::add_btc_tx(crypto::hash const& btc_hash, crypto::hash c
   uint64_t tx_id = get_btc_tx_count();
   MWARNING("BTC_TX_COUNT = " << std::to_string(tx_id));
 
-  MDB_val_set(val_tx_id, tx_id);
+  //TODO: Do we need below? - val_tx_id unused despite being set
+  //MDB_val_set(val_tx_id, tx_id);
   MDB_val_set(val_h, btc_hash);
   auto result = mdb_cursor_get(m_cur_btc_indices, (MDB_val *)&zerokval, &val_h, MDB_GET_BOTH);
   if (result == 0) {
@@ -1107,14 +1109,12 @@ void BlockchainLMDB::open(const std::string& filename, const int db_flags)
   MDB_stat db_stats;
   if ((result = mdb_stat(txn, m_blocks, &db_stats)))
     throw0(DB_ERROR(lmdb_error("Failed to query m_blocks: ", result).c_str()));
-  LOG_PRINT_L2("Setting m_height to: " << db_stats.ms_entries);
   uint64_t m_height = db_stats.ms_entries;
-
-  bool compatible = true;
+  LOG_PRINT_L2("Setting m_height to: " << m_height);
 
   MDB_val_copy<const char*> k("version");
   MDB_val v;
-  auto get_result = mdb_get(txn, m_properties, &k, &v);
+  mdb_get(txn, m_properties, &k, &v);
 
   // commit the transaction
   txn.commit();
