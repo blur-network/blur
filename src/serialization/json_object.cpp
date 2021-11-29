@@ -551,7 +551,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::connection_info& in
 {
   val.SetObject();
 
-  auto& al = doc.GetAllocator();
+  //TODO: as in rpc/daemon_messages, check if call to member GetAllocator() necessary
+
+  doc.GetAllocator();
   INSERT_INTO_JSON_OBJECT(val, doc, incoming, info.incoming);
   INSERT_INTO_JSON_OBJECT(val, doc, localhost, info.localhost);
   INSERT_INTO_JSON_OBJECT(val, doc, local_ip, info.local_ip);

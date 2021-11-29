@@ -1651,9 +1651,9 @@ namespace tools
 
     try
     {
-      uint64_t received;
-      bool in_pool;
-      uint64_t confirmations;
+      //uint64_t received;
+      //bool in_pool;
+      //uint64_t confirmations;
       res.good = m_wallet->check_tx_proof(txid, info.address, info.is_subaddress, req.message, req.signature, res.received, res.in_pool, res.confirmations);
     }
     catch (const std::exception &e)
@@ -2092,8 +2092,8 @@ namespace tools
         return false;
       }
 
-      crypto::hash long_payment_id;
-      crypto::hash8 short_payment_id;
+      //crypto::hash long_payment_id;
+      //crypto::hash8 short_payment_id;
 
       if (!wallet2::parse_long_payment_id(req.payment_id, payment_id))
       {
@@ -2251,7 +2251,7 @@ namespace tools
       crypto::ElectrumWords::get_language_list(languages);
       std::vector<std::string>::iterator it;
       std::string wallet_file;
-      char *ptr;
+      //char *ptr;
 
       it = std::find(languages.begin(), languages.end(), req.language);
       if (it == languages.end())
@@ -2285,7 +2285,7 @@ namespace tools
     cryptonote::COMMAND_RPC_GET_HEIGHT::request hreq;
     cryptonote::COMMAND_RPC_GET_HEIGHT::response hres;
     hres.height = 0;
-    bool r = wal->invoke_http_json("/getheight", hreq, hres);
+    wal->invoke_http_json("/getheight", hreq, hres);
     wal->set_refresh_from_block_height(hres.height);
     crypto::secret_key dummy_key;
     try {

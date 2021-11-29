@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
 
   LOG_PRINT_L0("Scanning for blackballable outputs...");
 
-  size_t done = 0;
+  //size_t done = 0;
   std::unordered_map<crypto::key_image, std::vector<uint64_t>> relative_rings;
   std::unordered_map<output_data, std::unordered_set<crypto::key_image>> outputs;
   std::unordered_set<output_data> spent, newly_spent;

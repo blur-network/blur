@@ -1006,7 +1006,7 @@ bool simple_wallet::import_multisig(const std::vector<std::string> &args)
   // all read and parsed, actually import
   try
   {
-    size_t n_outputs = m_wallet->import_multisig(info);
+    m_wallet->import_multisig(info);
     // Clear line "Height xxx of xxx"
     std::cout << "\r                                                                \r";
     success_msg_writer() << tr("Multisig info imported");
@@ -5684,7 +5684,7 @@ static std::string get_human_readable_timestamp(uint64_t ts)
   gmtime_r(&tt, &tm);
 #endif
   uint64_t now = time(NULL);
-  uint64_t diff = ts > now ? ts - now : now - ts;
+  //uint64_t diff = ts > now ? ts - now : now - ts;
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
   return std::string(buffer);
 }

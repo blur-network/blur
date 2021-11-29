@@ -798,7 +798,7 @@ namespace cryptonote
   {
     std::vector<crypto::hash> vh;
     std::vector<std::pair<crypto::hash,uint64_t>> ntz_hash_height;
-    uint64_t ntz_count = m_core.get_blockchain_storage().get_ntz_count(ntz_hash_height);
+    m_core.get_blockchain_storage().get_ntz_count(ntz_hash_height);
     std::vector<std::string> ntz_hexs;
     std::vector<std::pair<std::string,uint64_t>> ntz_hexs_height;
     for (const auto& each : ntz_hash_height)
@@ -970,7 +970,7 @@ namespace cryptonote
       block blk;
       bool orphan = false;
       crypto::hash block_hash = m_core.get_block_id_by_height(req.heights[i]);
-      bool have_block = m_core.get_block_by_hash(block_hash, blk, &orphan);
+      m_core.get_block_by_hash(block_hash, blk, &orphan);
 
       for(auto& btxs: blk.tx_hashes)
         vh.push_back(btxs);
@@ -2402,8 +2402,6 @@ namespace cryptonote
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_get_ntz_data(const COMMAND_RPC_GET_NTZ_DATA::request& req, COMMAND_RPC_GET_NTZ_DATA::response& res, epee::json_rpc::error& error_resp)
   {
-      const char* ASSETCHAINS_SYMBOL[5] = { "BLUR" };
-
       uint64_t height = m_core.get_blockchain_storage().get_db().height()-1;
 
       if (height <= 0) {
@@ -2805,7 +2803,6 @@ namespace cryptonote
   {
     PERF_TIMER(on_relay_txpool);
 
-    bool failed = false;
     res.status = "";
     std::string logging;
     for (const auto &str: req.txids)
