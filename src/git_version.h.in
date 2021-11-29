@@ -10,7 +10,6 @@
 
 namespace cryptonote {
 
-static char const*  MONERO_VERSION_TAG = MONERO_VERSION_TAG;
 static char const* MONERO_VERSION = DEF_MONERO_VERSION;
 static char const* MONERO_RELEASE_NAME = DEF_MONERO_RELEASE_NAME;
 static char const* MONERO_VERSION_FULL = DEF_MONERO_VERSION_FULL(-,@GIT_HEAD_SHA1@);

@@ -54,7 +54,7 @@
 
 namespace cryptonote {
 
-static char const* CRYPTO777_PUBSECPSTR[33] = { "020e46e79a2a8d12b9b5d12c7a91adb4e454edfae43c0a0cb805427d2ac7613fd9" };
+//static char const* CRYPTO777_PUBSECPSTR[33] = { "020e46e79a2a8d12b9b5d12c7a91adb4e454edfae43c0a0cb805427d2ac7613fd9" };
 static uint64_t const KOMODO_MINRATIFY = 11;
 static uint64_t const  KOMODO_ELECTION_GAP = 2000;
 static uint64_t const  KOMODO_ASSETCHAIN_MAXLEN = 64;

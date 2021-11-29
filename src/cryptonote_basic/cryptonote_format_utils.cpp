@@ -508,7 +508,7 @@ namespace cryptonote
   //---------------------------------------------------------------
   void remove_ntz_data_from_tx_extra(std::vector<uint8_t> const& tx_extra, std::vector<uint8_t>& new_extra, std::vector<uint8_t>& ntz_data, blobdata& ntz_str, int& signer_index)
   {
-    size_t ntz_data_size;
+    //size_t ntz_data_size;
     uint8_t ex_nonce_size;
     std::string byte_one, byte_two, byte_one_bin, byte_two_bin, extra;
     std::list<uint8_t> tmp;
@@ -516,10 +516,10 @@ namespace cryptonote
       tmp.push_back(each);
       extra += epee::string_tools::pod_to_hex(each);
     }
-//    MWARNING("Full extra field: " << extra);
+    //MWARNING("Full extra field: " << extra);
     std::vector<tx_extra_field> fields;
     tx_extra_nonce ex_nonce;
-    tx_extra_pub_key pk_primary;
+    //tx_extra_pub_key pk_primary;
     tx_extra_additional_pub_keys pk_additional;
     std::ostringstream ss, ntz_ss;
 
