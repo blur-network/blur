@@ -135,7 +135,9 @@ static rct::key vector_exponent_custom(const rct::keyV &A, const rct::keyV &B, c
     }
     rct::addKeys3(term, a[i], *Acache, b[i], *Bcache);
 #else
-    ge_dsmp Acache, Bcache;
+    //TODO: investigate unused variable below
+    //ge_dsmp Acache;
+    ge_dsmp Bcache;
     rct::precomp(Bcache, B[i]);
     rct::addKeys3(term, a[i], A[i], b[i], Bcache);
 #endif
