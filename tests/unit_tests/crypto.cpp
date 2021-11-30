@@ -32,6 +32,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <sodium/crypto_verify_32.h>
 
 #include "cryptonote_basic/cryptonote_basic_impl.h"
 

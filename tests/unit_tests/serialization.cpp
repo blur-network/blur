@@ -700,8 +700,8 @@ TEST(Serialization, portability_wallet)
     std::vector<tools::wallet2::address_book_row>                   m_address_book
   */
   // blockchain
-  ASSERT_TRUE(w.m_blockchain.size() == 1);
-  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_blockchain[0]) == "48ca7cd3c8de5b6a4d53d2861fbdaedca141553559f9be9520068053cda8430b");
+  ASSERT_TRUE(w.m_hashchain.size() == 1);
+  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_hashchain[0]) == "48ca7cd3c8de5b6a4d53d2861fbdaedca141553559f9be9520068053cda8430b");
   // transfers (TODO)
   ASSERT_TRUE(w.m_transfers.size() == 3);
   // account public address

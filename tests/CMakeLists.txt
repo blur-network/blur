@@ -81,7 +81,7 @@ add_subdirectory(core_tests)
 add_subdirectory(fuzz)
 add_subdirectory(crypto)
 add_subdirectory(functional_tests)
-add_subdirectory(performance_tests)
+#add_subdirectory(performance_tests)
 add_subdirectory(core_proxy)
 add_subdirectory(unit_tests)
 add_subdirectory(difficulty)
@@ -116,7 +116,7 @@ set(enabled_tests
     core_tests
     difficulty
     hash
-    performance_tests
+#    performance_tests
     core_proxy
     fuzz
     unit_tests)
