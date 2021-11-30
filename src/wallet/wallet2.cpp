@@ -3745,7 +3745,7 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
       try {
         std::stringstream iss;
         iss << cache_data;
-        boost::archive::portable_binary_iarchive ar(iss);
+        cryptonote::portable_iarchive ar(iss);
         ar >> *this;
       }
       catch (...)
@@ -3755,7 +3755,7 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
         {
           std::stringstream iss;
           iss << cache_data;
-          boost::archive::portable_binary_iarchive ar(iss);
+          cryptonote::portable_iarchive ar(iss);
           ar >> *this;
         }
         catch (...)
@@ -3776,7 +3776,7 @@ void wallet2::load(const std::string& wallet_, const epee::wipeable_string& pass
       try {
         std::stringstream iss;
         iss << buf;
-        boost::archive::portable_binary_iarchive ar(iss);
+        cryptonote::portable_iarchive ar(iss);
         ar >> *this;
       }
       catch (...)
@@ -3909,7 +3909,7 @@ void wallet2::store_to(const std::string &path, const epee::wipeable_string &pas
   }
   // preparing wallet data
   std::stringstream oss;
-  boost::archive::portable_binary_oarchive ar(oss);
+  cryptonote::portable_oarchive ar(oss);
   ar << *this;
 
   wallet2::cache_file_data cache_file_data = boost::value_initialized<wallet2::cache_file_data>();
@@ -4595,7 +4595,7 @@ bool wallet2::save_tx(const std::vector<pending_tx>& ptx_vector, const std::stri
   txs.transfers = m_transfers;
   // save as binary
   std::ostringstream oss;
-  boost::archive::portable_binary_oarchive ar(oss);
+  cryptonote::portable_oarchive ar(oss);
   try
   {
     ar << txs;
@@ -4638,7 +4638,7 @@ bool wallet2::load_unsigned_tx(const std::string &unsigned_filename, unsigned_tx
     try
     {
       std::istringstream iss(s);
-      boost::archive::portable_binary_iarchive ar(iss);
+      cryptonote::portable_iarchive ar(iss);
       ar >> exported_txs;
     }
     catch (...)
@@ -4655,7 +4655,7 @@ bool wallet2::load_unsigned_tx(const std::string &unsigned_filename, unsigned_tx
       try
       {
         std::istringstream iss(s);
-        boost::archive::portable_binary_iarchive ar(iss);
+        cryptonote::portable_iarchive ar(iss);
         ar >> exported_txs;
       }
       catch (...)
@@ -4764,7 +4764,7 @@ bool wallet2::sign_tx(unsigned_tx_set &exported_txs, const std::string &signed_f
 
   // save as binary
   std::ostringstream oss;
-  boost::archive::portable_binary_oarchive ar(oss);
+  cryptonote::portable_oarchive ar(oss);
   try
   {
     ar << signed_txes;
@@ -4828,7 +4828,7 @@ bool wallet2::load_tx(const std::string &signed_filename, std::vector<tools::wal
     try
     {
       std::istringstream iss(s);
-      boost::archive::portable_binary_iarchive ar(iss);
+      cryptonote::portable_iarchive ar(iss);
       ar >> signed_txs;
     }
     catch (...)
@@ -4845,7 +4845,7 @@ bool wallet2::load_tx(const std::string &signed_filename, std::vector<tools::wal
       try
       {
         std::istringstream iss(s);
-        boost::archive::portable_binary_iarchive ar(iss);
+        cryptonote::portable_iarchive ar(iss);
         ar >> signed_txs;
       }
       catch (...)
@@ -4921,7 +4921,7 @@ std::string wallet2::save_multisig_tx(multisig_tx_set txs)
 
   // save as binary
   std::ostringstream oss;
-  boost::archive::portable_binary_oarchive ar(oss);
+  cryptonote::portable_oarchive ar(oss);
   try
   {
     ar << txs;
@@ -4987,7 +4987,7 @@ bool wallet2::load_multisig_tx(cryptonote::blobdata s, multisig_tx_set &exported
   try
   {
     std::istringstream iss(s);
-    boost::archive::portable_binary_iarchive ar(iss);
+    cryptonote::portable_iarchive ar(iss);
     ar >> exported_txs;
   }
   catch (...)
@@ -8232,7 +8232,7 @@ std::string wallet2::get_reserve_proof(const boost::optional<std::pair<uint32_t,
 
   // serialize & encode
   std::ostringstream oss;
-  boost::archive::portable_binary_oarchive ar(oss);
+  cryptonote::portable_oarchive ar(oss);
   ar << proofs << subaddr_spendkeys;
   return "ReserveProofV1" + tools::base58::encode(oss.str());
 }
@@ -8252,7 +8252,7 @@ bool wallet2::check_reserve_proof(const cryptonote::account_public_address &addr
     "Signature decoding error");
 
   std::istringstream iss(sig_decoded);
-  boost::archive::portable_binary_iarchive ar(iss);
+  cryptonote::portable_iarchive ar(iss);
   std::vector<reserve_proof_entry> proofs;
   std::unordered_map<crypto::public_key, crypto::signature> subaddr_spendkeys;
   ar >> proofs >> subaddr_spendkeys;
@@ -9159,7 +9159,7 @@ cryptonote::blobdata wallet2::export_multisig()
   }
 
   std::stringstream oss;
-  boost::archive::portable_binary_oarchive ar(oss);
+  cryptonote::portable_oarchive ar(oss);
   ar << info;
 
   std::string magic(MULTISIG_EXPORT_FILE_MAGIC, strlen(MULTISIG_EXPORT_FILE_MAGIC));
@@ -9232,7 +9232,7 @@ size_t wallet2::import_multisig(std::vector<cryptonote::blobdata> blobs)
     std::string body(data, headerlen);
     std::istringstream iss(body);
     std::vector<tools::wallet2::multisig_info> i;
-    boost::archive::portable_binary_iarchive ar(iss);
+    cryptonote::portable_iarchive ar(iss);
     ar >> i;
     MINFO(boost::format("%u outputs found") % boost::lexical_cast<std::string>(i.size()));
     info.push_back(std::move(i));

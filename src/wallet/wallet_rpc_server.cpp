@@ -661,7 +661,7 @@ namespace tools
   static std::string ptx_to_string(const tools::wallet2::pending_tx &ptx)
   {
     std::ostringstream oss;
-    boost::archive::portable_binary_oarchive ar(oss);
+    cryptonote::portable_oarchive ar(oss);
     try
     {
       ar << ptx;
@@ -1004,7 +1004,7 @@ namespace tools
     try
     {
       std::istringstream iss(blob);
-      boost::archive::portable_binary_iarchive ar(iss);
+      cryptonote::portable_iarchive ar(iss);
       ar >> ptx;
     }
     catch (...)

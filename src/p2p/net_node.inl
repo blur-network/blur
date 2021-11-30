@@ -97,7 +97,7 @@ namespace nodetool
       try
       {
         // first try reading in portable mode
-        boost::archive::portable_binary_iarchive a(p2p_data);
+        cryptonote::portable_iarchive a(p2p_data);
         a >> *this;
       }
       catch (...)
@@ -625,7 +625,7 @@ namespace nodetool
       return false;
     };
 
-    boost::archive::portable_binary_oarchive a(p2p_data);
+    cryptonote::portable_oarchive a(p2p_data);
     a << *this;
     return true;
     CATCH_ENTRY_L0("blockchain_storage::save", false);

@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/portable_binary_archive.hpp>
 #include <boost/archive/portable_binary_oarchive.hpp>
 #include <boost/archive/portable_binary_iarchive.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -77,7 +77,7 @@ namespace tools
       return false;
 #endif
 
-    boost::archive::portable_binary_oarchive a(data_file);
+    cryptonote::portable_oarchive a(data_file);
     a << obj;
     if (data_file.fail())
       return false;
@@ -104,7 +104,7 @@ namespace tools
     try
     {
       // first try reading in portable mode
-      boost::archive::portable_binary_iarchive a(data_file);
+      cryptonote::portable_iarchive a(data_file);
       a >> obj;
     }
     catch(...)

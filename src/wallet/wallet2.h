@@ -1307,10 +1307,8 @@ namespace boost
       }
       if (ver < 6)
       {
-        // v5 did not properly initialize
-        uint8_t u;
-        a & u;
         x.m_key_image_known = true;
+        initialize_transfer_details(a, x, ver);
         return;
       }
       a & x.m_key_image_known;

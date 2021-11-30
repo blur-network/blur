@@ -1,55 +1,35 @@
-#ifndef PORTABLE_BINARY_ARCHIVE_HPP
-#define PORTABLE_BINARY_ARCHIVE_HPP
+/*****************************************************************************/
+/**
+ * \file portable_archive.hpp
+ * \brief Needed for unit tests on portable archives.
+ * \author christian.pfligersdorffer@gmx.at
+ *
+ * Header for testing portable archives with all of the serialization tests.
+ * Before use copy all hpp files from this directory to your boost folder
+ * boost_.../libs/serialization/test and run from there a visual studio
+ * prompt with b2 oder bjam -sBOOST_ARCHIVE_LIST=portable_archive.hpp
+ *
+ * \note Since portable archives version 5.0 we depend on program_options!
+ * Edit libs/serialization/test/Jamfile.v2 and change the requirements to
+ * : requirements <source>/boost/filesystem <source>/boost/program_options
+ */
+/****************************************************************************/
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
-// Use, modification and distribution is subject to the Boost Software
-// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+//#pragma warning( disable:4217 4127 4310 4244 4800 4267 )
 
-// MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
-# pragma once
-#endif
+// text_archive test header
+// include output archive header
+#include "portable_binary_oarchive.hpp"
+// set name of test output archive
+typedef cryptonote::portable_oarchive test_oarchive;
+// set name of test output stream
+typedef std::ofstream test_ostream;
 
-#include <boost/config.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/archive/archive_exception.hpp>
+// repeat the above for input archive
+#include "portable_binary_iarchive.hpp"
+typedef cryptonote::portable_iarchive test_iarchive;
+typedef std::ifstream test_istream;
 
-#include <climits>
-#if CHAR_BIT != 8
-#error This code assumes an eight-bit byte.
-#endif
-
-#include <boost/archive/basic_archive.hpp>
-#include <boost/detail/endian.hpp>
-
-#include <boost/archive/impl/archive_serializer_map.ipp>
-
-namespace boost { namespace archive {
-
-enum portable_binary_archive_flags {
-    endian_big        = 0x4000,
-    endian_little     = 0x8000
-};
-
-//#if ( endian_big <= boost::archive::flags_last )
-//#error archive flags conflict
-//#endif
-
-inline void
-reverse_bytes(signed char size, char *address){
-    if (size <= 0)
-        throw archive_exception(archive_exception::other_exception);
-    char * first = address;
-    char * last = first + size - 1;
-    for(;first < last;++first, --last){
-        char x = *last;
-        *last = *first;
-        *first = x;
-    }
-}
-
-} }
-
-#endif // PORTABLE_BINARY_ARCHIVE_HPP
+// define open mode for streams
+//   binary archives should use std::ios_base::binary
+#define TEST_STREAM_FLAGS std::ios_base::binary
