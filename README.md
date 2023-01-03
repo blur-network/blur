@@ -27,8 +27,8 @@ The Blur Network employs a custom algorithm for mining, called CryptoNight-Dynam
 Currency:   | <center> Blur (Ticker: BLUR) </center>
 |:-------|:---------:|
 **Website:** | <center> https://blur.cash </center>
-**Block Explorer:** | <center>http://explorer.blur.cash/</center>
-**Block Explorer API Example:** | <center>http://explorer.blur.cash/api/transactions</center>
+**Block Explorer:** | <center>https://explorer.blur.cash/</center>
+**Block Explorer API Example:** | <center>https://explorer.blur.cash/api/transactions</center>
 **Offline Wallet Generator:** | <center><a href="https://blur.cash/wp-content/uploads/2018/06/offline-wallet.html"> Offline HTML Page</a><center>
 **Discord (Main Point of Contact for Blur):** | <center><a href="https://discord.gg/VFP2VES"> Blur Official Discord</a> </center>
 **Telegram:** | <center> <a href="https://t.me/theblurnetwork"> Telegram </a> </center>
@@ -196,10 +196,10 @@ Whenever you find a block, your daemon will show a bold message with the block #
 If you cannot synchronize with the network, kill your daemon & restart with the following options:
 
 Linux: `cd` to the directory you downloaded the files into, and type:
-`./blurd --add-priority-node="66.70.188.178:52541" --add-priority-node="66.70.189.131:52541" --add-priority-node="66.70.189.183:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
+`./blurd --add-priority-node="51.79.66.123:52541" --add-priority-node="51.79.64.184:52541" --add-priority-node="51.79.66.36:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
 
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
-`blurd.exe --add-priority-node="66.70.188.178:52541" --add-priority-node="66.70.189.131:52541" --add-priority-node="66.70.189.183:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
+`blurd.exe --add-priority-node="51.79.66.123:52541" --add-priority-node="51.79.64.184:52541" --add-priority-node="51.79.66.36:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
 
 This should fix the synchronizattion issue if the daemon does not connect to the seed nodes automatically. 
 
