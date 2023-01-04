@@ -640,11 +640,10 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
     const uint8_t ideal_hf_version = get_ideal_hard_fork_version(top_height);
     if (ideal_hf_version <= 1 || ideal_hf_version == top_block.major_version)
     {
-      if (num_popped_blocks > 0)
-      {
+      if (num_popped_blocks > 0) {
         MINFO("Initial popping done, top block: " << top_id << ", top height: " << top_height << ", block version: " << (uint64_t)top_block.major_version);
-        break;
       }
+      break;
     }
     else
     {
