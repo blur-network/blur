@@ -8,13 +8,13 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v1
     - name: submodules
       run: git submodule update --init
     - name: install deps
-      run: sudo apt install libssl-dev libsodium-dev libunwind-dev libboost-all-dev
+      run: sudo apt install libssl-dev libsodium-dev libunwind-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev
     - name: make
       run: make release-static-linux-x86_64
