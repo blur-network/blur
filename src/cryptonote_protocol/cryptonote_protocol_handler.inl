@@ -728,14 +728,14 @@ namespace cryptonote
                 return true;
               }))
               
-              if (!m_core.cleanup_handle_incoming_blocks())
+              /*if (!m_core.cleanup_handle_incoming_blocks())
               {
                 LOG_ERROR_CCONTEXT("Failure in cleanup_handle_incoming_blocks");
                 return 1;
-              }
+              }*/
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
-              m_block_queue.remove_spans(span_connection_id, start_height);
+//              m_block_queue.remove_spans(span_connection_id, start_height);
               break;
             }
 
