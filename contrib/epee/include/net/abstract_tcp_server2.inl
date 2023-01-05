@@ -59,6 +59,7 @@
 #define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s).get_executor().context())
 #else
 #define GET_IO_SERVICE(s) ((s).get_io_service())
+#endif
 
 PRAGMA_WARNING_PUSH
 namespace epee
