@@ -734,7 +734,7 @@ namespace cryptonote
               }
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
-              m_block_queue.remove_spans(span_connection_id, start_height);
+              m_block_queue.flush_spans(span_connection_id, true);
               break;
             }
 
