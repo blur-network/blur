@@ -376,7 +376,7 @@ namespace cryptonote
     if(bvc.m_verifivation_failed)
     {
       LOG_PRINT_CCONTEXT_L0("Block verification failed, dropping connection");
-      drop_connection(context, true, false);
+      drop_connection(context, false, false);
       return 1;
     }
     if(bvc.m_added_to_main_chain)
@@ -704,7 +704,7 @@ namespace cryptonote
             {
               if (!m_p2p->for_connection(span_connection_id, [&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t f)->bool{
                 LOG_PRINT_CCONTEXT_L1("Block verification failed, dropping connection");
-                drop_connection(context, true, true);
+                drop_connection(context, false, true);
                 return 1;
               }))
                 LOG_ERROR_CCONTEXT("span connection id not found");
@@ -723,7 +723,7 @@ namespace cryptonote
             {
               if (!m_p2p->for_connection(span_connection_id, [&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t f)->bool{
                 m_block_queue.flush_spans(span_connection_id, true);
-                drop_connection(context, true, false);
+                drop_connection(context, false, false);
                 LOG_ERROR_CCONTEXT("Block received at sync phase was marked as orphaned! Connection dropped.");
                 return true;
               }))

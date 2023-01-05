@@ -239,7 +239,7 @@ namespace nodetool
       CHECK_AND_ASSERT_MES(it != m_host_fails_score.end(), false, "internal error");
       if ((it->second) >= 9) {
         block_host(address);
-        MCLOG_CYAN(el::Level::Info, "global", "Host " << address.host_str() << " added to block list. Failed to connect after at least 9 attempts."); 
+        MCLOG_CYAN(el::Level::Info, "global", "Host " << address.host_str() << " added to block list, too many failures"); 
       }
     }
     return true;
