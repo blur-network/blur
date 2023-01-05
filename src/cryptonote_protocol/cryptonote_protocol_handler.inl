@@ -722,6 +722,7 @@ namespace cryptonote
             if(bvc.m_marked_as_orphaned)
             {
               if (!m_p2p->for_connection(span_connection_id, [&](cryptonote_connection_context& context, nodetool::peerid_type peer_id, uint32_t f)->bool{
+                m_block_queue.flush_spans(span_connection_id, true);
                 drop_connection(context, true, false);
                 LOG_ERROR_CCONTEXT("Block received at sync phase was marked as orphaned! Connection dropped.");
                 return true;
@@ -734,7 +735,7 @@ namespace cryptonote
               }
 
               // in case the peer had dropped beforehand, remove the span anyway so other threads can wake up and get it
-              m_block_queue.flush_spans(span_connection_id, true);
+              m_block_queue.remove_spans(span_connection_id, start_height);
               break;
             }
 
