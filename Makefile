@@ -122,9 +122,9 @@ release-cross-gui-linux-x86_64:
 	cd build/release && cmake -D STATIC=ON -D BUILD_GUI_DEPS=ON  -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-gnu-linux/share/toolchain.cmake ../.. && ${MAKE}
 
 release-cross-mac-x86_64:
-	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-apple-darwin
+	cd contrib/depends && ${MAKE} -j4 HOST=x86_64-apple-darwin11
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="mac-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-apple-darwin/share/toolchain.cmake ../.. && ${MAKE}
+	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE="Release" -D BUILD_TAG="mac-x64" -D CMAKE_TOOLCHAIN_FILE=${PWD}/contrib/depends/x86_64-apple-darwin11/share/toolchain.cmake ../.. && ${MAKE}
 
 release-static-win64:
 	mkdir -p build/release
