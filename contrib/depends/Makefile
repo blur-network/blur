@@ -2,19 +2,15 @@
 
 SOURCES_PATH ?= $(BASEDIR)/sources
 BASE_CACHE ?= $(BASEDIR)/built
-SDK_PATH ?= $(BASEDIR)/SDKs
-NO_QT ?=
-NO_WALLET ?=
-NO_UPNP ?=
-FALLBACK_DOWNLOAD_PATH ?= https://bitcoincore.org/depends-sources
+FALLBACK_DOWNLOAD_PATH ?= https://downloads.getmonero.org/depends-sources
 
 BUILD = $(shell ./config.guess)
 HOST ?= $(BUILD)
 PATCHES_PATH = $(BASEDIR)/patches
 BASEDIR = $(CURDIR)
 HASH_LENGTH:=11
-DOWNLOAD_CONNECT_TIMEOUT:=10
-DOWNLOAD_RETRIES:=3
+DOWNLOAD_CONNECT_TIMEOUT:=30
+DOWNLOAD_RETRIES:=5
 HOST_ID_SALT ?= salt
 BUILD_ID_SALT ?= salt
 
@@ -25,9 +21,16 @@ host_toolchain:=$(HOST)-
 endif
 
 ifneq ($(DEBUG),)
-release_type=debug
+release_type=Debug
 else
-release_type=release
+release_type=Release
+endif
+
+ifneq ($(TESTS),)
+build_tests=ON
+release_type=Debug
+else
+build_tests=OFF
 endif
 
 base_build_dir=$(BASEDIR)/work/build
@@ -97,8 +100,7 @@ $(host_arch)_$(host_os)_id_string+=$(shell $(host_CXX) --version 2>/dev/null)
 $(host_arch)_$(host_os)_id_string+=$(shell $(host_RANLIB) --version 2>/dev/null)
 $(host_arch)_$(host_os)_id_string+=$(shell $(host_STRIP) --version 2>/dev/null)
 
-qt_packages_$(NO_QT) = $(qt_packages)
-packages += $($(host_arch)_$(host_os)_packages) $($(host_os)_packages) $(qt_packages_)
+packages += $($(host_arch)_$(host_os)_packages) $($(host_os)_packages)
 native_packages += $($(host_arch)_$(host_os)_native_packages) $($(host_os)_native_packages)
 
 all_packages = $(packages) $(native_packages)
@@ -146,9 +148,6 @@ $(host_prefix)/share/config.site : config.site.in $(host_prefix)/.stamp_$(final_
             -e 's|@CPPFLAGS@|$(strip $(host_CPPFLAGS) $(host_$(release_type)_CPPFLAGS))|' \
             -e 's|@LDFLAGS@|$(strip $(host_LDFLAGS) $(host_$(release_type)_LDFLAGS))|' \
             -e 's|@allow_host_packages@|$(ALLOW_HOST_PACKAGES)|' \
-            -e 's|@no_qt@|$(NO_QT)|' \
-            -e 's|@no_wallet@|$(NO_WALLET)|' \
-            -e 's|@no_upnp@|$(NO_UPNP)|' \
             -e 's|@debug@|$(DEBUG)|' \
             $< > $@
 	$(AT)touch $@
@@ -169,13 +168,11 @@ $(host_prefix)/share/toolchain.cmake : toolchain.cmake.in $(host_prefix)/.stamp_
             -e 's|@CPPFLAGS@|$(strip $(host_CPPFLAGS) $(host_$(release_type)_CPPFLAGS))|' \
             -e 's|@LDFLAGS@|$(strip $(host_LDFLAGS) $(host_$(release_type)_LDFLAGS))|' \
             -e 's|@allow_host_packages@|$(ALLOW_HOST_PACKAGES)|' \
-            -e 's|@no_qt@|$(NO_QT)|' \
-            -e 's|@no_wallet@|$(NO_WALLET)|' \
-            -e 's|@no_upnp@|$(NO_UPNP)|' \
             -e 's|@debug@|$(DEBUG)|' \
+            -e 's|@release_type@|$(release_type)|' \
+            -e 's|@build_tests@|$(build_tests)|' \
             -e 's|@depends@|$(host_cmake)|' \
             -e 's|@prefix@|$($(host_arch)_$(host_os)_prefix)|'\
-            -e 's|@sdk@|$(SDK_PATH)|'\
             -e 's|@arch@|$(host_arch)|'\
             $< > $@
 	$(AT)touch $@
@@ -216,5 +213,7 @@ download-linux:
 download-win:
 	@$(MAKE) -s HOST=x86_64-w64-mingw32 download-one
 download: download-osx download-linux download-win
+
+ $(foreach package,$(all_packages),$(eval $(call ext_add_stages,$(package))))
 
 .PHONY: install cached download-one download-osx download-linux download-win download check-packages check-sources

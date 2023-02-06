@@ -10,7 +10,7 @@ $(package)_config_opts_debug=variant=debug
 $(package)_config_opts=--layout=tagged --build-type=complete --user-config=user-config.jam
 $(package)_config_opts+=threading=multi link=static -sNO_BZIP2=1 -sNO_ZLIB=1
 $(package)_config_opts_linux=threadapi=pthread runtime-link=shared
-$(package)_config_opts_darwin=--toolset=darwin-4.2.1 runtime-link=shared
+$(package)_config_opts_darwin=--toolset=darwin runtime-link=shared
 $(package)_config_opts_mingw32=binary-format=pe target-os=windows threadapi=win32 runtime-link=static
 $(package)_config_opts_x86_64_mingw32=address-model=64
 $(package)_config_opts_i686_mingw32=address-model=32
@@ -20,7 +20,7 @@ $(package)_archiver_$(host_os)=$($(package)_ar)
 $(package)_toolset_darwin=darwin
 $(package)_archiver_darwin=$($(package)_libtool)
 $(package)_config_libraries=chrono,filesystem,program_options,system,thread,test,date_time,regex,serialization,locale
-$(package)_cxxflags=-std=c++11 -fvisibility=hidden
+$(package)_cxxflags=-std=c++11
 $(package)_cxxflags_linux=-fPIC
 endef
 

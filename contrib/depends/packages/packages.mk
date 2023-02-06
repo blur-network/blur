@@ -1,21 +1,26 @@
-packages:=boost openssl readline libiconv
+packages:=boost openssl libiconv
+
+# ccache is useless in gitian builds
+ifneq ($(GITIAN),1)
 native_packages := native_ccache
-
-darwin_native_packages = native_biplist native_ds_store native_mac_alias
-darwin_packages = sodium-darwin
-
-qt_packages=qt
-
-ifeq ($(host_os),linux)
-packages += unwind
-packages += sodium
 endif
-ifeq ($(host_os),mingw32)
-packages += sodium
+
+darwin_packages = ncurses readline sodium
+
+
+linux_packages = ncurses readline sodium
+
+ifeq ($(build_tests),ON)
+packages += gtest
 endif
+
+ifneq ($(host_arch),riscv64)
+linux_packages += unwind
+endif
+
+mingw32_packages = icu4c sodium
 
 ifneq ($(build_os),darwin)
-darwin_native_packages += native_cctools native_cdrkit native_libdmg-hfsplus
+darwin_native_packages += darwin_sdk native_clang native_cctools native_libtapi
 endif
-
 
