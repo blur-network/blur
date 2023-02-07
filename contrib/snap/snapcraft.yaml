@@ -9,7 +9,7 @@ description: |
     Join the Fight for Financial Freedom.
 grade: stable
 confinement: strict
-base: core18
+base: core20
 
 apps:
     blurd:
@@ -36,7 +36,7 @@ parts:
     cmake-build:
         plugin: cmake
         disable-parallel: true
-        configflags:
+        cmake-parameters:
             - -DCMAKE_BUILD_TYPE=Release
             - -DBUILD_TESTS=OFF
             - -DSTATIC=ON
@@ -45,25 +45,33 @@ parts:
             - gcc
             - g++
             - pkg-config
-            - libboost-all-dev
+            - libboost-date-time1.71-dev
+            - libboost-serialization1.71-dev
+            - libboost-chrono1.71-dev
+            - libboost-system1.71-dev
+            - libboost-thread1.71-dev
+            - libboost-locale1.71-dev
+            - libboost-atomic1.71-dev
+            - libboost-filesystem1.71-dev
+            - libboost-program-options1.71-dev
+            - libboost-regex1.71-dev
             - libssl-dev
             - libsodium-dev
             - git
             - build-essential
-            - libunwind-dev
-            - libreadline7
+            - libreadline8
             - libtinfo5
         stage-packages:
-            - libboost-date-time1.62.0
-            - libboost-serialization1.62.0
-            - libboost-chrono1.62.0
-            - libboost-system1.62.0
-            - libboost-thread1.62.0
-            - libboost-locale1.62.0
-            - libboost-atomic1.62.0
-            - libboost-filesystem1.62.0
-            - libboost-program-options1.62.0
-            - libboost-regex1.62.0
+            - libboost-date-time1.71.0
+            - libboost-serialization1.71.0
+            - libboost-chrono1.71.0
+            - libboost-system1.71.0
+            - libboost-thread1.71.0
+            - libboost-locale1.71.0
+            - libboost-atomic1.71.0
+            - libboost-filesystem1.71.0
+            - libboost-program-options1.71.0
+            - libboost-regex1.71.0
             - libssl-dev
             - libsodium23
             - libstdc++6
