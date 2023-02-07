@@ -76,8 +76,7 @@ parts:
             - libsodium23
             - libstdc++6
             - libgcc1
-            - libreadline7
-            - libunwind-dev
+            - libreadline8
             - libtinfo5
         prime:
             - bin
