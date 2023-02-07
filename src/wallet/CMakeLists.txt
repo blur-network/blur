@@ -53,6 +53,7 @@ monero_add_library(wallet
   ${wallet_sources}
   ${wallet_private_headers})
 add_dependencies(wallet check_git_repository)
+
 target_link_libraries(wallet
   PRIVATE
     common
@@ -67,7 +68,6 @@ target_link_libraries(wallet
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
     ${EXTRA_LIBRARIES})
-
 set(wallet_rpc_sources
   wallet_rpc_server.cpp)
 
@@ -84,21 +84,40 @@ monero_add_executable(wallet_rpc_server
   ${wallet_rpc_private_headers})
 
 add_dependencies(wallet_rpc_server check_git_repository wallet)
-target_link_libraries(wallet_rpc_server
-  PRIVATE
-    wallet
-    epee
-    rpc_base
-    cryptonote_core
-    mnemonics
-    cncrypto
-    common
-    ${Boost_CHRONO_LIBRARY}
-    ${Boost_PROGRAM_OPTIONS_LIBRARY}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${EXTRA_LIBRARIES})
+if (WIN32)
+  target_link_libraries(wallet_rpc_server
+    PRIVATE
+      wallet
+      epee
+      rpc_base
+      cryptonote_core
+      mnemonics
+      cncrypto
+      common
+      ${Boost_CHRONO_LIBRARY}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
+      ${Boost_THREAD_LIBRARY}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${ICONV_LIBRARY}
+      ${EXTRA_LIBRARIES})
+else()
+  target_link_libraries(wallet_rpc_server
+    PRIVATE
+      wallet
+      epee
+      rpc_base
+      cryptonote_core
+      mnemonics
+      cncrypto
+      common
+      ${Boost_CHRONO_LIBRARY}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
+      ${Boost_THREAD_LIBRARY}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${EXTRA_LIBRARIES})
+endif()
 set_property(TARGET wallet_rpc_server
   PROPERTY
     OUTPUT_NAME "blur-wallet-rpc")

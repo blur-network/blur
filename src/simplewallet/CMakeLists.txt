@@ -42,24 +42,47 @@ monero_add_executable(simplewallet
   ${simplewallet_sources}
   ${simplewallet_headers}
   ${simplewallet_private_headers})
-target_link_libraries(simplewallet
-  PRIVATE
-    wallet
-    rpc_base
-    cryptonote_core
-    cncrypto
-    common
-    mnemonics
-    ${EPEE_READLINE}
-    ${Boost_CHRONO_LIBRARY}
-    ${Boost_PROGRAM_OPTIONS_LIBRARY}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_LOCALE_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${GNU_READLINE_LIBRARY}
-    ${OPENSSL_LIBRARIES}
-    ${EXTRA_LIBRARIES})
+
+if (WIN32)
+  target_link_libraries(simplewallet
+      PRIVATE
+      wallet
+      rpc_base
+      cryptonote_core
+      cncrypto
+      common
+      mnemonics
+      ${EPEE_READLINE}
+      ${Boost_CHRONO_LIBRARY}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
+      ${Boost_LOCALE_LIBRARY}
+      ${Boost_THREAD_LIBRARY}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GNU_READLINE_LIBRARY}
+      ${ICONV_LIBRARY}
+      ${OPENSSL_LIBRARIES}
+      ${EXTRA_LIBRARIES})
+else()
+  target_link_libraries(simplewallet
+      PRIVATE
+      wallet
+      rpc_base
+      cryptonote_core
+      cncrypto
+      common
+      mnemonics
+      ${EPEE_READLINE}
+      ${Boost_CHRONO_LIBRARY}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
+      ${Boost_LOCALE_LIBRARY}
+      ${Boost_THREAD_LIBRARY}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GNU_READLINE_LIBRARY}
+      ${OPENSSL_LIBRARIES}
+      ${EXTRA_LIBRARIES})
+endif()
 set_property(TARGET simplewallet
   PROPERTY
     OUTPUT_NAME "blur-wallet-cli")

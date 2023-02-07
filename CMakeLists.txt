@@ -71,20 +71,6 @@ if (${CMAKE_VERSION} VERSION_GREATER "3.0.0" AND CMAKE_MAKE_PROGRAM MATCHES "nin
     set(CMAKE_JOB_POOL_LINK link_job_pool)
   endif ()
 endif ()
-  
-option (USE_CLANG_TIDY_C   "Lint the code with clang-tidy - variant C"   OFF)
-option (USE_CLANG_TIDY_CXX "Lint the code with clang-tidy - variant C++" OFF)
-if (USE_CLANG_TIDY_C AND USE_CLANG_TIDY_CXX)
-	message(FATAL_ERROR "Enabling both USE_CLANG_TIDY_C and USE_CLANG_TIDY_CXX simultaneously crashes clang-tidy.")
-endif()
-if (USE_CLANG_TIDY_C OR USE_CLANG_TIDY_CXX)
-	include(SetClangTidy)
-endif()
-if (USE_CLANG_TIDY_C)
-	monero_clang_tidy("C")
-elseif (USE_CLANG_TIDY_CXX)
-	monero_clang_tidy("CXX")
-endif()
 
 enable_language(C ASM)
 
@@ -885,11 +871,6 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 if(MINGW)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
   set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;bcrypt)
-  if(DEPENDS)
-    set(ICU_LIBRARIES icuio icui18n icuuc icudata icutu iconv)
-  else()
-    set(ICU_LIBRARIES icuio icuin icuuc icudt icutu iconv)
-  endif()
 elseif(APPLE OR OPENBSD OR ANDROID)
   set(EXTRA_LIBRARIES "")
 elseif(FREEBSD)
@@ -987,6 +968,14 @@ endif()
 
 add_subdirectory(contrib)
 add_subdirectory(src)
+
+find_library(ICONV_LIBRARY iconv)
+
+if(ICONV_LIBRARY)
+  set(ICONV_LIBRARY "${ICONV_LIBRARY}")
+  message("Using iconv library located at: ${ICONV_LIBRARY}.")
+endif()
+
 
 if(BUILD_TESTS)
   add_subdirectory(tests)
