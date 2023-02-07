@@ -969,13 +969,16 @@ endif()
 add_subdirectory(contrib)
 add_subdirectory(src)
 
-find_library(ICONV_LIBRARY iconv)
+if (WIN32)
+  find_library(ICONV_LIBRARY iconv)
 
-if(ICONV_LIBRARY)
-  set(ICONV_LIBRARY "${ICONV_LIBRARY}")
-  message("Using iconv library located at: ${ICONV_LIBRARY}.")
+  if(ICONV_LIBRARY)
+    set(ICONV_LIBRARY "${ICONV_LIBRARY}")
+    message("Using iconv library located at: ${ICONV_LIBRARY}.")
+  endif()
+else()
+    message("Not using iconv library, since we are not building for Windows.")
 endif()
-
 
 if(BUILD_TESTS)
   add_subdirectory(tests)
