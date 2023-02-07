@@ -37,7 +37,10 @@ parts:
         plugin: cmake
         disable-parallel: true
         cmake-parameters:
-            - -DCMAKE_BUILD_TYPE=Release
+            - -DARCH="x86-64"
+            - -DBUILD_TAG="linux-x64"
+            - -DBUILD_64=ON
+            - -DCMAKE_BUILD_TYPE="Release"
             - -DBUILD_TESTS=OFF
             - -DSTATIC=ON
         source: .
