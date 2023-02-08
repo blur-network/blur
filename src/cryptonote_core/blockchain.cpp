@@ -4517,7 +4517,7 @@ void Blockchain::load_compiled_in_block_hashes()
       const crypto::hash expected_hash = *reinterpret_cast<const crypto::hash*>(expected_hash_data.data());
       if (hash != expected_hash)
       {
-        MERROR("Block hash data does not match expected hash");
+        MERROR("Block hash data(" << hash << ") does not match expected hash(" << expected_hash << ")");
         return;
       }
     }
