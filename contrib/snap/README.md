@@ -13,3 +13,12 @@ SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G SNAPCRAFT_BUILD_ENVIRONMENT_CPU=4 snapcra
 ```
 
 From root directory of `blur` repository.  Builder may modify `CPU` and `MEMORY` to fit needs.
+
+If it was successful, you should see following when VM/container launches:
+
+```
+'SNAPCRAFT_BUILD_ENVIRONMENT_CPU' was set to '4' in the environment. Changing the default allocation upon user request
+'SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY' was set to '16G' in the environment. Changing the default allocation upon user request
+```
+
+If you do not, `snapcraft clean` and retry
