@@ -13,21 +13,18 @@ base: core20
 
 apps:
     blurd:
-        command: |
-          blurd-wrapper --data-dir ${HOME}/.blur-net
+        command: bin/blurd-wrapper
         plugs:
             - network
             - network-bind
     blur-wallet-rpc:
-        command: |
-          blur-wallet-rpc --log-file ${SNAP_USER_DATA}
+        command: usr/local/bin/blur-wallet-rpc
         plugs:
             - home
             - network
             - network-bind
     blur-wallet-cli:
-        command: |
-          blur-wallet-cli --log-file ${SNAP_USER_DATA}
+        command: usr/local/bin/blur-wallet-cli
         plugs:
             - home
             - network
@@ -35,7 +32,6 @@ apps:
 parts:
     cmake-build:
         plugin: cmake
-        disable-parallel: true
         cmake-parameters:
             - -DARCH="x86-64"
             - -DBUILD_TAG="linux-x64"
@@ -63,7 +59,7 @@ parts:
             - git
             - build-essential
             - libreadline8
-            - libtinfo5
+            - libtinfo-dev
         stage-packages:
             - libboost-date-time1.71.0
             - libboost-serialization1.71.0
@@ -75,14 +71,15 @@ parts:
             - libboost-filesystem1.71.0
             - libboost-program-options1.71.0
             - libboost-regex1.71.0
+            - libtinfo-dev
             - libssl-dev
             - libsodium23
             - libstdc++6
             - libgcc1
             - libreadline8
-            - libtinfo5
         prime:
-            - bin
+            - usr/local/bin
+            - etc
             - usr/lib/
             - -usr/lib/gcc
             - -usr/share
@@ -96,3 +93,4 @@ parts:
         prime:
             - etc
             - bin
+

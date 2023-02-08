@@ -5,4 +5,4 @@ if [ ! -d "$SNAP_USER_DATA/etc" ]; then
   cp -R $SNAP/etc/blurd.conf $SNAP_USER_DATA/etc/blurd.conf
 fi
 
-exec "$SNAP/bin/blurd" "$@"
+exec "$SNAP/usr/local/bin/blurd" "$@"
