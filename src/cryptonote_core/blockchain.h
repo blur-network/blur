@@ -739,7 +739,7 @@ namespace cryptonote
      * @param fast_sync sync using built-in block hashes as trusted
      */
     void set_user_options(uint64_t maxthreads, uint64_t blocks_per_sync,
-        blockchain_db_sync_mode sync_mode, bool fast_sync);
+        blockchain_db_sync_mode sync_mode, bool fast_sync_no_pow);
 
     /**
      * @brief Put DB in safe sync mode
@@ -1011,7 +1011,7 @@ namespace cryptonote
     std::vector<crypto::hash> m_blocks_txs_check;
 
     blockchain_db_sync_mode m_db_sync_mode;
-    bool m_fast_sync;
+    bool m_fast_sync_no_pow;
     bool m_show_time_stats;
     bool m_db_default_sync;
     uint64_t m_db_blocks_per_sync;

@@ -104,9 +104,9 @@ namespace cryptonote
   , "Sleep time in ms, defaults to 0 (off), used to debug before/after locking mutex. Values 100 to 1000 are good for tests."
   , 0
   };
-  static const command_line::arg_descriptor<uint64_t> arg_fast_block_sync = {
-    "fast-block-sync"
-  , "Sync up most of the way by using embedded, known block hashes."
+  static const command_line::arg_descriptor<uint64_t> arg_fast_sync_no_pow = {
+    "fast-sync-disable-pow"
+  , "DISABLES PROOF-OF-WORK VERIFICATION FOR CHECKPOINTED BLOCKCHAIN HISTORY. Sync up most of the way by using embedded, known block hashes."
   , 1
   };
   static const command_line::arg_descriptor<uint64_t> arg_prep_blocks_threads = {
@@ -243,7 +243,7 @@ namespace cryptonote
     command_line::add_arg(desc, arg_testnet_on);
     command_line::add_arg(desc, arg_stagenet_on);
     command_line::add_arg(desc, arg_prep_blocks_threads);
-    command_line::add_arg(desc, arg_fast_block_sync);
+    command_line::add_arg(desc, arg_fast_sync_no_pow);
     command_line::add_arg(desc, arg_show_time_stats);
     command_line::add_arg(desc, arg_block_sync_size);
     command_line::add_arg(desc, arg_test_dbg_lock_sleep);
@@ -332,7 +332,7 @@ namespace cryptonote
     std::string db_type = command_line::get_arg(vm, cryptonote::arg_db_type);
     std::string db_sync_mode = command_line::get_arg(vm, cryptonote::arg_db_sync_mode);
     bool db_salvage = command_line::get_arg(vm, cryptonote::arg_db_salvage) != 0;
-    bool fast_sync = command_line::get_arg(vm, arg_fast_block_sync) != 0;
+    bool fast_sync_no_pow = command_line::get_arg(vm, arg_fast_sync_no_pow) != 0;
     uint64_t blocks_threads = command_line::get_arg(vm, arg_prep_blocks_threads);
     size_t max_txpool_size = command_line::get_arg(vm, arg_max_txpool_size);
 
@@ -449,7 +449,7 @@ namespace cryptonote
     }
 
     m_blockchain_storage.set_user_options(blocks_threads,
-        blocks_per_sync, sync_mode, fast_sync);
+        blocks_per_sync, sync_mode, fast_sync_no_pow);
 
     r = m_blockchain_storage.init(db.release(), m_nettype, m_offline, test_options);
 

@@ -151,7 +151,7 @@ static const struct {
 //------------------------------------------------------------------
 Blockchain::Blockchain(tx_memory_pool& tx_pool) :
   m_db(), m_tx_pool(tx_pool), m_hardfork(NULL), m_timestamps_and_difficulties_height(0), m_current_block_cumul_sz_limit(0), m_current_block_cumul_sz_median(0),
-  m_max_prepare_blocks_threads(4), m_db_blocks_per_sync(1), m_db_sync_mode(db_async), m_db_default_sync(false), m_fast_sync(true), m_show_time_stats(false), m_sync_counter(0), m_cancel(false)
+  m_max_prepare_blocks_threads(4), m_db_blocks_per_sync(1), m_db_sync_mode(db_async), m_db_default_sync(false), m_fast_sync_no_pow(true), m_show_time_stats(false), m_sync_counter(0), m_cancel(false)
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
 }
@@ -3431,7 +3431,7 @@ leave:
   // validate proof_of_work versus difficulty target
 
   bool precomputed = false;
-  //bool fast_check = false;
+  bool fast_check = false;
 
 #if defined(PER_BLOCK_CHECKPOINT)
   if (m_db->height() < m_blocks_hash_check.size())
@@ -3455,6 +3455,7 @@ leave:
   }
   else
 #endif
+  if (!fast_check)
   {
     auto it = m_blocks_longhash_table.find(id);
     if (it != m_blocks_longhash_table.end())
@@ -3515,7 +3516,7 @@ leave:
 
 // XXX old code adds miner tx here
 
-  //size_t tx_index = 0;
+  size_t tx_index = 0;
 
   // Iterate over the block's transaction hashes, grabbing each
   // from the tx_pool and validating them.  Each is then added
@@ -4405,7 +4406,7 @@ bool Blockchain::for_all_txpool_txes(std::function<bool(const crypto::hash&, con
   return m_db->for_all_txpool_txes(f, include_blob, include_unrelayed_txes);
 }
 
-void Blockchain::set_user_options(uint64_t maxthreads, uint64_t blocks_per_sync, blockchain_db_sync_mode sync_mode, bool fast_sync)
+void Blockchain::set_user_options(uint64_t maxthreads, uint64_t blocks_per_sync, blockchain_db_sync_mode sync_mode, bool fast_sync_no_pow)
 {
   if (sync_mode == db_defaultsync)
   {
@@ -4413,7 +4414,7 @@ void Blockchain::set_user_options(uint64_t maxthreads, uint64_t blocks_per_sync,
     sync_mode = db_async;
   }
   m_db_sync_mode = sync_mode;
-  m_fast_sync = fast_sync;
+  m_fast_sync_no_pow = fast_sync_no_pow;
   m_db_blocks_per_sync = blocks_per_sync;
   m_max_prepare_blocks_threads = maxthreads;
 }
@@ -4493,7 +4494,7 @@ void Blockchain::load_compiled_in_block_hashes()
 {
   const bool testnet = m_nettype == TESTNET;
   const bool stagenet = m_nettype == STAGENET;
-  if (m_fast_sync && get_blocks_dat_start(testnet, stagenet) != nullptr && get_blocks_dat_size(testnet, stagenet) > 0)
+  if (m_fast_sync_no_pow && get_blocks_dat_start(testnet, stagenet) != nullptr && get_blocks_dat_size(testnet, stagenet) > 0)
   {
     MINFO("Loading precomputed blocks (" << get_blocks_dat_size(testnet, stagenet) << " bytes)");
 
