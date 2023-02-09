@@ -7,6 +7,7 @@ Copyright (c) 2018-2023, Blur Network
 [![Blur Master Branch Build Status](https://github.com/blur-network/blur/workflows/Blur%20Master%20Branch/badge.svg?branch=master)](https://github.com/blur-network/blur/actions?query=workflow%3A%22Blur+Master+Branch%22)
 
 *See [License](LICENSE)*
+
 *See [Code of Conduct](CODE_OF_CONDUCT.md)*
 
 # About the Project
