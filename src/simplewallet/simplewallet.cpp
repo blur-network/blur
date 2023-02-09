@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2022, Blur Network
+// Copyright (c) 2018-2023, Blur Network
 // Copyright (c) 2017-2018, The Masari Project
 // Copyright (c) 2014-2018, The Monero Project
 // 

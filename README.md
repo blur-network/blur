@@ -1,12 +1,13 @@
 ![Blur: The Private Cryptocurrency](https://i.ibb.co/CJyDmLm/blur-repo.jpg)
-# Blur Network 
-Copyright (c) 2018-2022, Blur Network<br></br>
+# Blur Network
+Copyright (c) 2018-2023, Blur Network
+
 
 [![Blur Network Command-Line Tools](https://snapcraft.io/blur/badge.svg)](https://snapcraft.io/blur)
 [![Blur Master Branch Build Status](https://github.com/blur-network/blur/workflows/Blur%20Master%20Branch/badge.svg?branch=master)](https://github.com/blur-network/blur/actions?query=workflow%3A%22Blur+Master+Branch%22)
 
-*See [License](LICENSE)*<br>
-*See [Code of Conduct](CODE_OF_CONDUCT.md)*<br>
+*See [License](LICENSE)*
+*See [Code of Conduct](CODE_OF_CONDUCT.md)*
 
 # About the Project
 
