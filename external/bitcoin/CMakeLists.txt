@@ -28,7 +28,7 @@
 
 message(STATUS "Adding bitcoin-specfic dependencies for DPoW integrations")
 
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.0)
 
 project(bitcoin LANGUAGES C CXX)
 
