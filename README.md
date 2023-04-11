@@ -1,4 +1,4 @@
-![Blur: The Private Cryptocurrency](https://i.ibb.co/CJyDmLm/blur-repo.jpg)
+![Blur: The Private Cryptocurrency](https://i.ibb.co/qxR0nzx/blur.png)
 # Blur Network
 Copyright (c) 2018-2023, Blur Network
 
