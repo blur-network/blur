@@ -98,20 +98,20 @@ The `Makefile` entries run by the above commands will build dependencies for `x8
 <h1 id="mining-linux">Mining on Linux</h1>
 
 
-Compile from source, or download the <a href="https://github.com/blur-network/blur/releases"> latest binary release from the Releases page</a>.  
+Compile from source, or download the <a href="https://github.com/blur-network/blur/releases"> latest binary release from the Releases page</a>.
 
 We also now offer a Snap package on the Ubuntu Snap Store: <a href="https://snapcraft.io/blur"><img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /></a>
 
 Open a terminal in the directory within which the binaries were downloaded.  Assuming that is your Downloads folder, enter the following command:
 
 
->`cd ~/Downloads && tar xvzf blur-v0.1.9.9.5-linux-x86_64.tar.gz`
+>`cd ~/Downloads && tar xvzf blur-v0.1.9.9.6-linux-x86_64.tar.gz`
 
 
 Navigate into the directory you just extracted from the archive, and start the daemon.
 
 
->`cd blur-v0.1.9.9.5-linux_x86_64 && ./blurd`
+>`cd blur-v0.1.9.9.6-linux_x86_64 && ./blurd`
 
 
 Wait for sync to complete, open a new tab or terminal window, and then start the wallet:
@@ -138,20 +138,20 @@ Example: `start_mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53
 
 Example: `./blurd --start-mining="bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu" --mining-threads="4"`
 
-You should see a message for each thread that reads: `Mining started for thread[0]` or something similar. 
+You should see a message for each thread that reads: `Mining started for thread[0]` or something similar.
 
 To view your hashrate in real-time, use the command `show_hr`.
 
-Whenever you find a block, your daemon will show a bold message with the block # found.  It is normal to experience a slight delay between that message and the balance reflecting in your wallet. 
+Whenever you find a block, your daemon will show a bold message with the block # found.  It is normal to experience a slight delay between that message and the balance reflecting in your wallet.
 
 <h1 id="mining-windows"> Mining on Windows </h1>
 
 
 Download the <a href="https://github.com/blur-network/blur/releases">latest release from our Releases page</a>.
 
-Open your Downloads Library in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted. 
+Open your Downloads Library in your File Explorer.  Extract the executables from the compressed archive, and navigate to the folder that you just extracted.
 
-Start the daemon by double-clicking the `blurd.exe` file. 
+Start the daemon by double-clicking the `blurd.exe` file.
 
 You will see a pop-up from your firewall.  Be sure to check the box next to "Private Networks" if you are on a private network, or your daemon will not be able to sync with the network. If you daemon stalls while syncing, close and restart the program.  You will not lose any blocks you have already synced with. Once your daemon is synced with the network...
 
@@ -174,17 +174,17 @@ Example: `start_mining bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53
 
 Example: `blurd.exe --start-mining="bL4PdWFk3VVgEGYezGTXigHrsoJ3JGKgxKDi1gHXT7GKTLawFu3WMhu53Gc2KCmxxmCHbR4VEYMQ93PRv8vWgJ8j2mMHVEzLu" --mining-threads="4"`
 
-You should see a message for each thread that reads: `Mining started for thread[0]` or something similar. 
+You should see a message for each thread that reads: `Mining started for thread[0]` or something similar.
 
 To view your hashrate in real-time, use the command `show_hr`.
 
-Whenever you find a block, your daemon will show a bold message with the block # found.  It is normal to experience a slight delay between that message and the balance reflecting in your wallet.  
+Whenever you find a block, your daemon will show a bold message with the block # found.  It is normal to experience a slight delay between that message and the balance reflecting in your wallet.
 
 You should see the message: `Mining started in daemon`
 
 Switch back to the terminal or tab in which your daemon is running, and type `show_hr` for real-time  hashrate monitoring.  For further commands in either the wallet or the daemon, type `help` into either CLI.  Note that the commands for the daemon and wallet are different.
 
-Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet. 
+Whenever you find a block, your daemon will show a bold message with the block # found.  There is a slight delay between that message and the balance reflecting in your wallet.
 
 
 <h1 id="sync-issues">How to Fix Synchronization Issues</h1>
@@ -198,6 +198,6 @@ Linux: `cd` to the directory you downloaded the files into, and type:
 Windows:  Open cmd.exe, `cd` to the directory you downloaded the files into, and type:
 `blurd.exe --add-priority-node="51.79.66.123:52541" --add-priority-node="51.79.64.184:52541" --add-priority-node="51.79.66.36:52541" --p2p-bind-port="52541" --rpc-bind-port="52542" --rpc-bind-ip="127.0.0.1"`
 
-This should fix the synchronizattion issue if the daemon does not connect to the seed nodes automatically. 
+This should fix the synchronizattion issue if the daemon does not connect to the seed nodes automatically.
 
-You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions. 
+You can also see additional command-line options by running the daemon with the option `--help`.  The program will return a list of startup flags and their descriptions.
