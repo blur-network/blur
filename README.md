@@ -87,9 +87,8 @@ To compile for Linux (distro-agnostic): `make release-cross-linux-x86_64`
 To compile for Windows(mingw64): `make release-cross-winx64`
 
 To compile for Mac(x86_64): `make release-cross-mac-x86_64`
-*Please note: the mac cross-compilation does not function properly.  Additional steps may be required.  As a result, our binaries are compiled for macOS on a macOS host.*
 
-The `Makefile` entries run by the above commands will build dependencies for `x86_64-gnu-linux` and `x86_64-w64-mingw32` hosts, respectively. If you would like to compile for a different type of host platform, `cd` into the `contrib/depends` directory, and build with `make HOST=xxx-yyy-zzz` where xxx-yyy-zzz is a <a href="https://wiki.osdev.org/Target_Triplet">standard host triplet</a>.
+The `Makefile` entries run by the above commands will build dependencies for `x86_64-gnu-linux` and `x86_64-w64-mingw32`, and `x86_64-apple-darwin11` hosts, respectively. If you would like to compile for a different type of host platform, `cd` into the `contrib/depends` directory, and build with `make HOST=xxx-yyy-zzz` where xxx-yyy-zzz is a <a href="https://wiki.osdev.org/Target_Triplet">standard host triplet</a>.
 
 
 *Note that we do not officially support builds for 32-bit architecture, arm architecture, or the freebsd linux distribution currently. However, there are options within the [Makefile](Makefile) for these configurations.  These entries may require significant modifications to source files, in order to work properly.*
