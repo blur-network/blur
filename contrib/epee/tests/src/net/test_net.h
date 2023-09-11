@@ -27,7 +27,7 @@
 #pragma once
 
 #include <boost/thread.hpp>
-#include <boost/bind.hpp> 
+#include <boost/bind/bind.hpp>
 
 #include "net/levin_server_cp2.h"
 #include "storages/abstract_invoke.h"
